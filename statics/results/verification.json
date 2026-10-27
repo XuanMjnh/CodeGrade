@@ -1,0 +1,156 @@
+{
+  "version": "5.5.2",
+  "verification_date": "2026-10-27",
+  "environment": {
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "java": "Temurin 21.0.13",
+    "maven": "3.9.11",
+    "node": "24.22.1",
+    "python": "3.12.14",
+    "database": "H2 2.3.232 MySQL mode"
+  },
+  "junit": {
+    "vn.codegrade.QuestionRulesTest": {
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "vn.codegrade.SystemIntegrationTest": {
+      "tests": 35,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "vn.codegrade.ProblemNumberMigrationTest": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "vn.codegrade.FairnessExperimentTest": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "vn.codegrade.RoundRankingTest": {
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "frontend": {
+    "passed": 59,
+    "failed": 0,
+    "including_live_client_regressions": 5
+  },
+  "dom": {
+    "kind": "JSDOM interaction over real Spring Boot and configured SQL database, not native visual browser verification",
+    "checks": [
+      "author authenticated through live WebSocket",
+      "five text navigation links, skip link and account Escape",
+      "bookmark exposes pressed state",
+      "live favorites, category counts, top five Elo and header name",
+      "timer above favorites, one top Elo trophy and no connection label",
+      "category chip navigation and header search filter practice",
+      "public problem ID is displayed and searchable",
+      "five initial tests",
+      "all-or-nothing preserves mark",
+      "add three keeps ordering",
+      "custom sections toggle",
+      "export JSON keeps metadata and newline",
+      "server save load roundtrip",
+      "empty difficulty rejected",
+      "two simultaneous clients synchronize room config",
+      "six readable difficulty labels toggle through their full label and remain locked for other players",
+      "English interface renders and authenticates",
+      "sortable headers and clean problem metadata",
+      "light CodeMirror editor and light banner semantic surfaces",
+      "syntax editor, source import and separate judging history",
+      "submission summaries, podium, empty contest schedule and profile panels in English",
+      "contest creation, contextual schedule and countdown detail",
+      "admin overview and announcement composer"
+    ],
+    "passed": 23,
+    "errors": []
+  },
+  "receipt_tests": {
+    "passed": 3,
+    "failed": 0
+  },
+  "dataset": {
+    "kind": "Local trusted reference verification; not Docker/MySQL end-to-end",
+    "problems": 120,
+    "cases": 2394,
+    "cpp_standard_case_runs": 7182,
+    "standalone_cpp11": 120,
+    "ubsan_case_runs": 2394,
+    "independent_brute_checks": 750,
+    "rejected_constant_mutants": 240,
+    "levels": {
+      "1": 36,
+      "2": 37,
+      "3": 26,
+      "4": 14,
+      "5": 6,
+      "6": 1
+    },
+    "categories": {
+      "arithmetic": 20,
+      "arrays": 20,
+      "strings": 20,
+      "numbertheory": 20,
+      "sequences": 20,
+      "graphs": 20
+    },
+    "dataset_sha256": "0a16cbbe14e0ddc03867a2bdce409ba4e242410fe75a8ff2fda7b089a6f3146f",
+    "elapsed_seconds": 88.71
+  },
+  "fairness": {
+    "kind": "seeded simulation using the production Java ranking function; not network latency",
+    "seed": 20261024,
+    "trials": 10000,
+    "players": 10,
+    "survivors": 7,
+    "receiptWindowMs": [
+      1000,
+      119000
+    ],
+    "workerDelayMs": [
+      0,
+      60000
+    ],
+    "baselineCutoffDisagreements": 6151,
+    "proposedCutoffDisagreements": 0,
+    "onTimeJobsCompletingAfterDeadline": 24650,
+    "elapsedMs": 246.781846
+  },
+  "network": {
+    "kind": "measured localhost WebSocket PING RTT, not judge throughput",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "python": "3.12.14",
+    "timestamp_utc": "2026-10-26T17:38:57Z"
+  },
+  "packaged_jar": {
+    "file": "codegrade-network-5.5.2.jar",
+    "booted": true,
+    "demo_seed": true,
+    "real_websocket_dom_checks": 23,
+    "expected_production_database": "MySQL 8.4",
+    "sha256": "8e8f53340dc5e3678baa0a4a6710555d490100238c525255f2a5c7895ac8b47a",
+    "clean_build": true,
+    "exact_class_resource_matches": 73,
+    "served_assets_match_frontend": true
+  },
+  "pending": [
+    "MySQL 8.4 / Docker / actual sandbox worker end-to-end",
+    "Native browser visual QA",
+    "Group number, member identities, contribution details and Compilatio result"
+  ],
+  "report": {
+    "pages": 6,
+    "rendered_and_visually_reviewed": true
+  }
+}

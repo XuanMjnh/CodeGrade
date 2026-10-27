@@ -1,0 +1,30 @@
+{
+  "kind": "JSDOM interaction over real Spring Boot and configured SQL database, not native visual browser verification",
+  "checks": [
+    "author authenticated through live WebSocket",
+    "five text navigation links, skip link and account Escape",
+    "bookmark exposes pressed state",
+    "live favorites, category counts, top five Elo and header name",
+    "timer above favorites, one top Elo trophy and no connection label",
+    "category chip navigation and header search filter practice",
+    "public problem ID is displayed and searchable",
+    "five initial tests",
+    "all-or-nothing preserves mark",
+    "add three keeps ordering",
+    "custom sections toggle",
+    "export JSON keeps metadata and newline",
+    "server save load roundtrip",
+    "empty difficulty rejected",
+    "two simultaneous clients synchronize room config",
+    "six readable difficulty labels toggle through their full label and remain locked for other players",
+    "English interface renders and authenticates",
+    "sortable headers and clean problem metadata",
+    "light CodeMirror editor and light banner semantic surfaces",
+    "syntax editor, source import and separate judging history",
+    "submission summaries, podium, empty contest schedule and profile panels in English",
+    "contest creation, contextual schedule and countdown detail",
+    "admin overview and announcement composer"
+  ],
+  "passed": 23,
+  "errors": []
+}

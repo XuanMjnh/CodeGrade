@@ -1,0 +1,54 @@
+{
+  "kind": "real Docker judge smoke results",
+  "results": [
+    {
+      "language": "CPP11",
+      "expected": "AC",
+      "actual": "AC",
+      "elapsed_seconds": 21.368610767000064,
+      "submissionId": "798db055-93ad-4107-b9d6-12327a7cdbe9"
+    },
+    {
+      "language": "CPP17",
+      "expected": "AC",
+      "actual": "AC",
+      "elapsed_seconds": 16.332465703000707,
+      "submissionId": "d6f588c2-55d2-41d1-8a8c-011c350217d6"
+    },
+    {
+      "language": "CPP20",
+      "expected": "AC",
+      "actual": "AC",
+      "elapsed_seconds": 14.691147478000858,
+      "submissionId": "f81de3f5-859f-46e7-b513-26f9a1762196"
+    },
+    {
+      "language": "PY311",
+      "expected": "AC",
+      "actual": "AC",
+      "elapsed_seconds": 9.1288374880005,
+      "submissionId": "0f1688ea-534c-4c99-9d32-13de5e291bf2"
+    },
+    {
+      "language": "PY311",
+      "expected": "WA",
+      "actual": "WA",
+      "elapsed_seconds": 9.647990376999587,
+      "submissionId": "002bb3e8-4b51-42e5-b557-13ec6eb9497f"
+    },
+    {
+      "language": "PY311",
+      "expected": "CE",
+      "actual": "CE",
+      "elapsed_seconds": 9.640371399000287,
+      "submissionId": "a3520c5a-02dd-4bd0-8fa7-02c1cdf559a3"
+    },
+    {
+      "language": "PY311",
+      "expected": "TLE",
+      "actual": "TLE",
+      "elapsed_seconds": 57.5437293039995,
+      "submissionId": "3ae17925-9d44-44b9-a07e-d4432ca6eeb4"
+    }
+  ]
+}

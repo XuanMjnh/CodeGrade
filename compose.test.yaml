@@ -1,0 +1,21 @@
+name: codegrade-verification
+services:
+  frontend-test:
+    build: {context: ., target: frontend-test}
+  backend-test:
+    build: {context: ., target: backend-test}
+    volumes:
+      - maven_test_cache:/root/.m2
+      - ./statics/results:/results
+  tools-test:
+    build: {context: ., target: tools-test}
+    volumes:
+      - ./.env:/workspace/.env:ro
+      - ./statics/results:/results
+    networks: [application]
+networks:
+  application:
+    external: true
+    name: codegrade-network_default
+volumes:
+  maven_test_cache:

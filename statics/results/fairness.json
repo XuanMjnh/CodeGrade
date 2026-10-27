@@ -1,0 +1,6814 @@
+{
+  "kind" : "seeded simulation using the production Java ranking function; not network latency",
+  "seed" : 20261024,
+  "trials" : 10000,
+  "players" : 10,
+  "survivors" : 7,
+  "receiptWindowMs" : [ 1000, 119000 ],
+  "workerDelayMs" : [ 0, 60000 ],
+  "baselineCutoffDisagreements" : 6151,
+  "proposedCutoffDisagreements" : 0,
+  "onTimeJobsCompletingAfterDeadline" : 24650,
+  "elapsedMs" : 246.781846,
+  "first100Trials" : [ {
+    "gold" : [ "p0", "p1", "p2", "p3", "p4", "p5", "p6" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 13121
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 20076
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 20045
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 18447
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 52655
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 78157
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 7802
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 93460
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 99425
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 109738
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p3", "p4", "p6", "p8" ],
+    "proposed" : [ "p0", "p1", "p2", "p3", "p4", "p5", "p6" ],
+    "trial" : 0,
+    "completedAt" : {
+      "p0" : 49726,
+      "p1" : 30121,
+      "p2" : 28053,
+      "p3" : 59969,
+      "p4" : 76290,
+      "p5" : 128580,
+      "p6" : 11272,
+      "p7" : 115720,
+      "p8" : 102589,
+      "p9" : 115971
+    }
+  }, {
+    "gold" : [ "p1", "p2", "p3", "p6", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 90290
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 5346
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 3460
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 53901
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 115981
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 85703
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 41608
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 36392
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 47557
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 38250
+    } ],
+    "baseline" : [ "p1", "p2", "p5", "p6", "p7", "p8", "p9" ],
+    "proposed" : [ "p1", "p2", "p3", "p6", "p7", "p8", "p9" ],
+    "trial" : 1,
+    "completedAt" : {
+      "p0" : 98480,
+      "p1" : 53098,
+      "p2" : 39308,
+      "p3" : 99576,
+      "p4" : 171769,
+      "p5" : 95828,
+      "p6" : 80266,
+      "p7" : 89649,
+      "p8" : 53349,
+      "p9" : 70307
+    }
+  }, {
+    "gold" : [ "p0", "p2", "p4", "p5", "p6", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 19304
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 73745
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 53134
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 79453
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 9419
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 43619
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 31081
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 92001
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 26144
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 37369
+    } ],
+    "baseline" : [ "p0", "p3", "p4", "p5", "p6", "p8", "p9" ],
+    "proposed" : [ "p0", "p2", "p4", "p5", "p6", "p8", "p9" ],
+    "trial" : 2,
+    "completedAt" : {
+      "p0" : 29461,
+      "p1" : 130981,
+      "p2" : 101075,
+      "p3" : 87773,
+      "p4" : 40978,
+      "p5" : 76414,
+      "p6" : 60790,
+      "p7" : 112111,
+      "p8" : 69475,
+      "p9" : 44050
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p3", "p5", "p6", "p7", "p8" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 52992
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 50839
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 108443
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 36957
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 116409
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 44579
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 18571
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 94592
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 11333
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 106157
+    } ],
+    "baseline" : [ "p0", "p1", "p3", "p5", "p6", "p8", "p9" ],
+    "proposed" : [ "p0", "p1", "p3", "p5", "p6", "p7", "p8" ],
+    "trial" : 3,
+    "completedAt" : {
+      "p0" : 78987,
+      "p1" : 96911,
+      "p2" : 143385,
+      "p3" : 51779,
+      "p4" : 137430,
+      "p5" : 47270,
+      "p6" : 75491,
+      "p7" : 126950,
+      "p8" : 48500,
+      "p9" : 119815
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p4", "p5", "p6", "p7", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 28724
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 49799
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 58047
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 101111
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 18212
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 18477
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 44253
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 14998
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 60602
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 14760
+    } ],
+    "baseline" : [ "p0", "p2", "p4", "p5", "p6", "p7", "p9" ],
+    "proposed" : [ "p0", "p1", "p4", "p5", "p6", "p7", "p9" ],
+    "trial" : 4,
+    "completedAt" : {
+      "p0" : 80514,
+      "p1" : 81785,
+      "p2" : 76409,
+      "p3" : 158992,
+      "p4" : 32744,
+      "p5" : 28585,
+      "p6" : 64837,
+      "p7" : 20620,
+      "p8" : 107917,
+      "p9" : 20744
+    }
+  }, {
+    "gold" : [ "p0", "p2", "p3", "p6", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 52343
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 78738
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 37955
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 73049
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 96516
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 101417
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 8361
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 32660
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 63456
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 8159
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p3", "p6", "p7", "p9" ],
+    "proposed" : [ "p0", "p2", "p3", "p6", "p7", "p8", "p9" ],
+    "trial" : 5,
+    "completedAt" : {
+      "p0" : 70470,
+      "p1" : 88140,
+      "p2" : 40581,
+      "p3" : 82090,
+      "p4" : 155334,
+      "p5" : 138863,
+      "p6" : 20341,
+      "p7" : 45005,
+      "p8" : 107655,
+      "p9" : 42798
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p3", "p4", "p6", "p7", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 25195
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 15144
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 61719
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 54497
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 32647
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 100994
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 55945
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 25314
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 86258
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 32161
+    } ],
+    "baseline" : [ "p0", "p1", "p3", "p4", "p6", "p7", "p9" ],
+    "proposed" : [ "p0", "p1", "p3", "p4", "p6", "p7", "p9" ],
+    "trial" : 6,
+    "completedAt" : {
+      "p0" : 61471,
+      "p1" : 39529,
+      "p2" : 114390,
+      "p3" : 101493,
+      "p4" : 84939,
+      "p5" : 125145,
+      "p6" : 111988,
+      "p7" : 81703,
+      "p8" : 125998,
+      "p9" : 84332
+    }
+  }, {
+    "gold" : [ "p0", "p4", "p5", "p6", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 34950
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 97005
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 104436
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 110147
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 25568
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 94825
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 34561
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 34694
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 84231
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 95330
+    } ],
+    "baseline" : [ "p0", "p3", "p4", "p5", "p6", "p7", "p9" ],
+    "proposed" : [ "p0", "p4", "p5", "p6", "p7", "p8", "p9" ],
+    "trial" : 7,
+    "completedAt" : {
+      "p0" : 83595,
+      "p1" : 155274,
+      "p2" : 149968,
+      "p3" : 117352,
+      "p4" : 29336,
+      "p5" : 109913,
+      "p6" : 76791,
+      "p7" : 82118,
+      "p8" : 121889,
+      "p9" : 97997
+    }
+  }, {
+    "gold" : [ "p2", "p3", "p5", "p6", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 92274
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 94916
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 13637
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 42857
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 118416
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 84423
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 28058
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 69065
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 17356
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 66308
+    } ],
+    "baseline" : [ "p0", "p2", "p3", "p6", "p7", "p8", "p9" ],
+    "proposed" : [ "p2", "p3", "p5", "p6", "p7", "p8", "p9" ],
+    "trial" : 8,
+    "completedAt" : {
+      "p0" : 101729,
+      "p1" : 129582,
+      "p2" : 53001,
+      "p3" : 74505,
+      "p4" : 136761,
+      "p5" : 133952,
+      "p6" : 76411,
+      "p7" : 69766,
+      "p8" : 22968,
+      "p9" : 98891
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p3", "p4", "p5", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 92698
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 67263
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 32300
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 39449
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 80008
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 30099
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 101836
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 103709
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 102006
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 91986
+    } ],
+    "baseline" : [ "p1", "p2", "p3", "p4", "p5", "p7", "p9" ],
+    "proposed" : [ "p0", "p1", "p2", "p3", "p4", "p5", "p9" ],
+    "trial" : 9,
+    "completedAt" : {
+      "p0" : 111479,
+      "p1" : 93820,
+      "p2" : 36204,
+      "p3" : 69130,
+      "p4" : 82499,
+      "p5" : 64075,
+      "p6" : 144501,
+      "p7" : 104862,
+      "p8" : 111428,
+      "p9" : 92014
+    }
+  }, {
+    "gold" : [ "p0", "p2", "p3", "p5", "p6", "p7", "p8" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 37217
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 68163
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 39784
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 43463
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 63253
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 12612
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 53385
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 8264
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 1294
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 65248
+    } ],
+    "baseline" : [ "p0", "p2", "p3", "p5", "p6", "p7", "p8" ],
+    "proposed" : [ "p0", "p2", "p3", "p5", "p6", "p7", "p8" ],
+    "trial" : 10,
+    "completedAt" : {
+      "p0" : 71399,
+      "p1" : 87583,
+      "p2" : 60934,
+      "p3" : 57754,
+      "p4" : 84835,
+      "p5" : 24656,
+      "p6" : 76460,
+      "p7" : 33206,
+      "p8" : 57619,
+      "p9" : 105789
+    }
+  }, {
+    "gold" : [ "p0", "p2", "p3", "p4", "p6", "p7", "p8" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 80818
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 113711
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 9948
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 26277
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 1333
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 114691
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 93860
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 40049
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 19798
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 108813
+    } ],
+    "baseline" : [ "p0", "p2", "p3", "p4", "p6", "p7", "p8" ],
+    "proposed" : [ "p0", "p2", "p3", "p4", "p6", "p7", "p8" ],
+    "trial" : 11,
+    "completedAt" : {
+      "p0" : 96798,
+      "p1" : 147372,
+      "p2" : 55107,
+      "p3" : 46101,
+      "p4" : 6243,
+      "p5" : 140948,
+      "p6" : 105028,
+      "p7" : 60770,
+      "p8" : 63696,
+      "p9" : 131223
+    }
+  }, {
+    "gold" : [ "p0", "p2", "p4", "p6", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 12737
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 95549
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 15519
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 104332
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 48893
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 56612
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 17895
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 22161
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 52573
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 10341
+    } ],
+    "baseline" : [ "p0", "p2", "p4", "p6", "p7", "p8", "p9" ],
+    "proposed" : [ "p0", "p2", "p4", "p6", "p7", "p8", "p9" ],
+    "trial" : 12,
+    "completedAt" : {
+      "p0" : 43267,
+      "p1" : 147329,
+      "p2" : 33043,
+      "p3" : 137638,
+      "p4" : 68359,
+      "p5" : 114275,
+      "p6" : 74868,
+      "p7" : 77402,
+      "p8" : 91461,
+      "p9" : 40564
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p3", "p4", "p6", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 77364
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 39902
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 83927
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 32524
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 55560
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 87848
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 47502
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 84047
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 82325
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 51670
+    } ],
+    "baseline" : [ "p1", "p2", "p3", "p4", "p6", "p8", "p9" ],
+    "proposed" : [ "p0", "p1", "p3", "p4", "p6", "p8", "p9" ],
+    "trial" : 13,
+    "completedAt" : {
+      "p0" : 117635,
+      "p1" : 94630,
+      "p2" : 112722,
+      "p3" : 35393,
+      "p4" : 88929,
+      "p5" : 114206,
+      "p6" : 67532,
+      "p7" : 130270,
+      "p8" : 88426,
+      "p9" : 107298
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p3", "p4", "p6", "p8" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 89175
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 22480
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 69737
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 61531
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 22119
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 111759
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 25368
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 102802
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 56016
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 96051
+    } ],
+    "baseline" : [ "p1", "p2", "p3", "p4", "p6", "p8", "p9" ],
+    "proposed" : [ "p0", "p1", "p2", "p3", "p4", "p6", "p8" ],
+    "trial" : 14,
+    "completedAt" : {
+      "p0" : 144268,
+      "p1" : 70705,
+      "p2" : 115489,
+      "p3" : 78278,
+      "p4" : 61990,
+      "p5" : 150253,
+      "p6" : 51859,
+      "p7" : 144212,
+      "p8" : 107897,
+      "p9" : 98608
+    }
+  }, {
+    "gold" : [ "p0", "p2", "p3", "p4", "p5", "p7", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 60773
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 77026
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 43299
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 9193
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 40745
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 52556
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 109870
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 12194
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 113293
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 29873
+    } ],
+    "baseline" : [ "p0", "p2", "p3", "p4", "p5", "p7", "p9" ],
+    "proposed" : [ "p0", "p2", "p3", "p4", "p5", "p7", "p9" ],
+    "trial" : 15,
+    "completedAt" : {
+      "p0" : 100593,
+      "p1" : 129236,
+      "p2" : 78603,
+      "p3" : 27359,
+      "p4" : 50637,
+      "p5" : 95755,
+      "p6" : 109920,
+      "p7" : 21043,
+      "p8" : 156566,
+      "p9" : 41179
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p4", "p5", "p6", "p7", "p8" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 29684
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 61610
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 107697
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 110463
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 18682
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 78290
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 65445
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 21378
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 24629
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 108154
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p4", "p6", "p7", "p8" ],
+    "proposed" : [ "p0", "p1", "p4", "p5", "p6", "p7", "p8" ],
+    "trial" : 16,
+    "completedAt" : {
+      "p0" : 61053,
+      "p1" : 98713,
+      "p2" : 110218,
+      "p3" : 131547,
+      "p4" : 76016,
+      "p5" : 119370,
+      "p6" : 93693,
+      "p7" : 22132,
+      "p8" : 60789,
+      "p9" : 112571
+    }
+  }, {
+    "gold" : [ "p1", "p2", "p3", "p5", "p6", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 87934
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 39371
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 10510
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 37212
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 111530
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 40814
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 61915
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 111255
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 37833
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 70973
+    } ],
+    "baseline" : [ "p1", "p2", "p3", "p5", "p6", "p8", "p9" ],
+    "proposed" : [ "p1", "p2", "p3", "p5", "p6", "p8", "p9" ],
+    "trial" : 17,
+    "completedAt" : {
+      "p0" : 103764,
+      "p1" : 71273,
+      "p2" : 12633,
+      "p3" : 58914,
+      "p4" : 112291,
+      "p5" : 42167,
+      "p6" : 92133,
+      "p7" : 163323,
+      "p8" : 69085,
+      "p9" : 89103
+    }
+  }, {
+    "gold" : [ "p1", "p2", "p4", "p6", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 95882
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 23397
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 61045
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 105795
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 57450
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 104347
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 67114
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 68806
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 25248
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 69907
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p6", "p7", "p8", "p9" ],
+    "proposed" : [ "p1", "p2", "p4", "p6", "p7", "p8", "p9" ],
+    "trial" : 18,
+    "completedAt" : {
+      "p0" : 114873,
+      "p1" : 54647,
+      "p2" : 106568,
+      "p3" : 157412,
+      "p4" : 115087,
+      "p5" : 144587,
+      "p6" : 106210,
+      "p7" : 77363,
+      "p8" : 36873,
+      "p9" : 74904
+    }
+  }, {
+    "gold" : [ "p1", "p2", "p3", "p4", "p5", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 107355
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 31092
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 25100
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 28794
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 35581
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 35837
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 103088
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 90949
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 41464
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 65691
+    } ],
+    "baseline" : [ "p1", "p2", "p3", "p4", "p5", "p8", "p9" ],
+    "proposed" : [ "p1", "p2", "p3", "p4", "p5", "p8", "p9" ],
+    "trial" : 19,
+    "completedAt" : {
+      "p0" : 155238,
+      "p1" : 65797,
+      "p2" : 58216,
+      "p3" : 72582,
+      "p4" : 83103,
+      "p5" : 50620,
+      "p6" : 140410,
+      "p7" : 135912,
+      "p8" : 49533,
+      "p9" : 113301
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p4", "p5", "p6", "p7" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 86091
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 31679
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 14915
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 88485
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 8896
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 19052
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 25701
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 16702
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 115738
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 98813
+    } ],
+    "baseline" : [ "p1", "p2", "p4", "p5", "p6", "p7", "p9" ],
+    "proposed" : [ "p0", "p1", "p2", "p4", "p5", "p6", "p7" ],
+    "trial" : 20,
+    "completedAt" : {
+      "p0" : 137224,
+      "p1" : 46727,
+      "p2" : 26587,
+      "p3" : 120204,
+      "p4" : 22303,
+      "p5" : 50865,
+      "p6" : 84105,
+      "p7" : 64531,
+      "p8" : 171821,
+      "p9" : 106346
+    }
+  }, {
+    "gold" : [ "p1", "p3", "p4", "p5", "p6", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 87806
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 7867
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 79149
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 49524
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 4860
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 3425
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 65144
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 74127
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 23252
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 16806
+    } ],
+    "baseline" : [ "p0", "p1", "p3", "p4", "p5", "p8", "p9" ],
+    "proposed" : [ "p1", "p3", "p4", "p5", "p6", "p8", "p9" ],
+    "trial" : 21,
+    "completedAt" : {
+      "p0" : 94221,
+      "p1" : 32236,
+      "p2" : 118501,
+      "p3" : 89135,
+      "p4" : 48144,
+      "p5" : 58836,
+      "p6" : 107955,
+      "p7" : 118871,
+      "p8" : 36378,
+      "p9" : 38351
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p4", "p5", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 32189
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 70194
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 108721
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 90698
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 40731
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 39673
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 113253
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 41599
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 17222
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 8134
+    } ],
+    "baseline" : [ "p0", "p1", "p4", "p5", "p7", "p8", "p9" ],
+    "proposed" : [ "p0", "p1", "p4", "p5", "p7", "p8", "p9" ],
+    "trial" : 22,
+    "completedAt" : {
+      "p0" : 81800,
+      "p1" : 101361,
+      "p2" : 136001,
+      "p3" : 103095,
+      "p4" : 58877,
+      "p5" : 49341,
+      "p6" : 132560,
+      "p7" : 49329,
+      "p8" : 25667,
+      "p9" : 24005
+    }
+  }, {
+    "gold" : [ "p1", "p3", "p4", "p5", "p6", "p7", "p8" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 116080
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 55750
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 103911
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 63525
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 67173
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 68715
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 59719
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 58707
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 66198
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 78783
+    } ],
+    "baseline" : [ "p1", "p3", "p4", "p6", "p7", "p8", "p9" ],
+    "proposed" : [ "p1", "p3", "p4", "p5", "p6", "p7", "p8" ],
+    "trial" : 23,
+    "completedAt" : {
+      "p0" : 123281,
+      "p1" : 72223,
+      "p2" : 123548,
+      "p3" : 95261,
+      "p4" : 70441,
+      "p5" : 113542,
+      "p6" : 106114,
+      "p7" : 80407,
+      "p8" : 92874,
+      "p9" : 82833
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p3", "p4", "p6", "p7" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 17460
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 6845
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 20181
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 36497
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 62901
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 99205
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 72298
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 70394
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 115068
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 100158
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p3", "p4", "p6", "p7" ],
+    "proposed" : [ "p0", "p1", "p2", "p3", "p4", "p6", "p7" ],
+    "trial" : 24,
+    "completedAt" : {
+      "p0" : 23524,
+      "p1" : 24667,
+      "p2" : 66786,
+      "p3" : 51119,
+      "p4" : 97216,
+      "p5" : 118541,
+      "p6" : 72498,
+      "p7" : 91798,
+      "p8" : 152752,
+      "p9" : 154619
+    }
+  }, {
+    "gold" : [ "p0", "p2", "p3", "p4", "p5", "p6", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 55995
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 98822
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 11782
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 33731
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 3812
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 46063
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 14788
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 70681
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 78071
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 27034
+    } ],
+    "baseline" : [ "p0", "p2", "p3", "p4", "p5", "p6", "p9" ],
+    "proposed" : [ "p0", "p2", "p3", "p4", "p5", "p6", "p9" ],
+    "trial" : 25,
+    "completedAt" : {
+      "p0" : 60887,
+      "p1" : 126489,
+      "p2" : 43916,
+      "p3" : 49193,
+      "p4" : 29355,
+      "p5" : 48349,
+      "p6" : 37356,
+      "p7" : 108187,
+      "p8" : 123480,
+      "p9" : 73907
+    }
+  }, {
+    "gold" : [ "p1", "p2", "p4", "p5", "p6", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 99913
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 18640
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 28682
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 118846
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 28499
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 17810
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 86423
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 115772
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 84618
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 39009
+    } ],
+    "baseline" : [ "p1", "p2", "p4", "p5", "p6", "p8", "p9" ],
+    "proposed" : [ "p1", "p2", "p4", "p5", "p6", "p8", "p9" ],
+    "trial" : 26,
+    "completedAt" : {
+      "p0" : 130663,
+      "p1" : 62869,
+      "p2" : 75490,
+      "p3" : 176991,
+      "p4" : 60863,
+      "p5" : 45967,
+      "p6" : 91958,
+      "p7" : 164804,
+      "p8" : 99918,
+      "p9" : 49042
+    }
+  }, {
+    "gold" : [ "p1", "p2", "p3", "p4", "p6", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 116282
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 24846
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 99034
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 95124
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 68332
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 99360
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 18166
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 111307
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 85494
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 26761
+    } ],
+    "baseline" : [ "p1", "p3", "p4", "p5", "p6", "p8", "p9" ],
+    "proposed" : [ "p1", "p2", "p3", "p4", "p6", "p8", "p9" ],
+    "trial" : 27,
+    "completedAt" : {
+      "p0" : 147986,
+      "p1" : 45987,
+      "p2" : 156083,
+      "p3" : 137810,
+      "p4" : 79322,
+      "p5" : 103732,
+      "p6" : 34585,
+      "p7" : 157279,
+      "p8" : 103313,
+      "p9" : 51093
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p3", "p6", "p7", "p8" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 103641
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 77365
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 10185
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 35552
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 109038
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 109635
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 1244
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 20136
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 68481
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 113422
+    } ],
+    "baseline" : [ "p1", "p2", "p3", "p5", "p6", "p7", "p8" ],
+    "proposed" : [ "p0", "p1", "p2", "p3", "p6", "p7", "p8" ],
+    "trial" : 28,
+    "completedAt" : {
+      "p0" : 160279,
+      "p1" : 92496,
+      "p2" : 17365,
+      "p3" : 72504,
+      "p4" : 146424,
+      "p5" : 132516,
+      "p6" : 3032,
+      "p7" : 63269,
+      "p8" : 91120,
+      "p9" : 135500
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p3", "p4", "p6", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 82356
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 78147
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 96069
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 5391
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 72440
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 92429
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 67937
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 84660
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 77171
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 30451
+    } ],
+    "baseline" : [ "p2", "p3", "p4", "p6", "p7", "p8", "p9" ],
+    "proposed" : [ "p0", "p1", "p3", "p4", "p6", "p8", "p9" ],
+    "trial" : 29,
+    "completedAt" : {
+      "p0" : 134841,
+      "p1" : 137405,
+      "p2" : 123752,
+      "p3" : 53365,
+      "p4" : 108258,
+      "p5" : 133042,
+      "p6" : 96231,
+      "p7" : 118096,
+      "p8" : 102140,
+      "p9" : 51753
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p3", "p4", "p5", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 12161
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 38310
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 60727
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 26943
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 89260
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 40618
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 115113
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 102777
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 94438
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 21835
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p3", "p5", "p8", "p9" ],
+    "proposed" : [ "p0", "p1", "p2", "p3", "p4", "p5", "p9" ],
+    "trial" : 30,
+    "completedAt" : {
+      "p0" : 31248,
+      "p1" : 97368,
+      "p2" : 61532,
+      "p3" : 33799,
+      "p4" : 141428,
+      "p5" : 73592,
+      "p6" : 117515,
+      "p7" : 160700,
+      "p8" : 113916,
+      "p9" : 66253
+    }
+  }, {
+    "gold" : [ "p2", "p4", "p5", "p6", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 101226
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 81751
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 5823
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 100994
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 71374
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 34201
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 19093
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 34576
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 76302
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 74878
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p3", "p5", "p6", "p7" ],
+    "proposed" : [ "p2", "p4", "p5", "p6", "p7", "p8", "p9" ],
+    "trial" : 31,
+    "completedAt" : {
+      "p0" : 109232,
+      "p1" : 91306,
+      "p2" : 42462,
+      "p3" : 101738,
+      "p4" : 112384,
+      "p5" : 64160,
+      "p6" : 62756,
+      "p7" : 69994,
+      "p8" : 111593,
+      "p9" : 129870
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p4", "p6", "p7", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 46314
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 21898
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 5931
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 85793
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 79283
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 82983
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 51163
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 53081
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 92513
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 72895
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p5", "p6", "p7", "p9" ],
+    "proposed" : [ "p0", "p1", "p2", "p4", "p6", "p7", "p9" ],
+    "trial" : 32,
+    "completedAt" : {
+      "p0" : 70381,
+      "p1" : 71262,
+      "p2" : 62704,
+      "p3" : 132724,
+      "p4" : 123215,
+      "p5" : 117388,
+      "p6" : 52875,
+      "p7" : 103607,
+      "p8" : 132902,
+      "p9" : 112391
+    }
+  }, {
+    "gold" : [ "p1", "p2", "p3", "p4", "p5", "p6", "p7" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 91492
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 78777
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 59591
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 74980
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 25076
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 13312
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 51129
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 47213
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 100241
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 89506
+    } ],
+    "baseline" : [ "p1", "p2", "p4", "p5", "p6", "p7", "p9" ],
+    "proposed" : [ "p1", "p2", "p3", "p4", "p5", "p6", "p7" ],
+    "trial" : 33,
+    "completedAt" : {
+      "p0" : 142255,
+      "p1" : 80306,
+      "p2" : 85296,
+      "p3" : 133869,
+      "p4" : 27592,
+      "p5" : 21400,
+      "p6" : 75433,
+      "p7" : 103369,
+      "p8" : 148648,
+      "p9" : 119845
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p3", "p4", "p5", "p7" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 76346
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 65207
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 58960
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 29890
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 53602
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 58733
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 79034
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 37788
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 109090
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 92275
+    } ],
+    "baseline" : [ "p1", "p2", "p3", "p4", "p5", "p6", "p7" ],
+    "proposed" : [ "p0", "p1", "p2", "p3", "p4", "p5", "p7" ],
+    "trial" : 34,
+    "completedAt" : {
+      "p0" : 111965,
+      "p1" : 71597,
+      "p2" : 106181,
+      "p3" : 52903,
+      "p4" : 67870,
+      "p5" : 99543,
+      "p6" : 84981,
+      "p7" : 62816,
+      "p8" : 144028,
+      "p9" : 142114
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p4", "p5", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 42275
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 15275
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 14260
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 67208
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 47431
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 23763
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 106842
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 74821
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 24336
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 21075
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p4", "p5", "p8", "p9" ],
+    "proposed" : [ "p0", "p1", "p2", "p4", "p5", "p8", "p9" ],
+    "trial" : 35,
+    "completedAt" : {
+      "p0" : 75549,
+      "p1" : 24766,
+      "p2" : 38958,
+      "p3" : 76330,
+      "p4" : 63215,
+      "p5" : 71827,
+      "p6" : 111378,
+      "p7" : 82371,
+      "p8" : 51893,
+      "p9" : 21990
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p4", "p5", "p7", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 100739
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 63894
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 80180
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 104356
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 103115
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 39867
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 109255
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 12467
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 107664
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 85580
+    } ],
+    "baseline" : [ "p1", "p2", "p3", "p5", "p6", "p7", "p9" ],
+    "proposed" : [ "p0", "p1", "p2", "p4", "p5", "p7", "p9" ],
+    "trial" : 36,
+    "completedAt" : {
+      "p0" : 153262,
+      "p1" : 87133,
+      "p2" : 108786,
+      "p3" : 136199,
+      "p4" : 142829,
+      "p5" : 70782,
+      "p6" : 125694,
+      "p7" : 25650,
+      "p8" : 137780,
+      "p9" : 92958
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p4", "p5", "p6", "p7" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 56584
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 28013
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 48612
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 64782
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 20509
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 17308
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 56966
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 52603
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 83296
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 83446
+    } ],
+    "baseline" : [ "p1", "p2", "p3", "p4", "p5", "p6", "p7" ],
+    "proposed" : [ "p0", "p1", "p2", "p4", "p5", "p6", "p7" ],
+    "trial" : 37,
+    "completedAt" : {
+      "p0" : 96646,
+      "p1" : 40085,
+      "p2" : 53631,
+      "p3" : 72495,
+      "p4" : 36109,
+      "p5" : 18307,
+      "p6" : 65957,
+      "p7" : 65756,
+      "p8" : 124974,
+      "p9" : 115233
+    }
+  }, {
+    "gold" : [ "p1", "p3", "p4", "p5", "p6", "p7", "p8" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 98899
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 49884
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 91110
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 2257
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 37131
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 42588
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 19221
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 4740
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 13045
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 115800
+    } ],
+    "baseline" : [ "p1", "p3", "p4", "p5", "p6", "p7", "p8" ],
+    "proposed" : [ "p1", "p3", "p4", "p5", "p6", "p7", "p8" ],
+    "trial" : 38,
+    "completedAt" : {
+      "p0" : 116584,
+      "p1" : 87308,
+      "p2" : 134641,
+      "p3" : 36454,
+      "p4" : 79889,
+      "p5" : 83451,
+      "p6" : 29774,
+      "p7" : 49088,
+      "p8" : 45418,
+      "p9" : 117604
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p3", "p5", "p6", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 6155
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 16268
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 61712
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 40306
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 97360
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 41790
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 8232
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 98086
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 101957
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 93097
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p3", "p5", "p6", "p8" ],
+    "proposed" : [ "p0", "p1", "p2", "p3", "p5", "p6", "p9" ],
+    "trial" : 39,
+    "completedAt" : {
+      "p0" : 44302,
+      "p1" : 17865,
+      "p2" : 115096,
+      "p3" : 99557,
+      "p4" : 129527,
+      "p5" : 58238,
+      "p6" : 58683,
+      "p7" : 141967,
+      "p8" : 112729,
+      "p9" : 151467
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p4", "p6", "p7", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 98877
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 78653
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 44464
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 106299
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 40142
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 105748
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 3351
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 40464
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 105115
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 8703
+    } ],
+    "baseline" : [ "p1", "p2", "p4", "p5", "p6", "p7", "p9" ],
+    "proposed" : [ "p0", "p1", "p2", "p4", "p6", "p7", "p9" ],
+    "trial" : 40,
+    "completedAt" : {
+      "p0" : 148494,
+      "p1" : 90434,
+      "p2" : 82099,
+      "p3" : 116120,
+      "p4" : 45586,
+      "p5" : 111171,
+      "p6" : 50653,
+      "p7" : 99515,
+      "p8" : 137799,
+      "p9" : 31675
+    }
+  }, {
+    "gold" : [ "p2", "p3", "p5", "p6", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 79436
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 93159
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 49525
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 14959
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 56369
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 39023
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 52574
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 19939
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 24678
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 19107
+    } ],
+    "baseline" : [ "p2", "p3", "p4", "p5", "p7", "p8", "p9" ],
+    "proposed" : [ "p2", "p3", "p5", "p6", "p7", "p8", "p9" ],
+    "trial" : 41,
+    "completedAt" : {
+      "p0" : 120969,
+      "p1" : 104061,
+      "p2" : 55624,
+      "p3" : 57066,
+      "p4" : 66799,
+      "p5" : 93694,
+      "p6" : 96752,
+      "p7" : 23144,
+      "p8" : 26646,
+      "p9" : 24453
+    }
+  }, {
+    "gold" : [ "p2", "p3", "p4", "p5", "p6", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 110752
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 113959
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 34580
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 82496
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 28198
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 52438
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 100910
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 108666
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 13451
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 30399
+    } ],
+    "baseline" : [ "p2", "p3", "p4", "p5", "p6", "p8", "p9" ],
+    "proposed" : [ "p2", "p3", "p4", "p5", "p6", "p8", "p9" ],
+    "trial" : 42,
+    "completedAt" : {
+      "p0" : 150514,
+      "p1" : 126467,
+      "p2" : 60550,
+      "p3" : 84746,
+      "p4" : 64821,
+      "p5" : 69779,
+      "p6" : 109583,
+      "p7" : 129247,
+      "p8" : 57749,
+      "p9" : 56615
+    }
+  }, {
+    "gold" : [ "p0", "p3", "p4", "p5", "p6", "p7", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 74433
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 83973
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 113851
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 32641
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 21365
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 45948
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 31704
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 27484
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 84670
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 40758
+    } ],
+    "baseline" : [ "p3", "p4", "p5", "p6", "p7", "p8", "p9" ],
+    "proposed" : [ "p0", "p3", "p4", "p5", "p6", "p7", "p9" ],
+    "trial" : 43,
+    "completedAt" : {
+      "p0" : 109803,
+      "p1" : 125841,
+      "p2" : 137267,
+      "p3" : 84977,
+      "p4" : 38225,
+      "p5" : 53892,
+      "p6" : 69040,
+      "p7" : 75756,
+      "p8" : 98906,
+      "p9" : 72113
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p3", "p5", "p6", "p8" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 56169
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 29682
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 77128
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 46781
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 88206
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 47822
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 37706
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 110890
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 34475
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 79051
+    } ],
+    "baseline" : [ "p0", "p1", "p3", "p4", "p5", "p6", "p8" ],
+    "proposed" : [ "p0", "p1", "p2", "p3", "p5", "p6", "p8" ],
+    "trial" : 44,
+    "completedAt" : {
+      "p0" : 64436,
+      "p1" : 50671,
+      "p2" : 114401,
+      "p3" : 54007,
+      "p4" : 102480,
+      "p5" : 68391,
+      "p6" : 65597,
+      "p7" : 117945,
+      "p8" : 77095,
+      "p9" : 131407
+    }
+  }, {
+    "gold" : [ "p0", "p2", "p4", "p5", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 56388
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 107828
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 23068
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 118233
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 57801
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 75427
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 112479
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 48795
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 73243
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 3333
+    } ],
+    "baseline" : [ "p0", "p2", "p4", "p5", "p7", "p8", "p9" ],
+    "proposed" : [ "p0", "p2", "p4", "p5", "p7", "p8", "p9" ],
+    "trial" : 45,
+    "completedAt" : {
+      "p0" : 56906,
+      "p1" : 119776,
+      "p2" : 45096,
+      "p3" : 172459,
+      "p4" : 74798,
+      "p5" : 117886,
+      "p6" : 155450,
+      "p7" : 83686,
+      "p8" : 119706,
+      "p9" : 26180
+    }
+  }, {
+    "gold" : [ "p1", "p2", "p3", "p5", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 115535
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 91521
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 29750
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 69684
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 115663
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 53777
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 112612
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 105038
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 104049
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 29177
+    } ],
+    "baseline" : [ "p1", "p2", "p3", "p5", "p7", "p8", "p9" ],
+    "proposed" : [ "p1", "p2", "p3", "p5", "p7", "p8", "p9" ],
+    "trial" : 46,
+    "completedAt" : {
+      "p0" : 175167,
+      "p1" : 108286,
+      "p2" : 76524,
+      "p3" : 91781,
+      "p4" : 144741,
+      "p5" : 76293,
+      "p6" : 143338,
+      "p7" : 126153,
+      "p8" : 113480,
+      "p9" : 65513
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p4", "p5", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 32843
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 77085
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 86196
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 107008
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 53315
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 57357
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 81188
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 7246
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 33307
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 57647
+    } ],
+    "baseline" : [ "p0", "p2", "p4", "p5", "p7", "p8", "p9" ],
+    "proposed" : [ "p0", "p1", "p4", "p5", "p7", "p8", "p9" ],
+    "trial" : 47,
+    "completedAt" : {
+      "p0" : 56749,
+      "p1" : 112090,
+      "p2" : 93639,
+      "p3" : 132012,
+      "p4" : 79865,
+      "p5" : 82982,
+      "p6" : 123679,
+      "p7" : 30841,
+      "p8" : 91915,
+      "p9" : 89565
+    }
+  }, {
+    "gold" : [ "p1", "p4", "p5", "p6", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 89618
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 52844
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 98904
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 102334
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 25614
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 81242
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 70563
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 6791
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 43602
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 8291
+    } ],
+    "baseline" : [ "p1", "p2", "p4", "p6", "p7", "p8", "p9" ],
+    "proposed" : [ "p1", "p4", "p5", "p6", "p7", "p8", "p9" ],
+    "trial" : 48,
+    "completedAt" : {
+      "p0" : 140355,
+      "p1" : 103236,
+      "p2" : 101178,
+      "p3" : 115559,
+      "p4" : 46507,
+      "p5" : 125076,
+      "p6" : 102562,
+      "p7" : 46233,
+      "p8" : 72203,
+      "p9" : 19469
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p4", "p5", "p6", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 23563
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 6726
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 31946
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 64783
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 21359
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 26713
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 2540
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 93294
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 57662
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 55805
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p4", "p5", "p6", "p9" ],
+    "proposed" : [ "p0", "p1", "p2", "p4", "p5", "p6", "p9" ],
+    "trial" : 49,
+    "completedAt" : {
+      "p0" : 36633,
+      "p1" : 40545,
+      "p2" : 39970,
+      "p3" : 115112,
+      "p4" : 35841,
+      "p5" : 46718,
+      "p6" : 21264,
+      "p7" : 132080,
+      "p8" : 110182,
+      "p9" : 103312
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p3", "p4", "p7", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 26460
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 94900
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 52208
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 30132
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 95095
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 118356
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 105285
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 75355
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 117560
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 89203
+    } ],
+    "baseline" : [ "p0", "p2", "p3", "p4", "p6", "p7", "p9" ],
+    "proposed" : [ "p0", "p1", "p2", "p3", "p4", "p7", "p9" ],
+    "trial" : 50,
+    "completedAt" : {
+      "p0" : 54943,
+      "p1" : 135347,
+      "p2" : 63559,
+      "p3" : 87040,
+      "p4" : 132640,
+      "p5" : 156767,
+      "p6" : 113329,
+      "p7" : 119833,
+      "p8" : 138033,
+      "p9" : 101442
+    }
+  }, {
+    "gold" : [ "p0", "p2", "p3", "p4", "p5", "p7", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 27232
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 103726
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 11323
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 48422
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 65459
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 34474
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 96600
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 77008
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 82312
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 50613
+    } ],
+    "baseline" : [ "p0", "p2", "p3", "p4", "p5", "p8", "p9" ],
+    "proposed" : [ "p0", "p2", "p3", "p4", "p5", "p7", "p9" ],
+    "trial" : 51,
+    "completedAt" : {
+      "p0" : 83182,
+      "p1" : 154489,
+      "p2" : 48301,
+      "p3" : 96804,
+      "p4" : 105161,
+      "p5" : 44007,
+      "p6" : 129989,
+      "p7" : 126866,
+      "p8" : 87862,
+      "p9" : 100487
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p3", "p5", "p6", "p7" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 88307
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 90619
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 24817
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 30113
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 104619
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 17912
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 22873
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 15896
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 107367
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 97660
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p3", "p5", "p6", "p7" ],
+    "proposed" : [ "p0", "p1", "p2", "p3", "p5", "p6", "p7" ],
+    "trial" : 52,
+    "completedAt" : {
+      "p0" : 115907,
+      "p1" : 97843,
+      "p2" : 26520,
+      "p3" : 82414,
+      "p4" : 134167,
+      "p5" : 53804,
+      "p6" : 44219,
+      "p7" : 69243,
+      "p8" : 161689,
+      "p9" : 135566
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p3", "p5", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 74001
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 51931
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 111804
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 93053
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 111279
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 99045
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 103450
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 12963
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 83714
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 78768
+    } ],
+    "baseline" : [ "p0", "p1", "p5", "p6", "p7", "p8", "p9" ],
+    "proposed" : [ "p0", "p1", "p3", "p5", "p7", "p8", "p9" ],
+    "trial" : 53,
+    "completedAt" : {
+      "p0" : 90540,
+      "p1" : 78032,
+      "p2" : 124191,
+      "p3" : 118779,
+      "p4" : 155772,
+      "p5" : 101715,
+      "p6" : 106650,
+      "p7" : 57923,
+      "p8" : 85137,
+      "p9" : 89917
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p3", "p4", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 81643
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 64922
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 76232
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 4928
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 68629
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 91942
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 102557
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 109188
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 80154
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 29577
+    } ],
+    "baseline" : [ "p1", "p2", "p3", "p4", "p6", "p8", "p9" ],
+    "proposed" : [ "p0", "p1", "p2", "p3", "p4", "p8", "p9" ],
+    "trial" : 54,
+    "completedAt" : {
+      "p0" : 127816,
+      "p1" : 116600,
+      "p2" : 94775,
+      "p3" : 61584,
+      "p4" : 100125,
+      "p5" : 146972,
+      "p6" : 111273,
+      "p7" : 146765,
+      "p8" : 104337,
+      "p9" : 85506
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p4", "p5", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 4189
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 43805
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 66852
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 80223
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 63772
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 24388
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 95734
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 33667
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 31162
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 20327
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p5", "p7", "p8", "p9" ],
+    "proposed" : [ "p0", "p1", "p4", "p5", "p7", "p8", "p9" ],
+    "trial" : 55,
+    "completedAt" : {
+      "p0" : 50468,
+      "p1" : 77490,
+      "p2" : 110399,
+      "p3" : 120699,
+      "p4" : 117746,
+      "p5" : 40819,
+      "p6" : 144350,
+      "p7" : 47621,
+      "p8" : 40639,
+      "p9" : 55404
+    }
+  }, {
+    "gold" : [ "p0", "p4", "p5", "p6", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 46800
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 108625
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 82908
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 112387
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 79449
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 78173
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 79882
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 82304
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 46591
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 10840
+    } ],
+    "baseline" : [ "p0", "p1", "p4", "p5", "p7", "p8", "p9" ],
+    "proposed" : [ "p0", "p4", "p5", "p6", "p7", "p8", "p9" ],
+    "trial" : 56,
+    "completedAt" : {
+      "p0" : 56726,
+      "p1" : 125551,
+      "p2" : 127982,
+      "p3" : 153328,
+      "p4" : 83277,
+      "p5" : 116692,
+      "p6" : 128457,
+      "p7" : 109038,
+      "p8" : 79415,
+      "p9" : 32041
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p3", "p5", "p6", "p7", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 15919
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 14426
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 102657
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 23605
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 75124
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 66073
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 70302
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 58587
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 105412
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 55666
+    } ],
+    "baseline" : [ "p0", "p1", "p3", "p4", "p5", "p6", "p9" ],
+    "proposed" : [ "p0", "p1", "p3", "p5", "p6", "p7", "p9" ],
+    "trial" : 57,
+    "completedAt" : {
+      "p0" : 50904,
+      "p1" : 61703,
+      "p2" : 155611,
+      "p3" : 67053,
+      "p4" : 103371,
+      "p5" : 103604,
+      "p6" : 82178,
+      "p7" : 109447,
+      "p8" : 113118,
+      "p9" : 73105
+    }
+  }, {
+    "gold" : [ "p1", "p3", "p5", "p6", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 101679
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 31106
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 104655
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 17278
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 107360
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 22008
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 79049
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 55660
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 45049
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 37096
+    } ],
+    "baseline" : [ "p1", "p3", "p5", "p6", "p7", "p8", "p9" ],
+    "proposed" : [ "p1", "p3", "p5", "p6", "p7", "p8", "p9" ],
+    "trial" : 58,
+    "completedAt" : {
+      "p0" : 116530,
+      "p1" : 60863,
+      "p2" : 113018,
+      "p3" : 37095,
+      "p4" : 139700,
+      "p5" : 62021,
+      "p6" : 110063,
+      "p7" : 67391,
+      "p8" : 103269,
+      "p9" : 72207
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p3", "p5", "p6", "p7", "p8" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 17810
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 53986
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 78817
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 41831
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 100286
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 27086
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 45946
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 37450
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 2451
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 109320
+    } ],
+    "baseline" : [ "p0", "p2", "p3", "p5", "p6", "p7", "p8" ],
+    "proposed" : [ "p0", "p1", "p3", "p5", "p6", "p7", "p8" ],
+    "trial" : 59,
+    "completedAt" : {
+      "p0" : 18807,
+      "p1" : 113409,
+      "p2" : 89717,
+      "p3" : 56252,
+      "p4" : 122611,
+      "p5" : 42307,
+      "p6" : 105423,
+      "p7" : 39877,
+      "p8" : 42174,
+      "p9" : 151649
+    }
+  }, {
+    "gold" : [ "p1", "p2", "p4", "p5", "p6", "p7", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 104174
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 29393
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 58726
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 74066
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 26733
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 64872
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 31026
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 19700
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 86748
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 59616
+    } ],
+    "baseline" : [ "p1", "p2", "p4", "p5", "p6", "p7", "p9" ],
+    "proposed" : [ "p1", "p2", "p4", "p5", "p6", "p7", "p9" ],
+    "trial" : 60,
+    "completedAt" : {
+      "p0" : 112673,
+      "p1" : 58146,
+      "p2" : 79696,
+      "p3" : 122946,
+      "p4" : 26896,
+      "p5" : 91678,
+      "p6" : 60398,
+      "p7" : 47582,
+      "p8" : 131869,
+      "p9" : 104699
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p3", "p5", "p6", "p7", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 4909
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 76055
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 107009
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 38461
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 85958
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 16364
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 47674
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 3832
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 95775
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 75952
+    } ],
+    "baseline" : [ "p0", "p1", "p3", "p5", "p6", "p7", "p9" ],
+    "proposed" : [ "p0", "p1", "p3", "p5", "p6", "p7", "p9" ],
+    "trial" : 61,
+    "completedAt" : {
+      "p0" : 49861,
+      "p1" : 113350,
+      "p2" : 153561,
+      "p3" : 86121,
+      "p4" : 125962,
+      "p5" : 30309,
+      "p6" : 69668,
+      "p7" : 17556,
+      "p8" : 126626,
+      "p9" : 105656
+    }
+  }, {
+    "gold" : [ "p0", "p2", "p4", "p5", "p6", "p7", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 41716
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 117245
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 16733
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 116580
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 54349
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 106688
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 20393
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 71467
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 113571
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 106558
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p3", "p4", "p6", "p7" ],
+    "proposed" : [ "p0", "p2", "p4", "p5", "p6", "p7", "p9" ],
+    "trial" : 62,
+    "completedAt" : {
+      "p0" : 65699,
+      "p1" : 138561,
+      "p2" : 53191,
+      "p3" : 140784,
+      "p4" : 106577,
+      "p5" : 144666,
+      "p6" : 32850,
+      "p7" : 106658,
+      "p8" : 149708,
+      "p9" : 143589
+    }
+  }, {
+    "gold" : [ "p2", "p3", "p4", "p6", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 99541
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 108732
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 37709
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 34816
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 61548
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 110768
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 16603
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 79843
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 14006
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 26091
+    } ],
+    "baseline" : [ "p1", "p2", "p3", "p4", "p6", "p8", "p9" ],
+    "proposed" : [ "p2", "p3", "p4", "p6", "p7", "p8", "p9" ],
+    "trial" : 63,
+    "completedAt" : {
+      "p0" : 116429,
+      "p1" : 112122,
+      "p2" : 62676,
+      "p3" : 93343,
+      "p4" : 80823,
+      "p5" : 157779,
+      "p6" : 37275,
+      "p7" : 122589,
+      "p8" : 35308,
+      "p9" : 33517
+    }
+  }, {
+    "gold" : [ "p1", "p2", "p3", "p4", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 88543
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 19407
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 41771
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 11347
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 24138
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 105334
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 114285
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 73950
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 56225
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 85288
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p3", "p4", "p7", "p9" ],
+    "proposed" : [ "p1", "p2", "p3", "p4", "p7", "p8", "p9" ],
+    "trial" : 64,
+    "completedAt" : {
+      "p0" : 92988,
+      "p1" : 38112,
+      "p2" : 46914,
+      "p3" : 32141,
+      "p4" : 66656,
+      "p5" : 132087,
+      "p6" : 172416,
+      "p7" : 94259,
+      "p8" : 103475,
+      "p9" : 89166
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p3", "p5", "p6", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 28684
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 14276
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 84734
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 51139
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 93255
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 50682
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 32652
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 114053
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 22149
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 70658
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p5", "p6", "p8", "p9" ],
+    "proposed" : [ "p0", "p1", "p3", "p5", "p6", "p8", "p9" ],
+    "trial" : 65,
+    "completedAt" : {
+      "p0" : 72855,
+      "p1" : 70521,
+      "p2" : 96348,
+      "p3" : 103816,
+      "p4" : 127758,
+      "p5" : 100086,
+      "p6" : 50022,
+      "p7" : 172704,
+      "p8" : 59602,
+      "p9" : 78826
+    }
+  }, {
+    "gold" : [ "p2", "p3", "p5", "p6", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 111578
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 81243
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 62938
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 33823
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 94672
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 41091
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 25427
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 50655
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 8139
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 18106
+    } ],
+    "baseline" : [ "p2", "p3", "p5", "p6", "p7", "p8", "p9" ],
+    "proposed" : [ "p2", "p3", "p5", "p6", "p7", "p8", "p9" ],
+    "trial" : 66,
+    "completedAt" : {
+      "p0" : 130451,
+      "p1" : 131234,
+      "p2" : 66553,
+      "p3" : 82985,
+      "p4" : 97392,
+      "p5" : 43728,
+      "p6" : 54268,
+      "p7" : 51017,
+      "p8" : 43516,
+      "p9" : 46675
+    }
+  }, {
+    "gold" : [ "p0", "p2", "p4", "p5", "p6", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 59697
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 91248
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 42025
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 94533
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 44390
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 55153
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 63248
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 96456
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 48400
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 65075
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p4", "p5", "p8", "p9" ],
+    "proposed" : [ "p0", "p2", "p4", "p5", "p6", "p8", "p9" ],
+    "trial" : 67,
+    "completedAt" : {
+      "p0" : 90626,
+      "p1" : 115831,
+      "p2" : 78647,
+      "p3" : 147002,
+      "p4" : 61546,
+      "p5" : 79425,
+      "p6" : 122196,
+      "p7" : 149147,
+      "p8" : 82059,
+      "p9" : 98441
+    }
+  }, {
+    "gold" : [ "p1", "p2", "p4", "p5", "p6", "p7", "p8" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 117720
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 27324
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 37302
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 103159
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 27776
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 11520
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 76657
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 35859
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 24772
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 81380
+    } ],
+    "baseline" : [ "p1", "p2", "p4", "p5", "p6", "p7", "p8" ],
+    "proposed" : [ "p1", "p2", "p4", "p5", "p6", "p7", "p8" ],
+    "trial" : 68,
+    "completedAt" : {
+      "p0" : 158876,
+      "p1" : 52695,
+      "p2" : 73631,
+      "p3" : 125896,
+      "p4" : 35520,
+      "p5" : 23446,
+      "p6" : 108029,
+      "p7" : 50705,
+      "p8" : 41719,
+      "p9" : 115183
+    }
+  }, {
+    "gold" : [ "p1", "p4", "p5", "p6", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 101396
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 28090
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 63618
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 70985
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 2258
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 21201
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 59307
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 23548
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 54291
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 51505
+    } ],
+    "baseline" : [ "p1", "p2", "p4", "p5", "p6", "p7", "p8" ],
+    "proposed" : [ "p1", "p4", "p5", "p6", "p7", "p8", "p9" ],
+    "trial" : 69,
+    "completedAt" : {
+      "p0" : 141197,
+      "p1" : 62749,
+      "p2" : 63990,
+      "p3" : 102823,
+      "p4" : 61894,
+      "p5" : 64809,
+      "p6" : 86662,
+      "p7" : 62538,
+      "p8" : 90299,
+      "p9" : 111349
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p3", "p6", "p7", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 39868
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 5185
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 52666
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 5986
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 105795
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 65535
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 53777
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 53068
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 67915
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 55344
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p3", "p6", "p8", "p9" ],
+    "proposed" : [ "p0", "p1", "p2", "p3", "p6", "p7", "p9" ],
+    "trial" : 70,
+    "completedAt" : {
+      "p0" : 60248,
+      "p1" : 33882,
+      "p2" : 94006,
+      "p3" : 6476,
+      "p4" : 155643,
+      "p5" : 119419,
+      "p6" : 53994,
+      "p7" : 111851,
+      "p8" : 94337,
+      "p9" : 61130
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p4", "p5", "p7", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 98176
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 18588
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 79476
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 116449
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 23623
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 10232
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 111336
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 42253
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 118183
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 90732
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p4", "p5", "p7", "p8" ],
+    "proposed" : [ "p0", "p1", "p2", "p4", "p5", "p7", "p9" ],
+    "trial" : 71,
+    "completedAt" : {
+      "p0" : 104020,
+      "p1" : 66416,
+      "p2" : 137372,
+      "p3" : 150237,
+      "p4" : 57814,
+      "p5" : 60055,
+      "p6" : 146213,
+      "p7" : 58121,
+      "p8" : 121956,
+      "p9" : 142000
+    }
+  }, {
+    "gold" : [ "p0", "p2", "p3", "p4", "p6", "p7", "p8" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 3429
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 79680
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 4126
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 49842
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 62468
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 77863
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 43331
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 60390
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 72908
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 86597
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p3", "p4", "p5", "p6" ],
+    "proposed" : [ "p0", "p2", "p3", "p4", "p6", "p7", "p8" ],
+    "trial" : 72,
+    "completedAt" : {
+      "p0" : 14945,
+      "p1" : 113031,
+      "p2" : 47696,
+      "p3" : 92281,
+      "p4" : 106890,
+      "p5" : 97734,
+      "p6" : 78461,
+      "p7" : 116476,
+      "p8" : 119498,
+      "p9" : 125138
+    }
+  }, {
+    "gold" : [ "p1", "p3", "p4", "p5", "p6", "p7", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 88363
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 37720
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 114236
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 53673
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 50309
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 9048
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 19381
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 61412
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 91017
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 31174
+    } ],
+    "baseline" : [ "p1", "p3", "p4", "p5", "p6", "p7", "p9" ],
+    "proposed" : [ "p1", "p3", "p4", "p5", "p6", "p7", "p9" ],
+    "trial" : 73,
+    "completedAt" : {
+      "p0" : 133190,
+      "p1" : 74269,
+      "p2" : 119660,
+      "p3" : 58978,
+      "p4" : 85639,
+      "p5" : 51896,
+      "p6" : 20107,
+      "p7" : 91230,
+      "p8" : 99478,
+      "p9" : 83835
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p3", "p5", "p6", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 50068
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 85097
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 19056
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 55573
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 117436
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 34178
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 4909
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 107693
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 97024
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 56983
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p3", "p5", "p6", "p9" ],
+    "proposed" : [ "p0", "p1", "p2", "p3", "p5", "p6", "p9" ],
+    "trial" : 74,
+    "completedAt" : {
+      "p0" : 64078,
+      "p1" : 128489,
+      "p2" : 26945,
+      "p3" : 105535,
+      "p4" : 174301,
+      "p5" : 66050,
+      "p6" : 9118,
+      "p7" : 157975,
+      "p8" : 153186,
+      "p9" : 57185
+    }
+  }, {
+    "gold" : [ "p1", "p2", "p4", "p5", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 105901
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 11274
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 32521
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 113048
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 90918
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 46867
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 113277
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 44735
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 60617
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 68676
+    } ],
+    "baseline" : [ "p1", "p2", "p4", "p5", "p7", "p8", "p9" ],
+    "proposed" : [ "p1", "p2", "p4", "p5", "p7", "p8", "p9" ],
+    "trial" : 75,
+    "completedAt" : {
+      "p0" : 154642,
+      "p1" : 16766,
+      "p2" : 38842,
+      "p3" : 171720,
+      "p4" : 136938,
+      "p5" : 85188,
+      "p6" : 150342,
+      "p7" : 53746,
+      "p8" : 99013,
+      "p9" : 88370
+    }
+  }, {
+    "gold" : [ "p0", "p3", "p4", "p5", "p6", "p7", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 70655
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 90557
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 109049
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 77318
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 89294
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 45077
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 65843
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 37960
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 89425
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 49634
+    } ],
+    "baseline" : [ "p0", "p2", "p3", "p5", "p6", "p7", "p9" ],
+    "proposed" : [ "p0", "p3", "p4", "p5", "p6", "p7", "p9" ],
+    "trial" : 76,
+    "completedAt" : {
+      "p0" : 76344,
+      "p1" : 125090,
+      "p2" : 114824,
+      "p3" : 92579,
+      "p4" : 131436,
+      "p5" : 71003,
+      "p6" : 98145,
+      "p7" : 72532,
+      "p8" : 144784,
+      "p9" : 102805
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p4", "p5", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 25633
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 86479
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 82611
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 110656
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 7656
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 8476
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 106528
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 102513
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 65757
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 48061
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p4", "p5", "p8", "p9" ],
+    "proposed" : [ "p0", "p1", "p2", "p4", "p5", "p8", "p9" ],
+    "trial" : 77,
+    "completedAt" : {
+      "p0" : 41660,
+      "p1" : 95390,
+      "p2" : 112228,
+      "p3" : 156324,
+      "p4" : 52175,
+      "p5" : 24324,
+      "p6" : 135245,
+      "p7" : 139747,
+      "p8" : 77527,
+      "p9" : 69792
+    }
+  }, {
+    "gold" : [ "p0", "p2", "p3", "p4", "p6", "p7", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 55483
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 106371
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 87091
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 70504
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 75177
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 117790
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 55992
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 28821
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 110814
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 89231
+    } ],
+    "baseline" : [ "p0", "p1", "p3", "p4", "p6", "p7", "p9" ],
+    "proposed" : [ "p0", "p2", "p3", "p4", "p6", "p7", "p9" ],
+    "trial" : 78,
+    "completedAt" : {
+      "p0" : 74037,
+      "p1" : 136269,
+      "p2" : 137532,
+      "p3" : 86654,
+      "p4" : 133186,
+      "p5" : 166999,
+      "p6" : 77888,
+      "p7" : 59270,
+      "p8" : 153389,
+      "p9" : 113142
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p5", "p6", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 34322
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 15081
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 12963
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 106116
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 107274
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 35971
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 60547
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 98233
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 4020
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 53623
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p5", "p6", "p8", "p9" ],
+    "proposed" : [ "p0", "p1", "p2", "p5", "p6", "p8", "p9" ],
+    "trial" : 79,
+    "completedAt" : {
+      "p0" : 91934,
+      "p1" : 59522,
+      "p2" : 25659,
+      "p3" : 119799,
+      "p4" : 110135,
+      "p5" : 85890,
+      "p6" : 69819,
+      "p7" : 124102,
+      "p8" : 52581,
+      "p9" : 61616
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p4", "p5", "p6", "p7", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 5962
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 6946
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 116180
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 71786
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 7309
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 29777
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 13161
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 35512
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 35957
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 34317
+    } ],
+    "baseline" : [ "p0", "p1", "p4", "p5", "p6", "p7", "p9" ],
+    "proposed" : [ "p0", "p1", "p4", "p5", "p6", "p7", "p9" ],
+    "trial" : 80,
+    "completedAt" : {
+      "p0" : 17637,
+      "p1" : 14188,
+      "p2" : 150295,
+      "p3" : 111350,
+      "p4" : 63893,
+      "p5" : 33091,
+      "p6" : 55388,
+      "p7" : 70680,
+      "p8" : 79326,
+      "p9" : 79200
+    }
+  }, {
+    "gold" : [ "p0", "p2", "p3", "p6", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 23961
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 84370
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 56516
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 23826
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 102237
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 96600
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 6329
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 79025
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 45267
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 26813
+    } ],
+    "baseline" : [ "p0", "p2", "p3", "p6", "p7", "p8", "p9" ],
+    "proposed" : [ "p0", "p2", "p3", "p6", "p7", "p8", "p9" ],
+    "trial" : 81,
+    "completedAt" : {
+      "p0" : 75014,
+      "p1" : 129232,
+      "p2" : 114461,
+      "p3" : 76776,
+      "p4" : 118334,
+      "p5" : 135093,
+      "p6" : 31056,
+      "p7" : 104333,
+      "p8" : 52090,
+      "p9" : 30806
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p3", "p4", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 35642
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 14807
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 102640
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 45935
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 81050
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 108437
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 86539
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 37830
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 52957
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 63664
+    } ],
+    "baseline" : [ "p0", "p1", "p3", "p6", "p7", "p8", "p9" ],
+    "proposed" : [ "p0", "p1", "p3", "p4", "p7", "p8", "p9" ],
+    "trial" : 82,
+    "completedAt" : {
+      "p0" : 89897,
+      "p1" : 32123,
+      "p2" : 147210,
+      "p3" : 85452,
+      "p4" : 134552,
+      "p5" : 157783,
+      "p6" : 87794,
+      "p7" : 46736,
+      "p8" : 102087,
+      "p9" : 94838
+    }
+  }, {
+    "gold" : [ "p1", "p3", "p5", "p6", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 84855
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 31200
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 117484
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 14857
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 70227
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 58524
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 1243
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 64224
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 27440
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 2715
+    } ],
+    "baseline" : [ "p0", "p1", "p3", "p5", "p6", "p8", "p9" ],
+    "proposed" : [ "p1", "p3", "p5", "p6", "p7", "p8", "p9" ],
+    "trial" : 83,
+    "completedAt" : {
+      "p0" : 86573,
+      "p1" : 52219,
+      "p2" : 129796,
+      "p3" : 24058,
+      "p4" : 98806,
+      "p5" : 78365,
+      "p6" : 35642,
+      "p7" : 90784,
+      "p8" : 70361,
+      "p9" : 11114
+    }
+  }, {
+    "gold" : [ "p1", "p2", "p3", "p6", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 88644
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 28760
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 6755
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 15401
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 78123
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 80914
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 53729
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 36975
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 9704
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 28746
+    } ],
+    "baseline" : [ "p1", "p2", "p3", "p6", "p7", "p8", "p9" ],
+    "proposed" : [ "p1", "p2", "p3", "p6", "p7", "p8", "p9" ],
+    "trial" : 84,
+    "completedAt" : {
+      "p0" : 141475,
+      "p1" : 84056,
+      "p2" : 55056,
+      "p3" : 15466,
+      "p4" : 127946,
+      "p5" : 111303,
+      "p6" : 60459,
+      "p7" : 84587,
+      "p8" : 63622,
+      "p9" : 63208
+    }
+  }, {
+    "gold" : [ "p0", "p2", "p3", "p6", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 32693
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 117060
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 33894
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 48768
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 93936
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 86122
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 14999
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 43437
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 15784
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 68835
+    } ],
+    "baseline" : [ "p0", "p2", "p3", "p6", "p7", "p8", "p9" ],
+    "proposed" : [ "p0", "p2", "p3", "p6", "p7", "p8", "p9" ],
+    "trial" : 85,
+    "completedAt" : {
+      "p0" : 39649,
+      "p1" : 128720,
+      "p2" : 36804,
+      "p3" : 63438,
+      "p4" : 135024,
+      "p5" : 125092,
+      "p6" : 28143,
+      "p7" : 75781,
+      "p8" : 38398,
+      "p9" : 96146
+    }
+  }, {
+    "gold" : [ "p0", "p3", "p4", "p5", "p6", "p7", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 31162
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 77278
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 70259
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 51928
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 7997
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 58823
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 41473
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 57926
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 118111
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 17460
+    } ],
+    "baseline" : [ "p0", "p2", "p3", "p4", "p5", "p6", "p9" ],
+    "proposed" : [ "p0", "p3", "p4", "p5", "p6", "p7", "p9" ],
+    "trial" : 86,
+    "completedAt" : {
+      "p0" : 80768,
+      "p1" : 106529,
+      "p2" : 76602,
+      "p3" : 55752,
+      "p4" : 11018,
+      "p5" : 104345,
+      "p6" : 89535,
+      "p7" : 111514,
+      "p8" : 144480,
+      "p9" : 42132
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p3", "p5", "p6", "p7", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 103378
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 31066
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 111429
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 94081
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 115609
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 70192
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 2056
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 91667
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 112237
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 82916
+    } ],
+    "baseline" : [ "p1", "p2", "p3", "p5", "p6", "p7", "p8" ],
+    "proposed" : [ "p0", "p1", "p3", "p5", "p6", "p7", "p9" ],
+    "trial" : 87,
+    "completedAt" : {
+      "p0" : 125052,
+      "p1" : 54168,
+      "p2" : 122422,
+      "p3" : 106387,
+      "p4" : 131227,
+      "p5" : 104080,
+      "p6" : 8245,
+      "p7" : 105643,
+      "p8" : 117098,
+      "p9" : 127243
+    }
+  }, {
+    "gold" : [ "p1", "p2", "p4", "p5", "p6", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 67663
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 26790
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 26337
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 73452
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 55468
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 50041
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 16819
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 83727
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 16266
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 11526
+    } ],
+    "baseline" : [ "p1", "p2", "p4", "p5", "p6", "p8", "p9" ],
+    "proposed" : [ "p1", "p2", "p4", "p5", "p6", "p8", "p9" ],
+    "trial" : 88,
+    "completedAt" : {
+      "p0" : 124006,
+      "p1" : 57015,
+      "p2" : 35498,
+      "p3" : 126764,
+      "p4" : 66332,
+      "p5" : 62875,
+      "p6" : 62776,
+      "p7" : 87345,
+      "p8" : 18935,
+      "p9" : 20299
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p4", "p6", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 15574
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 16258
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 95519
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 103304
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 9737
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 90030
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 77508
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 42058
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 23966
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 8642
+    } ],
+    "baseline" : [ "p0", "p1", "p4", "p6", "p7", "p8", "p9" ],
+    "proposed" : [ "p0", "p1", "p4", "p6", "p7", "p8", "p9" ],
+    "trial" : 89,
+    "completedAt" : {
+      "p0" : 65078,
+      "p1" : 43820,
+      "p2" : 139372,
+      "p3" : 139785,
+      "p4" : 61317,
+      "p5" : 108261,
+      "p6" : 91263,
+      "p7" : 53579,
+      "p8" : 70192,
+      "p9" : 65010
+    }
+  }, {
+    "gold" : [ "p2", "p3", "p5", "p6", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 93809
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 115463
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 37359
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 82521
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 82697
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 30297
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 73939
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 3297
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 45582
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 52513
+    } ],
+    "baseline" : [ "p2", "p3", "p4", "p5", "p7", "p8", "p9" ],
+    "proposed" : [ "p2", "p3", "p5", "p6", "p7", "p8", "p9" ],
+    "trial" : 90,
+    "completedAt" : {
+      "p0" : 115205,
+      "p1" : 155058,
+      "p2" : 82368,
+      "p3" : 110418,
+      "p4" : 94521,
+      "p5" : 41830,
+      "p6" : 128533,
+      "p7" : 15026,
+      "p8" : 104302,
+      "p9" : 76934
+    }
+  }, {
+    "gold" : [ "p0", "p2", "p4", "p5", "p6", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 46134
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 102233
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 5263
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 110325
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 37932
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 31947
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 1081
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 97173
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 30157
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 65655
+    } ],
+    "baseline" : [ "p0", "p2", "p4", "p5", "p6", "p8", "p9" ],
+    "proposed" : [ "p0", "p2", "p4", "p5", "p6", "p8", "p9" ],
+    "trial" : 91,
+    "completedAt" : {
+      "p0" : 48177,
+      "p1" : 155992,
+      "p2" : 18062,
+      "p3" : 169133,
+      "p4" : 84667,
+      "p5" : 78071,
+      "p6" : 6152,
+      "p7" : 136509,
+      "p8" : 39724,
+      "p9" : 67737
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p3", "p6", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 70260
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 63707
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 109135
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 63852
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 106287
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 85403
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 39409
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 70350
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 84908
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 3845
+    } ],
+    "baseline" : [ "p0", "p1", "p3", "p6", "p7", "p8", "p9" ],
+    "proposed" : [ "p0", "p1", "p3", "p6", "p7", "p8", "p9" ],
+    "trial" : 92,
+    "completedAt" : {
+      "p0" : 115331,
+      "p1" : 82043,
+      "p2" : 128779,
+      "p3" : 67328,
+      "p4" : 134639,
+      "p5" : 126032,
+      "p6" : 71563,
+      "p7" : 91536,
+      "p8" : 110198,
+      "p9" : 11716
+    }
+  }, {
+    "gold" : [ "p0", "p3", "p4", "p5", "p6", "p7", "p8" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 59530
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 72444
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 85366
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 27349
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 30478
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 48466
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 72204
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 51045
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 58579
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 79680
+    } ],
+    "baseline" : [ "p0", "p3", "p4", "p5", "p6", "p7", "p8" ],
+    "proposed" : [ "p0", "p3", "p4", "p5", "p6", "p7", "p8" ],
+    "trial" : 93,
+    "completedAt" : {
+      "p0" : 69061,
+      "p1" : 124405,
+      "p2" : 102377,
+      "p3" : 48164,
+      "p4" : 70199,
+      "p5" : 99722,
+      "p6" : 85996,
+      "p7" : 73244,
+      "p8" : 76174,
+      "p9" : 135755
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p3", "p4", "p5", "p6", "p8" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 64508
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 5317
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 65696
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 19663
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 57585
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 37742
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 16645
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 75856
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 3334
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 98685
+    } ],
+    "baseline" : [ "p0", "p1", "p3", "p4", "p5", "p6", "p8" ],
+    "proposed" : [ "p0", "p1", "p3", "p4", "p5", "p6", "p8" ],
+    "trial" : 94,
+    "completedAt" : {
+      "p0" : 68399,
+      "p1" : 14036,
+      "p2" : 111188,
+      "p3" : 54811,
+      "p4" : 82527,
+      "p5" : 67521,
+      "p6" : 58735,
+      "p7" : 92560,
+      "p8" : 46254,
+      "p9" : 150841
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p5", "p6", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 39858
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 10657
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 21769
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 82034
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 90856
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 7905
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 15291
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 61992
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 14970
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 26897
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p5", "p6", "p8", "p9" ],
+    "proposed" : [ "p0", "p1", "p2", "p5", "p6", "p8", "p9" ],
+    "trial" : 95,
+    "completedAt" : {
+      "p0" : 41066,
+      "p1" : 36570,
+      "p2" : 75700,
+      "p3" : 118107,
+      "p4" : 97975,
+      "p5" : 41311,
+      "p6" : 18248,
+      "p7" : 81519,
+      "p8" : 52748,
+      "p9" : 30675
+    }
+  }, {
+    "gold" : [ "p1", "p4", "p5", "p6", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 104281
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 32966
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 102917
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 117807
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 22140
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 77811
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 49047
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 46969
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 32724
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 90321
+    } ],
+    "baseline" : [ "p1", "p2", "p4", "p5", "p6", "p7", "p8" ],
+    "proposed" : [ "p1", "p4", "p5", "p6", "p7", "p8", "p9" ],
+    "trial" : 96,
+    "completedAt" : {
+      "p0" : 149954,
+      "p1" : 52030,
+      "p2" : 122744,
+      "p3" : 137916,
+      "p4" : 22932,
+      "p5" : 129307,
+      "p6" : 61282,
+      "p7" : 91374,
+      "p8" : 70427,
+      "p9" : 138371
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p3", "p5", "p6", "p7", "p8" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 75172
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 36490
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 87472
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 86231
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 118357
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 22663
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 39204
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 46527
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 72247
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 108402
+    } ],
+    "baseline" : [ "p0", "p1", "p3", "p5", "p6", "p7", "p8" ],
+    "proposed" : [ "p0", "p1", "p3", "p5", "p6", "p7", "p8" ],
+    "trial" : 97,
+    "completedAt" : {
+      "p0" : 102640,
+      "p1" : 83904,
+      "p2" : 128981,
+      "p3" : 117101,
+      "p4" : 156473,
+      "p5" : 71306,
+      "p6" : 61553,
+      "p7" : 105261,
+      "p8" : 124363,
+      "p9" : 167150
+    }
+  }, {
+    "gold" : [ "p1", "p2", "p3", "p4", "p7", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 117247
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 44687
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 57072
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 7476
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 26831
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 81896
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 83561
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 21872
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 43798
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 30624
+    } ],
+    "baseline" : [ "p1", "p3", "p4", "p5", "p7", "p8", "p9" ],
+    "proposed" : [ "p1", "p2", "p3", "p4", "p7", "p8", "p9" ],
+    "trial" : 98,
+    "completedAt" : {
+      "p0" : 138667,
+      "p1" : 79741,
+      "p2" : 116128,
+      "p3" : 9166,
+      "p4" : 61558,
+      "p5" : 97237,
+      "p6" : 131973,
+      "p7" : 34355,
+      "p8" : 96696,
+      "p9" : 35180
+    }
+  }, {
+    "gold" : [ "p0", "p1", "p2", "p4", "p5", "p8", "p9" ],
+    "received" : [ {
+      "user" : "p0",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 85994
+    }, {
+      "user" : "p1",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 8301
+    }, {
+      "user" : "p2",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 45966
+    }, {
+      "user" : "p3",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 97846
+    }, {
+      "user" : "p4",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 60504
+    }, {
+      "user" : "p5",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 28946
+    }, {
+      "user" : "p6",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 91134
+    }, {
+      "user" : "p7",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 115564
+    }, {
+      "user" : "p8",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 47978
+    }, {
+      "user" : "p9",
+      "verdict" : "AC",
+      "score" : 100.0,
+      "receivedAt" : 5053
+    } ],
+    "baseline" : [ "p0", "p1", "p2", "p5", "p6", "p8", "p9" ],
+    "proposed" : [ "p0", "p1", "p2", "p4", "p5", "p8", "p9" ],
+    "trial" : 99,
+    "completedAt" : {
+      "p0" : 86225,
+      "p1" : 39096,
+      "p2" : 47453,
+      "p3" : 103837,
+      "p4" : 106557,
+      "p5" : 53741,
+      "p6" : 101318,
+      "p7" : 118558,
+      "p8" : 92906,
+      "p9" : 45528
+    }
+  } ]
+}

@@ -1,0 +1,28 @@
+{
+  "kind": "Local trusted reference verification; not Docker/MySQL end-to-end",
+  "problems": 120,
+  "cases": 2394,
+  "cpp_standard_case_runs": 7182,
+  "standalone_cpp11": 120,
+  "ubsan_case_runs": 2394,
+  "independent_brute_checks": 750,
+  "rejected_constant_mutants": 240,
+  "levels": {
+    "1": 36,
+    "2": 37,
+    "3": 26,
+    "4": 14,
+    "5": 6,
+    "6": 1
+  },
+  "categories": {
+    "arithmetic": 20,
+    "arrays": 20,
+    "strings": 20,
+    "numbertheory": 20,
+    "sequences": 20,
+    "graphs": 20
+  },
+  "dataset_sha256": "0a16cbbe14e0ddc03867a2bdce409ba4e242410fe75a8ff2fda7b089a6f3146f",
+  "elapsed_seconds": 94.02
+}

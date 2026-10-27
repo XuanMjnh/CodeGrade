@@ -1,0 +1,2 @@
+# Optional clients for smoke tests and network measurements.
+websockets==15.0.1

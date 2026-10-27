@@ -1,0 +1,16 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {defaults,createTest,normalize,validate,serialized} from '../src/lib/coderunner.js';
+function valid(){const q=defaults();q.coderunnertype='cpp_program';q.general.questionName='A+B';q.general.questionText='Print sum';q.testcases[0].stdin='2 3\n';q.testcases[0].expected='5\n';return q;}
+test('five stable test ids, default rows and flags',()=>{const q=defaults();assert.equal(q.testcases.length,5);assert.equal(new Set(q.testcases.map(t=>t.id)).size,5);assert.equal(q.answerboxlines,18);assert.equal(q.allornothing,true);assert.deepEqual(q.testcases.map(t=>t.ordering),[10,20,30,40,50]);});
+test('adding three keeps all previous data and order 60,70,80',()=>{const q=valid();q.testcases.push(...[5,6,7].map(createTest));assert.equal(q.testcases.length,8);assert.deepEqual(q.testcases.slice(5).map(t=>t.ordering),[60,70,80]);assert.equal(q.testcases[0].stdin,'2 3\n');});
+test('undefined and invalid rows rejected',()=>{const q=valid();q.coderunnertype='Undefined';assert.ok(validate(q).some(x=>x.includes('Question type')));q.answerboxlines=0;assert.ok(validate(q).some(x=>x.includes('Rows')));});
+test('stdin program accepts absent testcode and empty expected',()=>{const q=valid();q.testcases[0].expected='';assert.deepEqual(validate(q),[]);});
+test('testcode all or none validation',()=>{const q=valid();q.testcases[0].testcode='print(sqr(2))';q.testcases[1].stdin='4\n';assert.ok(validate(q).some(x=>x.includes('Testcode')));});
+test('Examples requires useasexample and selected modes retained',()=>{const q=valid();q.precheck=2;assert.ok(validate(q).length);q.testcases[0].useasexample=true;assert.deepEqual(validate(q),[]);q.precheck=3;q.testcases[0].testtype=2;assert.equal(normalize(JSON.parse(JSON.stringify(q))).testcases[0].testtype,2);});
+test('JSON preserves Unicode, whitespace and all testcase metadata',()=>{const q=valid();Object.assign(q.testcases[0],{testcode:'',stdin:'\tViệt Nam\n\n',expected:'  kết quả\n',extra:'a\nb',display:'HIDE_IF_FAIL',hiderestiffail:true,useasexample:true,mark:2.5,ordering:77,testtype:2});const roundtrip=normalize(JSON.parse(JSON.stringify(serialized(q))));assert.deepEqual(roundtrip.testcases[0],q.testcases[0]);});
+test('all-or-nothing toggle keeps weights',()=>{const q=valid();q.testcases[0].mark=2.5;q.allornothing=false;q.allornothing=true;assert.equal(q.testcases[0].mark,2.5);});
+test('invalid import does not mutate current data',()=>{const q=valid(),before=structuredClone(q);assert.throws(()=>normalize({testcases:null}));assert.deepEqual(q,before);});
+test('empty question, negative mark, duplicate ids and bad display rejected',()=>{const q=valid();q.testcases[0].mark=-1;q.testcases[1].id=q.testcases[0].id;q.testcases[2].display='bad';assert.ok(validate(q).length>=3);const empty=valid();empty.testcases=[];assert.ok(validate(empty).length);});
+test('attachment required cannot exceed capacity',()=>{const q=valid();q.attachments.attachments=1;q.attachments.attachmentsrequired=2;assert.ok(validate(q).some(x=>x.includes('file')));});
+test('Python function fixture automatically selects Python on import',()=>{const raw={...valid(),coderunnertype:'python3'};delete raw.languages;assert.deepEqual(normalize(raw).languages,['PY311']);});
