@@ -179,4 +179,3 @@ PING p95 lần này: 14,362 / 18,084 / 200,664 ms. Đây không phải thông l�
 
 Đóng góp là cách tích hợp admission bền vững, event replay, lease, cutoff, engine ba mode và settlement có unique event key vào ứng dụng học lập trình. Elo, gamification, WebSocket và Docker là kỹ thuật có sẵn, không phải thuật toán mới của nhóm.
 
-Giới hạn: khóa toàn cục là điểm nghẽn mở rộng; chưa chứng minh HA đa server; Docker socket cần môi trường tin cậy; chưa có chống đạo văn/giám sát gian lận đầy đủ; năm testcase không bảo đảm bao phủ mọi lỗi. UI được kiểm tra DOM, chưa kiểm thử bố cục native: khởi chạy Edge tự động bị môi trường chặn. Xung đột AUTHOR cần chủ sở hữu rà soát. Nhóm cần đồng bộ phụ lục v6 vào báo cáo Word và hoàn tất các bước học thuật theo [INSTRUCTION.md](INSTRUCTION.md).
