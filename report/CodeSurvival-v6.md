@@ -4,7 +4,7 @@ Ngày kiểm chứng: 29/10/2026. Đây là phần bổ sung cho báo cáo Word 
 
 ## Abstract
 
-CodeGrade Network được mở rộng thành hệ thống luyện tập và thi đấu lập trình có một engine Survival với Practice, Normal và Ranked. Hệ thống dùng WebSocket cho command/ACK/EVENT, MySQL cho hàng đợi và trạng thái bền vững, Java worker cho chấm bất đồng bộ trong Docker. Normal/Ranked chỉ tạo nhóm năm CODER, có bước xác nhận và ghép Ranked theo độ chênh rating toàn nhóm. EXP phản ánh tiến trình học; Elo riêng phản ánh kết quả cạnh tranh. Settlement theo transaction và unique event key tránh cộng điểm trùng. Bản nâng cấp giữ lịch sử và UUID/mã bài, bổ sung 200 bài, chuẩn hóa ngân hàng 320 bài thành 1.600 testcase. Kết quả gồm 90 test backend, 68 test frontend, 7 kiểm tra DOM/server thật, ba mode chạy qua worker thật, kiểm tra restart và kiểm chứng lời giải tham chiếu.
+CodeGrade Network được mở rộng thành hệ thống luyện tập và thi đấu lập trình có một engine Survival với Practice, Normal và Ranked. Hệ thống dùng WebSocket cho command/ACK/EVENT, MySQL cho hàng đợi và trạng thái bền vững, Java worker cho chấm bất đồng bộ trong Docker. Normal/Ranked chỉ tạo nhóm năm CODER, có bước xác nhận và ghép Ranked theo độ chênh rating toàn nhóm. EXP phản ánh tiến trình học; Elo riêng phản ánh kết quả cạnh tranh. Settlement theo transaction và unique event key tránh cộng điểm trùng. Bản nâng cấp giữ lịch sử và UUID/mã bài, bổ sung 200 bài, chuẩn hóa ngân hàng 320 bài thành 1.600 testcase. Kết quả gồm 91 test backend, 68 test frontend, 7 kiểm tra DOM/server thật, ba mode chạy qua worker thật, kiểm tra restart và kiểm chứng lời giải tham chiếu.
 
 Keywords: WebSocket, matchmaking, online judge, concurrency, idempotency, multiplayer Elo.
 
@@ -63,7 +63,7 @@ Rating trước trận là R. Với mỗi cặp i,j: `E=1/(1+10^((Rj−Ri)/400))
 
 Survival rating tách khỏi Elo Contest. Chỉ FINISHED đủ roster mới cập nhật cả năm trong một transaction; reward key theo match/user và khóa match_results chống double settlement. Đồng hạng dùng S=0.5. Thứ hạng các ngưỡng và K nằm trong backend configuration.
 
-EXP cá nhân chỉ dành AC đầu tiên chưa có solved: mức 1..6 nhận 20/35/50/75/100/150. Không trao lại cho lịch sử giải từ trước khi nâng cấp. Practice Survival +5, giới hạn 30/ngày; Normal/Ranked không hòa nhận 100/80/60/40/20. Đồng hạng chia trung bình các vị trí bị chiếm. EXP không bị trừ khi thua. `Level=1+floor(sqrt(EXP/100))`, huy hiệu/khung chỉ hiển thị, không tạo lợi thế Ranked.
+Luyện tập cá nhân và giao lưu (Survival Practice) không cộng EXP, kể cả AC lần đầu. Normal/Ranked không hòa nhận 100/80/60/40/20 EXP. Đồng hạng nhận EXP theo vị trí thấp nhất mà nhóm hòa chiếm: một người nhất nhận 100, bốn người còn lại hòa nhau nhận 20 mỗi người; hai người cùng hạng 2 nhận 60 mỗi người. Thứ hạng dùng tính Elo vẫn giữ đồng hạng và S=0.5. Chính sách mới áp dụng cho kết quả mới; không tính lại phần thưởng lịch sử. EXP không bị trừ khi thua. `Level=1+floor(sqrt(EXP/100))`, huy hiệu/khung chỉ hiển thị, không tạo lợi thế Ranked.
 
 Ứng dụng gamification ở đây kết hợp phản hồi nhanh qua judge, cột mốc Level, phần thưởng giới hạn và cạnh tranh theo Elo. Không có phép đo trong bản này chứng minh hiệu quả sư phạm hay tăng kết quả học tập; muốn khẳng định điều đó cần nghiên cứu người dùng riêng.
 
@@ -89,12 +89,12 @@ Windows host, Docker Linux VM 12 CPU / 8 GiB; Java 21, MySQL 8.4, Python 3.11, g
 
 | Nhóm | Kết quả thực tế | Nguồn |
 |---|---|---|
-| Backend | 90 test, 0 failure/error/skip | verification-v6.json / Surefire |
+| Backend | 91 test, 0 failure/error/skip | verification-v6.json / Surefire |
 | Frontend | 68 test và Vite build đạt | verification-v6.json |
 | UI/server | 7 hành trình DOM đạt | survival-v6-ui.json |
 | Reference | 1.000 test Python + 1.800 C++ + 125 kiểm tra độc lập | dataset-v6-verification.json |
 | Judge thật | AC CPP11/17/20/PY311; WA,CE,TLE | judge-v6-smoke.json |
-| Ba mode thật | Practice 2, Normal 5, Ranked 5 có forfeit | survival-v6-smoke.json |
+| Ba mode thật | Practice 2 không EXP; Normal/Ranked: 100 + 4×20 EXP | exp-policy-smoke.json |
 | Restart | Session/queue/joinedAt và mã/version giữ nguyên | restart-v6.json |
 | PING | 820 ACK, 1/10/30 kết nối | network-v6.json |
 | Fairness | 10.000 mô phỏng: baseline sai 6.151, proposed sai 0 | fairness-v6.json |

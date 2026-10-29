@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import vn.codegrade.db.Store;
-import java.time.*;
 import java.util.*;
 import static vn.codegrade.db.Store.require;
 
@@ -55,10 +54,6 @@ public class Progression {
         db.sql.update("UPDATE progression SET exp=exp+?,rating=?,ranked_games=ranked_games+? WHERE user_id=?",exp,after,kind.equals("RANKED")?1:0,uid);
         db.event(uid,"progression_changed",get(uid));
     }
-    public void practiceAc(String uid,String pid,int difficulty) {
-        int[] awards={0,20,35,50,75,100,150}; int rating=get(uid).path("rating").asInt();
-        reward(uid,"practice:"+pid,"PRACTICE_AC",awards[difficulty],rating,rating);
-    }
     public void settle(ObjectNode room) {
         if(!room.path("state").asText().equals("FINISHED"))return;
         String rid=room.path("id").asText(),mode=room.path("mode").asText("PRACTICE");
@@ -83,18 +78,14 @@ public class Progression {
         if(mode.equals("RANKED"))deltas=elo(ratings,ranks,k);
         var results=room.putArray("results");
         for(String uid:ids) {
-            int exp;
-            if(mode.equals("PRACTICE")) {
-                long day=Instant.ofEpochMilli(db.now()).atZone(ZoneId.of("Asia/Bangkok")).toLocalDate().atStartOfDay(ZoneId.of("Asia/Bangkok")).toInstant().toEpochMilli();
-                int earned=db.sql.queryForObject("SELECT COALESCE(SUM(exp),0) FROM reward_events WHERE user_id=? AND kind='PRACTICE' AND created_at>=?",Integer.class,uid,day);
-                exp=Math.max(0,Math.min(5,30-earned));
-            } else {
-                int rank=ranks.get(uid),tie=(int)ids.stream().filter(id->ranks.get(id)==rank).count(),sum=0;
-                for(int pos=rank;pos<rank+tie;pos++)sum+=120-20*pos;
-                exp=sum/tie; // Ties split the occupied placement rewards.
+            int exp=0;
+            if(!mode.equals("PRACTICE")) {
+                int rank=ranks.get(uid),tie=(int)ids.stream().filter(id->ranks.get(id)==rank).count();
+                int lowestPlacement=rank+tie-1;
+                exp=120-20*lowestPlacement;
             }
             int before=ratings.get(uid),after=before+deltas.getOrDefault(uid,0);
-            reward(uid,"match:"+rid,mode,exp,before,after);
+            if(!mode.equals("PRACTICE"))reward(uid,"match:"+rid,mode,exp,before,after);
             db.sql.update("INSERT INTO match_results VALUES(?,?,?,?,?,?,?,?)",rid,uid,mode,ranks.get(uid),exp,before,after,db.now());
             results.add(db.obj().put("userId",uid).put("placement",ranks.get(uid)).put("exp",exp).put("ratingBefore",before).put("ratingAfter",after).put("rank",tier(after)));
         }

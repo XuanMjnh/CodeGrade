@@ -538,7 +538,7 @@ class SystemIntegrationTest {
   ObjectNode r=rooms.load(id);assertEquals("COUNTDOWN",r.path("state").asText());
   return nextRound(r);
  }
- @Test void practiceSupportsEverySizeFromTwoToTenWithNoRankChanges() {
+ @Test void practiceSupportsEverySizeFromTwoToTenWithoutExpOrRankChanges() {
   moreCoders(10);for(int i=0;i<6;i++)createProblem(1,true);
   for(int n=2;n<=10;n++) {
    ObjectNode r=(ObjectNode)call(coders.getFirst(),"ROOM_CREATE",data("capacity",n,"name","Practice "+n));
@@ -546,9 +546,10 @@ class SystemIntegrationTest {
    assertEquals(n,r.path("players").size());r=start(r);String rid=r.path("id").asText();
    for(int rounds=0;rounds<6&&!r.path("state").asText().equals("FINISHED");rounds++){everyoneAc(r);r=rooms.load(rid);if(!r.path("state").asText().equals("FINISHED"))r=nextRound(r);}
    assertEquals("FINISHED",r.path("state").asText());assertEquals(n,r.path("results").size());
-   for(int i=0;i<n;i++)assertEquals(1000,progression.get(coders.get(i).id()).path("rating").asInt());
+   for(var result:r.path("results"))assertEquals(0,result.path("exp").asInt());
+   for(int i=0;i<n;i++){assertEquals(1000,progression.get(coders.get(i).id()).path("rating").asInt());assertEquals(0,progression.get(coders.get(i).id()).path("exp").asInt());}
   }
-  assertEquals(30,db.sql.queryForObject("SELECT SUM(exp) FROM reward_events WHERE user_id=? AND kind='PRACTICE'",Integer.class,coders.getFirst().id()));
+  assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM reward_events WHERE kind='PRACTICE'",Integer.class));
  }
  @Test void normalRequiresFiveAndLeavesSixthWaiting() {
   for(int i=0;i<4;i++)assertEquals("WAITING",call(coders.get(i),"MATCH_QUEUE_JOIN",data("mode","NORMAL")).path("state").asText());
@@ -610,18 +611,22 @@ class SystemIntegrationTest {
    ObjectNode r=matched(mode);String rid=r.path("id").asText();
    for(int round=0;round<5&&!r.path("state").asText().equals("FINISHED");round++){everyoneAc(r);r=rooms.load(rid);if(!r.path("state").asText().equals("FINISHED"))r=nextRound(r);}
    assertEquals("FINISHED",r.path("state").asText());assertEquals(5,r.path("results").size());
-   assertEquals(300,db.sql.queryForObject("SELECT SUM(exp) FROM match_results WHERE room_id=?",Integer.class,rid));
+   assertEquals(280,db.sql.queryForObject("SELECT SUM(exp) FROM match_results WHERE room_id=?",Integer.class,rid));
    db.atomic(()->{progression.settle(rooms.load(rid));return null;});
    assertEquals(5,db.sql.queryForObject("SELECT COUNT(*) FROM reward_events WHERE event_key=?",Integer.class,"match:"+rid));
    assertEquals(1200,identity.user(coders.getFirst().id()).elo());
    int rating=progression.get(coders.getFirst().id()).path("rating").asInt();assertEquals(mode.equals("RANKED")?1016:1000,rating);
   }
  }
- @Test void firstIndependentAcAwardsExpButExamplesAndReplayDoNot() {
+ @Test void independentPracticeNeverAwardsExpIncludingFirstAcAndReplay() {
+  progression.get(coders.getFirst().id());db.sql.update("UPDATE progression SET exp=123,rating=1750 WHERE user_id=?",coders.getFirst().id());
   var q=createProblem(6,false);var p=data("problemId",q.path("id").asText(),"source","pass","language","PY311");
-  call(coders.getFirst(),"RUN_EXAMPLES",p);gradeNext(true);assertEquals(0,progression.get(coders.getFirst().id()).path("exp").asInt());
+  call(coders.getFirst(),"RUN_EXAMPLES",p);gradeNext(true);assertEquals(123,progression.get(coders.getFirst().id()).path("exp").asInt());
   String rid=db.id();commands.execute(coders.getFirst(),"SUBMIT",p,rid);gradeNext(true);commands.execute(coders.getFirst(),"SUBMIT",p,rid);
-  call(coders.getFirst(),"SUBMIT",p);gradeNext(true);assertEquals(150,progression.get(coders.getFirst().id()).path("exp").asInt());
+  call(coders.getFirst(),"SUBMIT",p);gradeNext(true);assertEquals(123,progression.get(coders.getFirst().id()).path("exp").asInt());
+  assertEquals(1750,progression.get(coders.getFirst().id()).path("rating").asInt());
+  assertEquals(1,db.sql.queryForObject("SELECT COUNT(*) FROM solved WHERE user_id=? AND problem_id=?",Integer.class,coders.getFirst().id(),q.path("id").asText()));
+  assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM reward_events WHERE user_id=?",Integer.class,coders.getFirst().id()));
  }
  @Test void competitiveSubmissionClearsLegacyDraftAndNeverReturnsProofs() {
   ObjectNode r=start(lobby(2,List.of(1),3));String pid=r.path("current").path("problemId").asText();
@@ -653,13 +658,17 @@ class SystemIntegrationTest {
    assertEquals(c[2],db.sql.queryForObject("SELECT COUNT(*) FROM rooms WHERE state='LOBBY'",Integer.class),Arrays.toString(c));
   }
  }
- @Test void tiesSplitOccupiedRewardsAndCancelledMatchesNeverReward() {
+ @Test void tiesUseLowestOccupiedRewardInBothModesAndCancelledMatchesNeverReward() {
   var ids=coders.subList(0,5).stream().map(User::id).toList();
-  var r=data("id",db.id(),"state","UNRESOLVED","mode","RANKED","participants",ids,"winnerId",ids.getFirst());
-  db.atomic(()->{progression.settle(r);return null;});assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM reward_events",Integer.class));
-  r.put("state","FINISHED");db.atomic(()->{progression.settle(r);return null;});
-  assertEquals(300,db.sql.queryForObject("SELECT SUM(exp) FROM match_results",Integer.class));
-  for(int i=1;i<5;i++){var result=db.one("SELECT * FROM match_results WHERE user_id=?",ids.get(i));assertEquals(2,((Number)result.get("placement")).intValue());assertEquals(50,((Number)result.get("exp")).intValue());assertEquals(996,((Number)result.get("rating_after")).intValue());}
+  for(String mode:List.of("NORMAL","RANKED")) {
+   var r=data("id",db.id(),"state","UNRESOLVED","mode",mode,"participants",ids,"winnerId",ids.getFirst());String rid=r.path("id").asText();
+   db.atomic(()->{progression.settle(r);return null;});assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM match_results WHERE room_id=?",Integer.class,rid));
+   r.put("state","FINISHED");db.atomic(()->{progression.settle(r);progression.settle(r);return null;});
+   assertEquals(180,db.sql.queryForObject("SELECT SUM(exp) FROM match_results WHERE room_id=?",Integer.class,rid));
+   assertEquals(100,((Number)db.one("SELECT exp FROM match_results WHERE room_id=? AND user_id=?",rid,ids.getFirst()).get("exp")).intValue());
+   assertEquals(5,db.sql.queryForObject("SELECT COUNT(*) FROM reward_events WHERE event_key=?",Integer.class,"match:"+rid));
+   for(int i=1;i<5;i++){var result=db.one("SELECT * FROM match_results WHERE room_id=? AND user_id=?",rid,ids.get(i));assertEquals(2,((Number)result.get("placement")).intValue());assertEquals(20,((Number)result.get("exp")).intValue());assertEquals(mode.equals("RANKED")?996:1000,((Number)result.get("rating_after")).intValue());}
+  }
  }
  @Test void multipleConnectionsAndAcceptCancelRaceCannotDuplicateMembership() throws Exception {
   var pool=Executors.newFixedThreadPool(2);
@@ -672,6 +681,17 @@ class SystemIntegrationTest {
    var cancel=pool.submit(()->call(coders.get(4),"MATCH_DECLINE",data()));accept.get();cancel.get();
    assertEquals("CLOSED",rooms.load(rid).path("state").asText());assertEquals(4,db.sql.queryForObject("SELECT COUNT(*) FROM match_queue WHERE state='WAITING'",Integer.class));
   }finally{pool.shutdownNow();}
+ }
+ @Test void placementExpHandlesDistinctMiddleAndBottomTieGroups() {
+  int[][] stages={{5,4,3,2,1},{5,4,4,3,2},{5,4,3,2,2},{5,4,4,3,3}};
+  int[][] awards={{100,80,60,40,20},{100,60,60,40,20},{100,80,60,20,20},{100,60,60,20,20}};
+  var ids=coders.subList(0,5).stream().map(User::id).toList();
+  for(String mode:List.of("NORMAL","RANKED"))for(int scenario=0;scenario<stages.length;scenario++) {
+   var r=data("id",db.id(),"state","FINISHED","mode",mode,"participants",ids,"winnerId",ids.getFirst());
+   var players=r.putArray("players");for(int i=0;i<5;i++)players.add(data("id",ids.get(i),"eliminatedStage",stages[scenario][i]));
+   db.atomic(()->{progression.settle(r);return null;});
+   for(int i=0;i<5;i++)assertEquals(awards[scenario][i],r.path("results").get(i).path("exp").asInt(),mode+" scenario "+scenario+" player "+i);
+  }
  }
  @Test void validationBacklogCannotStarveRealCompetitiveSubmissions() {
   ObjectNode r=start(lobby(2,List.of(1),3));var extra=createProblem(1,false);call(author,"QUESTION_VALIDATE",data("id",extra.path("id").asText()));

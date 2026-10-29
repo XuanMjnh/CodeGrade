@@ -10,7 +10,7 @@ Practice cá nhân, Contest, ngân hàng đề, chấm bài và lịch sử, b�
 
 | Survival | Cách vào | Số người bắt đầu | EXP | Rating Survival |
 |---|---|---:|---|---|
-| PRACTICE — Giao lưu | Host tạo phòng, mời bằng mã | 2–10 | +5/trận; tối đa 30/ngày | Không đổi |
+| PRACTICE — Giao lưu | Host tạo phòng, mời bằng mã | 2–10 | Không cộng | Không đổi |
 | NORMAL — Đấu thường | Server ghép queue | Đúng 5 | Theo thứ hạng | Không đổi |
 | RANKED — Đấu Rank | Server ghép theo rating | Đúng 5 | Theo thứ hạng | Elo năm người |
 
@@ -74,11 +74,11 @@ Bậc Đồng / Bạc / Vàng / Bạch Kim / Kim Cương / Cao Thủ có ngưỡ
 
 | Nguồn EXP | Thưởng |
 |---|---|
-| AC cá nhân đầu tiên, mức 1–6 | 20 / 35 / 50 / 75 / 100 / 150 |
-| Survival Practice | +5, tối đa 30/ngày theo Asia/Bangkok |
+| Luyện tập cá nhân, kể cả AC lần đầu | Không cộng |
+| Survival Practice — Giao lưu | Không cộng |
 | Normal/Ranked, hạng 1–5 không hòa | 100 / 80 / 60 / 40 / 20 |
 
-Đồng hạng chia trung bình EXP các vị trí bị chiếm: hai người hạng 4 nhận 30 mỗi người. Unique event key và khóa `(room_id,user_id)` chống thưởng/settlement trùng. Bài đã có trong solved trước nâng cấp không được farm EXP bằng nộp lại. Chạy thử, trận hủy và UNRESOLVED không thưởng. `Level = 1 + floor(sqrt(EXP/100))`; huy hiệu ở Level 2/5/10, khung silver/gold ở 5/10. Không tạo lợi thế về thời gian, lượt nộp hoặc quyền xem test.
+Người đồng hạng nhận EXP theo vị trí thấp nhất của nhóm hòa. Ví dụ: một người nhất nhận 100 EXP, bốn người còn lại cùng hạng nhận 20 EXP mỗi người; hai người cùng hạng 2 nhận 60 EXP mỗi người, hai người cùng hạng 4 nhận 20 EXP mỗi người. Unique event key và khóa `(room_id,user_id)` chống thưởng/settlement trùng. Luyện tập cá nhân và giao lưu không cộng EXP; chỉ Normal/Ranked thưởng EXP. Quy tắc mới áp dụng cho kết quả mới, không tính lại phần thưởng lịch sử. Chạy thử, trận hủy và UNRESOLVED không thưởng. `Level = 1 + floor(sqrt(EXP/100))`; huy hiệu ở Level 2/5/10, khung silver/gold ở 5/10. Không tạo lợi thế về thời gian, lượt nộp hoặc quyền xem test.
 
 ## Editor thi đấu
 
@@ -156,16 +156,16 @@ Kết quả thực chạy ngày 29/10/2026:
 
 | Kiểm tra | Kết quả | Bằng chứng |
 |---|---|---|
-| Backend | 90/90, không failure/error/skip | [verification-v6.json](statics/results/verification-v6.json) |
+| Backend | 91/91, không failure/error/skip | [verification-v6.json](statics/results/verification-v6.json) |
 | Frontend | 68/68; Vite build đạt | [verification-v6.json](statics/results/verification-v6.json) |
 | UI/server thật | 7 kiểm tra DOM đạt | [survival-v6-ui.json](statics/results/survival-v6-ui.json) |
 | Tham chiếu | 1.000 lượt Python, 1.800 lượt C++, 125 kiểm tra độc lập | [dataset-v6-verification.json](statics/results/dataset-v6-verification.json) |
-| Ba mode thật | Practice 2, Normal 5, Ranked 5 có forfeit | [survival-v6-smoke.json](statics/results/survival-v6-smoke.json) |
+| Ba mode thật | Practice 2 không EXP; Normal/Ranked: 100 + 4×20 EXP | [exp-policy-smoke.json](statics/results/exp-policy-smoke.json) |
 | Docker judge | AC bốn ngôn ngữ; WA/CE/TLE | [judge-v6-smoke.json](statics/results/judge-v6-smoke.json) |
 | Restart thật | Queue/session/joinedAt và UUID/mã/version giữ nguyên | [restart-v6.json](statics/results/restart-v6.json) |
 | Database cũ | Đối chiếu snapshot, verdict, UUID/mã và command sau nâng cấp | [project-upgrade-v6.json](statics/results/project-upgrade-v6.json) |
 | Fairness | 10.000 mô phỏng: baseline sai cutoff 6.151, proposed 0 | [fairness-v6.json](statics/results/fairness-v6.json) |
 | PING RTT | 1/10/30 client, tổng 820 ACK | [network-v6.json](statics/results/network-v6.json) |
 
-PING p95 lần này: 14,362 / 18,084 / 200,664 ms. Đây không phải thông lượng judge hay tải matchmaking. Fairness là mô phỏng, không đo mạng. Baseline frontend đạt 70 test sau cài dependency; một lần backend đạt 65/66 với lỗi nạp resource dataset, bộ cuối 90/90 đạt. Báo cáo v5.5 trong thư mục results giữ như lịch sử, không dùng thay kết quả v6.
+PING p95 lần này: 14,362 / 18,084 / 200,664 ms. Đây không phải thông lượng judge hay tải matchmaking. Fairness là mô phỏng, không đo mạng. Baseline frontend đạt 70 test sau cài dependency; một lần backend đạt 65/66 với lỗi nạp resource dataset, bộ cuối 91/91 đạt. Báo cáo v5.5 trong thư mục results giữ như lịch sử, không dùng thay kết quả v6.
 

@@ -2,7 +2,7 @@
   "version": "6.0.0",
   "date": "2026-10-29",
   "backend": {
-    "tests": 90,
+    "tests": 91,
     "failures": 0,
     "errors": 0,
     "skipped": 0
@@ -11,22 +11,22 @@
     {
       "name": "vn.codegrade.FairnessExperimentTest",
       "tests": 1,
-      "time_seconds": 0.512
+      "time_seconds": 0.473
     },
     {
       "name": "vn.codegrade.ProblemNumberMigrationTest",
       "tests": 1,
-      "time_seconds": 0.896
+      "time_seconds": 0.866
     },
     {
       "name": "vn.codegrade.ProgressionTest",
       "tests": 4,
-      "time_seconds": 0.014
+      "time_seconds": 0.013
     },
     {
       "name": "vn.codegrade.QuestionRulesTest",
       "tests": 11,
-      "time_seconds": 0.37
+      "time_seconds": 0.326
     },
     {
       "name": "vn.codegrade.RoundRankingTest",
@@ -35,8 +35,8 @@
     },
     {
       "name": "vn.codegrade.SystemIntegrationTest",
-      "tests": 66,
-      "time_seconds": 93.075
+      "tests": 67,
+      "time_seconds": 70.642
     }
   ],
   "frontend": {
@@ -52,7 +52,7 @@
   "dataset_sha256": "edb6427a34d5d0a3dbe3d7906fc4a212181ce543faf2f4f239947f764d37033b",
   "reports": [
     "dataset-v6-verification.json",
-    "survival-v6-smoke.json",
+    "exp-policy-smoke.json",
     "survival-v6-ui.json",
     "judge-v6-smoke.json",
     "restart-v6.json",
@@ -62,5 +62,18 @@
   ],
   "dataset_regeneration": "byte-for-byte reproducible",
   "application_url": "http://localhost:8080",
-  "isolated_test_project": "stopped; database volume preserved"
+  "isolated_test_project": "stopped; database volume preserved",
+  "exp_policy": {
+    "independent_practice": 0,
+    "survival_practice": 0,
+    "competitive_ties": "award by lowest occupied placement",
+    "example": [
+      100,
+      20,
+      20,
+      20,
+      20
+    ],
+    "historical_rewards": "preserved"
+  }
 }

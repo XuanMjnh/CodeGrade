@@ -3,7 +3,7 @@
     "statics/architecture.png",
     "statics/architecture.svg"
   ],
-  "count": 388,
+  "count": 389,
   "files": [
     {
       "status": "M",
@@ -1556,6 +1556,10 @@
     {
       "status": "??",
       "path": "statics/results/verification-v6.json"
+    },
+    {
+      "status": "??",
+      "path": "statics/results/exp-policy-smoke.json"
     }
   ]
 }

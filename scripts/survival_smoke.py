@@ -78,7 +78,8 @@ async def main(args):
                 alive={p['id'] for p in r['players'] if p['status']=='ALIVE'}
                 allowed=set(r.get('tiePlayers',alive));submitted.add(r['current']['id'])
                 async def submit(p):
-                    payload=dict(roomId=rid,roundId=r['current']['id'],problemId=pid,source=answer['sampleAnswer'],language=answer['language'])
+                    fail=args.tied_losers and p.uid!=group[0].uid
+                    payload=dict(roomId=rid,roundId=r['current']['id'],problemId=pid,source="raise RuntimeError('EXP policy smoke')\n" if fail else answer['sampleAnswer'],language='PY311' if fail else answer['language'])
                     return await p.call('SUBMIT',payload)
                 await asyncio.gather(*(submit(p) for p in group if p.uid in alive and p.uid in allowed))
             await asyncio.sleep(1)
@@ -104,8 +105,8 @@ async def main(args):
         assert len(eligible)>=4;checks.append('Actual workers validated eligible references')
         group=players[8:10];r=await group[0].call('ROOM_CREATE',dict(mode='PRACTICE',capacity=2,name='V6 smoke practice',selectedDifficulties=[1]))
         rid=r['id'];await group[1].call('ROOM_JOIN',dict(roomId=r['code']));await group[0].call('ROOM_START',dict(roomId=rid))
-        r=await play(group[0],rid,group);assert r['mode']=='PRACTICE';assert all(p['exp']==5 and p['ratingBefore']==p['ratingAfter'] for p in r['results'])
-        results.append(dict(mode='PRACTICE',roomId=rid,players=2,results=r['results']));checks.append('Practice two-player game finished using real judge; +5 EXP and no Elo')
+        r=await play(group[0],rid,group);assert r['mode']=='PRACTICE';assert all(p['exp']==0 and p['ratingBefore']==p['ratingAfter'] for p in r['results'])
+        results.append(dict(mode='PRACTICE',roomId=rid,players=2,results=r['results']));checks.append('Practice two-player game finished using real judge; no EXP or Elo')
         for mode in ['NORMAL','RANKED']:
             group=players[:5]
             for p in group[:4]:assert (await p.call('MATCH_QUEUE_JOIN',dict(mode=mode)))['state']=='WAITING'
@@ -114,17 +115,23 @@ async def main(args):
             for p in group[:4]:await p.call('MATCH_ACCEPT',dict(roomId=rid))
             assert (await snapshot(group[0],rid))['state']=='LOBBY'
             await group[4].call('MATCH_ACCEPT',dict(roomId=rid));assert (await snapshot(group[0],rid))['state']=='COUNTDOWN'
-            r=await play(group[0],rid,group,forfeit=mode=='RANKED')
-            assert len(r['participants'])==5 and sum(p['exp'] for p in r['results'])==300
+            r=await play(group[0],rid,group,forfeit=mode=='RANKED' and not args.tied_losers)
+            assert len(r['participants'])==5
+            for p in r['results']:
+                tied=sum(other['placement']==p['placement'] for other in r['results'])
+                assert p['exp']==120-20*(p['placement']+tied-1)
             if mode=='NORMAL':assert all(p['ratingAfter']==p['ratingBefore'] for p in r['results'])
             else:
                 assert any(p['ratingAfter']!=p['ratingBefore'] for p in r['results'])
-                assert next(p for p in r['results'] if p['userId']==group[-1].uid)['placement']==5
+                if not args.tied_losers:assert next(p for p in r['results'] if p['userId']==group[-1].uid)['placement']==5
+            if args.tied_losers:
+                assert next(p for p in r['results'] if p['userId']==group[0].uid)['exp']==100
+                assert all(p['placement']==2 and p['exp']==20 for p in r['results'] if p['userId']!=group[0].uid)
             for p in group:
                 history=await p.call('MATCH_HISTORY');assert sum(h['room_id']==rid for h in history)==1
             results.append(dict(mode=mode,roomId=rid,players=5,results=r['results']))
-            checks.append(mode+': four cannot start, five confirmations, sixth waits, judge settles once'+(' with retained forfeit' if mode=='RANKED' else ''))
-        # A repeated first AC of standalone practice must produce exactly one EXP reward.
+            checks.append(mode+': four cannot start, five confirmations, sixth waits, judge settles once'+(' with four tied losers receiving 20 EXP each' if args.tied_losers else ' with retained forfeit' if mode=='RANKED' else ''))
+        # Neither first AC nor repeated AC of standalone practice awards EXP.
         q=eligible[0];p=players[6];before=(await p.call('PROGRESSION_GET'))['exp']
         for _ in range(2):
             ack=await p.call('SUBMIT',dict(problemId=q['id'],source=q['answer']['sampleAnswer'],language=q['answer']['language']))
@@ -133,7 +140,7 @@ async def main(args):
                 if status['status'] not in ['QUEUED','RUNNING']:break
                 await asyncio.sleep(1)
             assert status['status']=='AC'
-        assert (await p.call('PROGRESSION_GET'))['exp']-before==20;checks.append('First independent AC adds EXP once, second AC does not duplicate')
+        assert (await p.call('PROGRESSION_GET'))['exp']==before;checks.append('First and repeated independent AC do not award EXP')
         report=dict(kind='Real WebSocket + MySQL 8.4 + Java workers + Docker sandbox',checks=checks,matches=results,elapsed_seconds=round(time.monotonic()-started,2))
         Path(args.output).write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
         print(json.dumps(dict(checks=checks,matches=len(results),elapsed_seconds=report['elapsed_seconds']),ensure_ascii=False,indent=2))
@@ -141,4 +148,4 @@ async def main(args):
         beat.cancel()
         await asyncio.gather(*(p.ws.close() for p in peers),return_exceptions=True)
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--url',default='ws://server:8080/ws');p.add_argument('--env-file',default='.env');p.add_argument('--output',default='statics/results/survival-v6-smoke.json');asyncio.run(main(p.parse_args()))
+    p=argparse.ArgumentParser();p.add_argument('--url',default='ws://server:8080/ws');p.add_argument('--env-file',default='.env');p.add_argument('--tied-losers',action='store_true');p.add_argument('--output',default='statics/results/survival-v6-smoke.json');asyncio.run(main(p.parse_args()))

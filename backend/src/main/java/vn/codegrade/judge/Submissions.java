@@ -15,9 +15,9 @@ import com.google.re2j.Pattern;
 
 @Service
 public class Submissions {
-    private final Store db; private final Catalog catalog; private final Survival survival; private final vn.codegrade.room.Progression progression;
+    private final Store db; private final Catalog catalog; private final Survival survival;
     @Value("${app.max-queue}") int maxQueue;
-    public Submissions(Store db,Catalog catalog,Survival survival,vn.codegrade.room.Progression progression) { this.db=db; this.catalog=catalog; this.survival=survival;this.progression=progression; }
+    public Submissions(Store db,Catalog catalog,Survival survival) { this.db=db; this.catalog=catalog; this.survival=survival; }
     public Object accept(User u,JsonNode p,String requestId,String mode) {
         String pid=p.path("problemId").asText(), source=p.path("source").asText(), lang=p.path("language").asText();
         require(QuestionRules.LANGUAGES.contains(lang),"Ngôn ngữ: CPP11, CPP17, CPP20, PY311");
@@ -238,8 +238,6 @@ public class Submissions {
             db.sql.queryForObject("SELECT COUNT(*) FROM solved WHERE user_id=? AND problem_id=?",Integer.class,s.get("user_id"),s.get("problem_id"))==0;
         if(firstSolve)
             db.sql.update("INSERT INTO solved(user_id,problem_id) VALUES(?,?)",s.get("user_id"),s.get("problem_id"));
-        if(firstSolve&&s.get("room_id")==null&&s.get("contest_id")==null)
-            progression.practiceAc((String)s.get("user_id"),(String)s.get("problem_id"),q.path("difficulty").asInt());
         if("VALIDATE".equals(s.get("mode")) && "AC".equals(verdict)) {
             ObjectNode current=(ObjectNode)catalog.document((String)s.get("problem_id"));
             if(current.path("version").asInt()==q.path("version").asInt()) {
