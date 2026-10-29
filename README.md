@@ -169,13 +169,3 @@ Kết quả thực chạy ngày 29/10/2026:
 
 PING p95 lần này: 14,362 / 18,084 / 200,664 ms. Đây không phải thông lượng judge hay tải matchmaking. Fairness là mô phỏng, không đo mạng. Baseline frontend đạt 70 test sau cài dependency; một lần backend đạt 65/66 với lỗi nạp resource dataset, bộ cuối 90/90 đạt. Báo cáo v5.5 trong thư mục results giữ như lịch sử, không dùng thay kết quả v6.
 
-## Demo và đóng góp
-
-1. Practice cá nhân: AC bài chưa làm, thấy EXP tăng một lần; nộp lại không tăng, reload còn nháp.
-2. Practice Survival: hai CODER tạo/tham gia bằng mã, cấu hình host, bắt đầu và theo dõi judge/kết quả +5 EXP. Thử sức chứa tới 10.
-3. Normal: bốn người còn chờ; người thứ năm vào, cả năm nhận trận rồi đếm ngược. Người thứ sáu tiếp tục chờ. Chỉ tăng EXP.
-4. Ranked: quan sát mốc 10/20/30 nếu rating chưa khớp; nhận đủ năm, xem rating trước/sau. Từ chối trước trận trả người còn lại về queue; forfeit sau bắt đầu vẫn có thứ hạng.
-5. Contest/Survival editor: thử không xóa code, SUBMIT được ACK về starter, reload không phục hồi source cũ; ACK muộn giữ phần code mới.
-
-Đóng góp là cách tích hợp admission bền vững, event replay, lease, cutoff, engine ba mode và settlement có unique event key vào ứng dụng học lập trình. Elo, gamification, WebSocket và Docker là kỹ thuật có sẵn, không phải thuật toán mới của nhóm.
-
