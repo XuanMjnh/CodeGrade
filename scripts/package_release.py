@@ -52,7 +52,7 @@ def main():
         if name not in entries:
             raise ValueError('Missing required file: ' + name)
     entries['README.txt'] = (
-        'CodeGrade Network 5.5.2\n'
+        'CodeGrade Network 6.0.0\n'
         'Start with README.md. Docker builds the application from source.\n'
         'Generate your own .env before starting. No private .env is included.\n'
         'report/ contains the supplied report. Fill all [CAN DIEN] fields before submission.\n'

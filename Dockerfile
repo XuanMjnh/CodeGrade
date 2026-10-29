@@ -13,7 +13,6 @@ COPY --from=client /client/dist ./src/main/resources/static
 RUN --mount=type=cache,target=/root/.m2 mvn -B -DskipTests package
 
 FROM client AS frontend-test
-COPY scripts/verify_certificate.cjs scripts/receipt-verification.test.cjs /checks/
 CMD ["npm","test"]
 
 FROM maven:3.9.11-eclipse-temurin-21 AS backend-test
@@ -34,7 +33,7 @@ CMD ["python","scripts/benchmark_ws.py","--url","ws://server:8080/ws","--output"
 
 FROM eclipse-temurin:21-jre-jammy AS server
 WORKDIR /app
-COPY --from=build /build/target/codegrade-network-5.5.2.jar /app/app.jar
+COPY --from=build /build/target/codegrade-network-6.0.0.jar /app/app.jar
 USER 10001:10001
 EXPOSE 8080
 ENTRYPOINT ["java","-XX:MaxRAMPercentage=70","-jar","/app/app.jar"]
@@ -43,5 +42,5 @@ FROM docker:27-cli AS dockercli
 FROM eclipse-temurin:21-jre-jammy AS worker
 WORKDIR /app
 COPY --from=dockercli /usr/local/bin/docker /usr/local/bin/docker
-COPY --from=build /build/target/codegrade-network-5.5.2.jar /app/app.jar
+COPY --from=build /build/target/codegrade-network-6.0.0.jar /app/app.jar
 ENTRYPOINT ["java","-XX:MaxRAMPercentage=70","-jar","/app/app.jar","--worker"]

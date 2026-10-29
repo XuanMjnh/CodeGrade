@@ -76,6 +76,7 @@ public class Catalog {
             // Running matches keep a stable problem bank.
             for(var room:db.sql.queryForList("SELECT document FROM rooms WHERE state NOT IN ('LOBBY','FINISHED','CLOSED','UNRESOLVED')")) {
                 require(!db.read((String)room.get("document")).path("used").toString().contains(id),"Đề đang dùng trong trận; đợi kết thúc");
+                for(var frozen:db.read((String)room.get("document")).path("bank"))require(!frozen.path("id").asText().equals(id),"Đề nằm trong bank đã khóa; đợi kết thúc trận");
             }
             for(var row:db.sql.queryForList("SELECT document FROM contests")) {
                 var contest=db.read((String)row.get("document"));

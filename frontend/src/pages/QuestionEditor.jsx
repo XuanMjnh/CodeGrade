@@ -2,7 +2,7 @@ import {StatGrid} from '../components/Insights';
 import {t as trUI} from "../lib/locale";
 import React,{useEffect,useState} from 'react';
 import {live} from '../lib/live';
-import {defaults,normalize,validate,serialized,createTest,displayNames,languageNames} from '../lib/coderunner';
+import {defaults,normalize,validate,serialized,displayNames,languageNames} from '../lib/coderunner';
 import {Field,Section,Check,Heading,ErrorBox,Help,go} from '../components/ui';
 
 function at(obj,path){return path.split('.').reduce((v,k)=>v?.[k],obj);}
@@ -40,8 +40,6 @@ export default function QuestionEditor({id,revision,onNotice}){
    setQ(incoming);setDirty(true);setErrors([]);setError(null);
   }catch(err){setError(err);}finally{e.target.value='';}
  }
- function cloneTest(i){const list=[...q.testcases];list.splice(i+1,0,{...list[i],id:crypto.randomUUID(),ordering:Math.max(0,...list.map(t=>t.ordering))+10});update('testcases',list);}
- function deleteTest(i){const t=q.testcases[i];if((t.testcode||t.stdin||t.expected||t.extra)&&!window.confirm(trUI("Xóa test case có dữ liệu này?")))return;update('testcases',q.testcases.filter((_,k)=>k!==i));}
  const selectedHelp=types.find(t=>t.id===q.coderunnertype)?.description||trUI("Chưa chọn loại câu hỏi.");
  return <div className="question-editor">
   
@@ -111,7 +109,7 @@ export default function QuestionEditor({id,revision,onNotice}){
    <Section title="Test cases" open>
     <p className="muted">Whitespace được giữ nguyên. Display chỉ điều khiển hiển thị, mọi test đã chọn vẫn được chấm.</p>
     {q.testcases.map((t,i)=><div className="test-block" key={t.id}>
-     <div className="test-heading"><h3>Test case {i+1}</h3><div><button className="ghost" type="button" onClick={()=>cloneTest(i)}>Nhân bản</button><button className="ghost danger-text" type="button" onClick={()=>deleteTest(i)}>Xóa</button></div></div>
+     <div className="test-heading"><h3>Test case {i+1} / 5</h3></div>
      {['testcode','stdin','expected','extra'].map((key,j)=><Field key={key} label={['Test case '+(i+1),'Standard Input','Expected output','Extra template data'][j]} help={[trUI("Mã harness (bài viết hàm), khác dữ liệu stdin."),trUI("Dữ liệu stdin, có thể rỗng."),trUI("Chuỗi mong đợi; không tự trim. Có thể rỗng."),trUI("Metadata riêng cho template, được lưu nguyên vẹn.")][j]}>{area('testcases.'+i+'.'+key,3)}</Field>)}
      <Field label="Test properties">
       {check('testcases.'+i+'.useasexample','Use as example')}
@@ -121,7 +119,7 @@ export default function QuestionEditor({id,revision,onNotice}){
      </Field>
      {q.precheck===3&&<Field label="Precheck test type">{select('testcases.'+i+'.testtype',[[0,'Check only'],[1,'Precheck only'],[2,'Both']])}</Field>}
     </div>)}
-    <button className="secondary" type="button" onClick={()=>{const max=Math.max(0,...q.testcases.map(t=>t.ordering));update('testcases',[...q.testcases,...Array.from({length:3},(_,i)=>({...createTest(q.testcases.length+i),ordering:max+(i+1)*10}))]);}}>+ Blanks for 3 more choices</button>
+    <p className="muted">Mỗi đề công bố có đúng 5 testcase: ví dụ, cơ bản, biên, đặc biệt và phức tạp.</p>
    </Section>
    <Section title="Support files"><div className="alert">Chỉ khả dụng với bản nháp.</div><pre>{JSON.stringify(q.datafiles,null,2)}</pre></Section>
    <Section title="Attachment options">

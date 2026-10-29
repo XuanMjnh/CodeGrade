@@ -1,0 +1,131 @@
+{
+  "kind": "Real WebSocket + MySQL 8.4 + Java workers + Docker sandbox",
+  "checks": [
+    "MySQL seeded exactly 320 distinct public problems",
+    "Actual workers validated eligible references",
+    "Practice two-player game finished using real judge; +5 EXP and no Elo",
+    "NORMAL: four cannot start, five confirmations, sixth waits, judge settles once",
+    "RANKED: four cannot start, five confirmations, sixth waits, judge settles once with retained forfeit",
+    "First independent AC adds EXP once, second AC does not duplicate"
+  ],
+  "matches": [
+    {
+      "mode": "PRACTICE",
+      "roomId": "0c63d407-3310-4d11-bdc6-cfd9e6d1f7f5",
+      "players": 2,
+      "results": [
+        {
+          "userId": "102eba46-163c-4400-b5b3-2b7002aa6d40",
+          "placement": 1,
+          "exp": 5,
+          "ratingBefore": 1000,
+          "ratingAfter": 1000,
+          "rank": "Đồng"
+        },
+        {
+          "userId": "51522847-04b9-4fb8-90c8-215becc5b263",
+          "placement": 2,
+          "exp": 5,
+          "ratingBefore": 1000,
+          "ratingAfter": 1000,
+          "rank": "Đồng"
+        }
+      ]
+    },
+    {
+      "mode": "NORMAL",
+      "roomId": "4fe910a5-0bf2-4c10-9774-7a62679b0480",
+      "players": 5,
+      "results": [
+        {
+          "userId": "a6f1c07d-4aa5-476a-b4cd-fe2f9b5d2542",
+          "placement": 3,
+          "exp": 60,
+          "ratingBefore": 1000,
+          "ratingAfter": 1000,
+          "rank": "Đồng"
+        },
+        {
+          "userId": "1a4c7200-1af5-4205-bdc2-6f91118154e9",
+          "placement": 1,
+          "exp": 100,
+          "ratingBefore": 1000,
+          "ratingAfter": 1000,
+          "rank": "Đồng"
+        },
+        {
+          "userId": "143b3ad7-960f-4349-be28-72f6180be893",
+          "placement": 2,
+          "exp": 80,
+          "ratingBefore": 1000,
+          "ratingAfter": 1000,
+          "rank": "Đồng"
+        },
+        {
+          "userId": "2b3c0ae8-e249-49e4-a305-29ed0fa6bb5d",
+          "placement": 4,
+          "exp": 30,
+          "ratingBefore": 1000,
+          "ratingAfter": 1000,
+          "rank": "Đồng"
+        },
+        {
+          "userId": "2bfb33af-98a2-4fd8-be85-1a01b3a50846",
+          "placement": 4,
+          "exp": 30,
+          "ratingBefore": 1000,
+          "ratingAfter": 1000,
+          "rank": "Đồng"
+        }
+      ]
+    },
+    {
+      "mode": "RANKED",
+      "roomId": "5fc4602f-a461-4719-8932-99d9bd52c57d",
+      "players": 5,
+      "results": [
+        {
+          "userId": "a6f1c07d-4aa5-476a-b4cd-fe2f9b5d2542",
+          "placement": 3,
+          "exp": 50,
+          "ratingBefore": 1000,
+          "ratingAfter": 996,
+          "rank": "Đồng"
+        },
+        {
+          "userId": "1a4c7200-1af5-4205-bdc2-6f91118154e9",
+          "placement": 2,
+          "exp": 80,
+          "ratingBefore": 1000,
+          "ratingAfter": 1008,
+          "rank": "Đồng"
+        },
+        {
+          "userId": "143b3ad7-960f-4349-be28-72f6180be893",
+          "placement": 3,
+          "exp": 50,
+          "ratingBefore": 1000,
+          "ratingAfter": 996,
+          "rank": "Đồng"
+        },
+        {
+          "userId": "2b3c0ae8-e249-49e4-a305-29ed0fa6bb5d",
+          "placement": 1,
+          "exp": 100,
+          "ratingBefore": 1000,
+          "ratingAfter": 1016,
+          "rank": "Đồng"
+        },
+        {
+          "userId": "2bfb33af-98a2-4fd8-be85-1a01b3a50846",
+          "placement": 5,
+          "exp": 20,
+          "ratingBefore": 1000,
+          "ratingAfter": 984,
+          "rank": "Đồng"
+        }
+      ]
+    }
+  ],
+  "elapsed_seconds": 156.76
+}

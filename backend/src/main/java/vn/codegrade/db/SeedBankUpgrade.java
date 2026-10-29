@@ -28,8 +28,10 @@ public class SeedBankUpgrade {
   for(var target:targets) byKey.put(target.path("general").path("idNumber").asText(),target);
   db.atomic(()->{
    Set<String> pinned=new HashSet<>();
-   for(var row:db.sql.queryForList("SELECT document FROM rooms WHERE state NOT IN ('LOBBY','FINISHED','CLOSED','UNRESOLVED')"))
-    for(var id:db.read((String)row.get("document")).path("used")) pinned.add(id.asText());
+   for(var row:db.sql.queryForList("SELECT document FROM rooms WHERE state NOT IN ('LOBBY','FINISHED','CLOSED','UNRESOLVED')")) {
+    var room=db.read((String)row.get("document"));for(var id:room.path("used")) pinned.add(id.asText());
+    for(var q:room.path("bank"))pinned.add(q.path("id").asText());
+   }
    for(var row:db.sql.queryForList("SELECT document FROM contests")) {
     var c=db.read((String)row.get("document"));
     if(c.path("startsAt").asLong()<=db.now() && db.now()<=c.path("endsAt").asLong())

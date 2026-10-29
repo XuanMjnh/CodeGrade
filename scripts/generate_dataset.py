@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RESOURCE = ROOT / 'backend/src/main/resources'
 MOD = 1000000007
 RNG = random.Random(56120)
-OLD = json.loads((RESOURCE / 'dataset.json').read_text())
+OLD = json.loads((RESOURCE / 'dataset.json').read_text(encoding='utf-8'))
 BASE = OLD[0]
 TITLES = {q['general']['idNumber']: q['general']['questionName'] for q in OLD}
 SPECS = []
@@ -489,32 +489,7 @@ for i,(desc,expr,level,method,time) in enumerate(GD):
     add('Graphs',i,level,desc,'Dòng đầu gồm n, m: 1 ≤ n ≤ 5 000, 0 ≤ m ≤ min(5 000, n(n−1)/2). Tiếp theo là m dòng u v (1 ≤ u,v ≤ n). Đồ thị vô hướng đơn: không có khuyên, không có cạnh trùng. Các đỉnh đánh số từ 1.',output,body+PRINT(expr),lambda s,j=i:graph_results(s)[j],GRAPH_CASES,method,time+', bộ nhớ O(n+m)')
 
 def generate():
-    out=[];index=[]
-    for spec in SPECS:
-        q=copy.deepcopy(BASE)
-        for name in ('id','version','publicId','validatedVersion','sampleValidation','validationNotice'):q.pop(name,None)
-        q.update(difficulty=spec['level'],coderunnertype='cpp_program',survivalEligible=True,allornothing=True)
-        q['general'].update(categoryId=spec['cat'].lower(),questionName=spec['title'],questionText=spec['text'],idNumber=spec['key'],status='ready',defaultMark=100,generalFeedback='')
-        q['answer'].update(sampleAnswer=spec['source'],language='CPP11',preloadAnswer='',validateOnSave=True)
-        q['advancedCustomisation'].update(cputimelimitsecs=3,memlimitmb=256)
-        q['testcases']=[]
-        for k,inp in enumerate(spec['cases']):
-            ans=str(spec['oracle'](inp))+'\n'
-            assert len(inp.encode())<=65536 and len(ans.encode())<=65536,(spec['key'],k,'case exceeds protocol limit')
-            q['testcases'].append(dict(id=f"{spec['key']}-{k}",testcode='',stdin=inp,expected=ans,extra='',useasexample=k==0,display='SHOW' if k==0 else 'HIDE',hiderestiffail=False,mark=1,ordering=(k+1)*10,testtype=0))
-        out.append(q)
-        entry={k:spec[k] for k in ('key','title','level','method','complexity')};entry['tests']=len(q['testcases']);index.append(entry)
-        path=ROOT/'solutions'/spec['cat']/f"{spec['key']}.cpp";path.parent.mkdir(parents=True,exist_ok=True);path.write_text(spec['source'])
-        print(spec['key'],spec['level'],len(q['testcases']),flush=True)
-    assert len(out)==120 and all(sum(q['general']['categoryId']==cat.lower() for q in out)==20 for cat in ('Arithmetic','Arrays','Strings','NumberTheory','Sequences','Graphs'))
-    (RESOURCE/'dataset.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
-    # Existing English localization remains supported; its destination is the audited statement.
-    loc=json.loads((RESOURCE/'dataset-localization.json').read_text());bykey={s['key']:s for s in SPECS}
-    for entry in loc:entry.update(title=bykey[entry['key']]['title'],text=bykey[entry['key']]['text'])
-    (RESOURCE/'dataset-localization.json').write_text(json.dumps(loc,ensure_ascii=False,indent=2)+'\n')
-    (ROOT/'solutions/index.json').write_text(json.dumps(index,ensure_ascii=False,indent=2)+'\n')
-    lines=['# Lời giải tham khảo C++','', '120 chương trình độc lập, dùng C++11; cũng biên dịch bằng C++17 và C++20. Mỗi bài có giới hạn và testcase riêng trong ngân hàng đề. Lời giải và testcase ẩn không được phục vụ qua public API.','', '| Mã tham chiếu | Bài | Mức | Thuật toán | Thời gian và bộ nhớ |','|---|---|---:|---|---|']
-    for s in SPECS:lines.append(f"| [{s['key']}]({s['cat']}/{s['key']}.cpp) | {s['title']} | {s['level']} | {s['method']} | {s['complexity']} |")
-    (ROOT/'solutions/README.md').write_text('\n'.join(lines)+'\n')
-    print('Generated',len(out),'problems,',sum(len(q['testcases']) for q in out),'cases')
+    from generate_dataset_v6 import main
+    return main()
+
 if __name__=='__main__':generate()

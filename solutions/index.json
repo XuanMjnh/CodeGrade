@@ -1,0 +1,2562 @@
+[
+  {
+    "key": "v5-Arithmetic-0",
+    "title": "Tổng hai số",
+    "level": 1,
+    "method": "Một phép cộng.",
+    "complexity": "O(1), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arithmetic-1",
+    "title": "Hiệu hai số",
+    "level": 1,
+    "method": "Một phép trừ.",
+    "complexity": "O(1), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arithmetic-2",
+    "title": "Tích hai số",
+    "level": 1,
+    "method": "Một phép nhân.",
+    "complexity": "O(1), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arithmetic-3",
+    "title": "Khoảng cách tuyệt đối",
+    "level": 1,
+    "method": "Lấy trị tuyệt đối.",
+    "complexity": "O(1), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arithmetic-4",
+    "title": "Số lớn nhất",
+    "level": 1,
+    "method": "So sánh hai số.",
+    "complexity": "O(1), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arithmetic-5",
+    "title": "Số nhỏ nhất",
+    "level": 1,
+    "method": "So sánh hai số.",
+    "complexity": "O(1), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arithmetic-6",
+    "title": "Bình phương khoảng cách",
+    "level": 1,
+    "method": "Nhân hiệu với chính nó.",
+    "complexity": "O(1), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arithmetic-7",
+    "title": "Tổng hai bình phương",
+    "level": 1,
+    "method": "Tính hai bình phương rồi cộng.",
+    "complexity": "O(1), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arithmetic-8",
+    "title": "Thương nguyên",
+    "level": 1,
+    "method": "Chia nguyên hai số dương.",
+    "complexity": "O(1), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arithmetic-9",
+    "title": "Phần dư",
+    "level": 1,
+    "method": "Dùng phép chia lấy dư.",
+    "complexity": "O(1), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arithmetic-10",
+    "title": "Thương làm tròn lên",
+    "level": 2,
+    "method": "Cộng một vào thương nếu còn dư.",
+    "complexity": "O(1), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arithmetic-11",
+    "title": "Ước chung lớn nhất",
+    "level": 2,
+    "method": "Thuật toán Euclid.",
+    "complexity": "O(log b), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arithmetic-12",
+    "title": "Bội chung nhỏ nhất",
+    "level": 2,
+    "method": "Chia cho GCD trước khi nhân.",
+    "complexity": "O(log b), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arithmetic-13",
+    "title": "Tổng cấp số cộng",
+    "level": 2,
+    "method": "Công thức tổng cấp số cộng.",
+    "complexity": "O(1), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arithmetic-14",
+    "title": "Chu vi hình chữ nhật",
+    "level": 1,
+    "method": "Tính 2(a+b).",
+    "complexity": "O(1), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arithmetic-15",
+    "title": "Diện tích hình chữ nhật",
+    "level": 1,
+    "method": "Nhân chiều dài với chiều rộng.",
+    "complexity": "O(1), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arithmetic-16",
+    "title": "Lũy thừa theo modulo",
+    "level": 3,
+    "method": "Lũy thừa nhị phân và lấy dư sau mỗi phép nhân.",
+    "complexity": "O(log b), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arithmetic-17",
+    "title": "Hệ số nhị thức",
+    "level": 3,
+    "method": "Tam giác Pascal, tránh tính trực tiếp giai thừa.",
+    "complexity": "O((a+b)²), bộ nhớ O((a+b)²)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arithmetic-18",
+    "title": "Đường đi trên lưới",
+    "level": 3,
+    "method": "Mỗi đường đi là một cách chọn vị trí của a bước sang phải.",
+    "complexity": "O((a+b)²), bộ nhớ O((a+b)²)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arithmetic-19",
+    "title": "Hiệu hai số tam giác",
+    "level": 2,
+    "method": "Lấy hiệu hai số tam giác.",
+    "complexity": "O(1), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arrays-0",
+    "title": "Tổng mảng",
+    "level": 1,
+    "method": "Cộng dồn.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arrays-1",
+    "title": "Phần tử lớn nhất",
+    "level": 1,
+    "method": "Duyệt và giữ giá trị lớn nhất.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arrays-2",
+    "title": "Phần tử nhỏ nhất",
+    "level": 1,
+    "method": "Duyệt và giữ giá trị nhỏ nhất.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arrays-3",
+    "title": "Số giá trị phân biệt",
+    "level": 2,
+    "method": "Đưa các giá trị vào tập hợp.",
+    "complexity": "O(n log n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arrays-4",
+    "title": "Đếm số chẵn",
+    "level": 1,
+    "method": "Kiểm tra phần dư khi chia 2.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arrays-5",
+    "title": "Đếm số lẻ",
+    "level": 1,
+    "method": "Phần dư khác 0.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arrays-6",
+    "title": "Đếm số âm",
+    "level": 1,
+    "method": "So sánh với 0.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arrays-7",
+    "title": "Đếm số dương",
+    "level": 1,
+    "method": "So sánh với 0.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arrays-8",
+    "title": "Tổng giá trị tuyệt đối",
+    "level": 1,
+    "method": "Lấy trị tuyệt đối rồi cộng.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arrays-9",
+    "title": "Tổng bình phương phần tử",
+    "level": 2,
+    "method": "Dùng số nguyên 64-bit cho tổng.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arrays-10",
+    "title": "Độ rộng mảng",
+    "level": 1,
+    "method": "Tìm hai cực trị.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arrays-11",
+    "title": "Trung vị của mảng",
+    "level": 2,
+    "method": "Sắp xếp rồi truy cập vị trí.",
+    "complexity": "O(n log n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arrays-12",
+    "title": "Tần suất lớn nhất",
+    "level": 2,
+    "method": "Đếm tần suất bằng bảng ánh xạ.",
+    "complexity": "O(n log n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arrays-13",
+    "title": "Đếm cặp bằng nhau",
+    "level": 3,
+    "method": "Mỗi phần tử đóng góp số phần tử bằng nó đã xuất hiện.",
+    "complexity": "O(n log n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arrays-14",
+    "title": "Đếm nghịch thế",
+    "level": 4,
+    "method": "Nén tọa độ và Fenwick lưu số phần tử đã gặp.",
+    "complexity": "O(n log n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arrays-15",
+    "title": "Cặp kề tăng dần",
+    "level": 1,
+    "method": "So sánh hai phần tử liên tiếp.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arrays-16",
+    "title": "Tổng biến thiên liền kề",
+    "level": 2,
+    "method": "Cộng độ chênh từng cặp liên tiếp.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arrays-17",
+    "title": "Đếm cực đại tiền tố",
+    "level": 2,
+    "method": "Giữ cực đại tiền tố, dùng so sánh ≥.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arrays-18",
+    "title": "Đếm đoạn có tổng bằng không",
+    "level": 4,
+    "method": "Các tổng tiền tố bằng nhau tạo một đoạn có tổng 0.",
+    "complexity": "O(n log n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Arrays-19",
+    "title": "Tổng đoạn con lớn nhất",
+    "level": 3,
+    "method": "Kadane, khởi tạo bằng phần tử đầu tiên.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Strings-0",
+    "title": "Độ dài chuỗi",
+    "level": 1,
+    "method": "Đếm số ký tự.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Strings-1",
+    "title": "Đảo ngược chuỗi",
+    "level": 1,
+    "method": "Đảo thứ tự ký tự.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Strings-2",
+    "title": "Chuyển thành chữ hoa",
+    "level": 1,
+    "method": "Chuyển từng chữ thường ASCII.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Strings-3",
+    "title": "Chuyển thành chữ thường",
+    "level": 1,
+    "method": "Chuyển từng chữ hoa ASCII.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Strings-4",
+    "title": "Đếm nguyên âm",
+    "level": 1,
+    "method": "Chuẩn hóa chữ rồi kiểm tra tập nguyên âm.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Strings-5",
+    "title": "Đếm chữ số",
+    "level": 1,
+    "method": "Kiểm tra khoảng ký tự.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Strings-6",
+    "title": "Đếm chữ cái",
+    "level": 1,
+    "method": "Kiểm tra hai khoảng ASCII.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Strings-7",
+    "title": "Đếm khoảng trắng",
+    "level": 1,
+    "method": "Đếm dấu cách.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Strings-8",
+    "title": "Đếm từ",
+    "level": 2,
+    "method": "Đếm điểm bắt đầu từ.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Strings-9",
+    "title": "Đếm ký tự phân biệt",
+    "level": 2,
+    "method": "Đánh dấu ký tự đã xuất hiện.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Strings-10",
+    "title": "Kiểm tra chuỗi đối xứng",
+    "level": 2,
+    "method": "So sánh với chuỗi đảo.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Strings-11",
+    "title": "Đếm nhóm ký tự liên tiếp",
+    "level": 2,
+    "method": "Đếm đầu đoạn mới.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Strings-12",
+    "title": "Tần suất ký tự lớn nhất",
+    "level": 2,
+    "method": "Đếm 128 ký tự ASCII.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Strings-13",
+    "title": "Sắp xếp ký tự",
+    "level": 2,
+    "method": "Sắp xếp ký tự.",
+    "complexity": "O(n log n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Strings-14",
+    "title": "Xóa khoảng trắng",
+    "level": 1,
+    "method": "Lọc ký tự.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Strings-15",
+    "title": "Đảo kiểu chữ",
+    "level": 1,
+    "method": "Đổi theo từng khoảng ASCII.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Strings-16",
+    "title": "Các ký tự phân biệt đã sắp xếp",
+    "level": 2,
+    "method": "Sắp xếp, xóa trùng.",
+    "complexity": "O(n log n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Strings-17",
+    "title": "Độ dài từ dài nhất",
+    "level": 2,
+    "method": "Đếm độ dài từ hiện tại.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Strings-18",
+    "title": "Đếm chuỗi con đối xứng",
+    "level": 4,
+    "method": "Quy hoạch động theo độ dài đoạn.",
+    "complexity": "O(n²), bộ nhớ O(n²)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Strings-19",
+    "title": "Đếm chuỗi con phân biệt",
+    "level": 6,
+    "method": "Suffix automaton: cộng len[state] − len[link[state]] cho mọi trạng thái khác gốc.",
+    "complexity": "O(n × 26), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-NumberTheory-0",
+    "title": "Đếm ước số",
+    "level": 2,
+    "method": "Liệt kê cặp ước d và n/d tới căn bậc hai.",
+    "complexity": "O(√n), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-NumberTheory-1",
+    "title": "Tổng ước số",
+    "level": 2,
+    "method": "Cộng cặp ước, không đếm đôi căn bậc hai.",
+    "complexity": "O(√n), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-NumberTheory-2",
+    "title": "Tổng ước thực sự",
+    "level": 2,
+    "method": "Tổng ước trừ chính n.",
+    "complexity": "O(√n), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-NumberTheory-3",
+    "title": "Kiểm tra số nguyên tố",
+    "level": 2,
+    "method": "Thử ước tới căn bậc hai.",
+    "complexity": "O(√n), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-NumberTheory-4",
+    "title": "Hàm phi Euler",
+    "level": 3,
+    "method": "Phân tích thừa số nguyên tố và áp dụng công thức Euler.",
+    "complexity": "O(√n), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-NumberTheory-5",
+    "title": "Giai thừa theo modulo",
+    "level": 2,
+    "method": "Nhân dồn và lấy dư từng bước.",
+    "complexity": "O(n), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-NumberTheory-6",
+    "title": "Tổng chữ số",
+    "level": 1,
+    "method": "Tách chữ số bằng chia và lấy dư cho 10.",
+    "complexity": "O(log n), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-NumberTheory-7",
+    "title": "Tích chữ số",
+    "level": 2,
+    "method": "Nhân từng chữ số. Kết quả nằm trong số nguyên 64-bit.",
+    "complexity": "O(log n), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-NumberTheory-8",
+    "title": "Đếm bit một",
+    "level": 2,
+    "method": "Tách bit thấp nhất.",
+    "complexity": "O(log n), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-NumberTheory-9",
+    "title": "Độ dài biểu diễn nhị phân",
+    "level": 1,
+    "method": "Chia đôi liên tiếp.",
+    "complexity": "O(log n), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-NumberTheory-10",
+    "title": "Kiểm tra số chính phương",
+    "level": 3,
+    "method": "Tìm căn nguyên bằng tìm kiếm nhị phân; dùng phép chia để tránh tràn.",
+    "complexity": "O(log n), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-NumberTheory-11",
+    "title": "Căn bậc hai làm tròn xuống",
+    "level": 3,
+    "method": "Tìm kiếm nhị phân trên căn nguyên.",
+    "complexity": "O(log n), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-NumberTheory-12",
+    "title": "Số chữ số không cuối giai thừa",
+    "level": 3,
+    "method": "Đếm số thừa số 5 bằng chia liên tiếp.",
+    "complexity": "O(log n), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-NumberTheory-13",
+    "title": "Tổng các số nguyên tố cùng nhau",
+    "level": 3,
+    "method": "Ghép x với n−x để có nφ(n)/2; xét riêng n=1.",
+    "complexity": "O(√n), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-NumberTheory-14",
+    "title": "Đếm số nguyên tố",
+    "level": 3,
+    "method": "Sàng Eratosthenes.",
+    "complexity": "O(n log log n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-NumberTheory-15",
+    "title": "Kiểm tra lũy thừa của hai",
+    "level": 2,
+    "method": "Số dương có đúng một bit 1.",
+    "complexity": "O(1), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-NumberTheory-16",
+    "title": "Fibonacci theo modulo",
+    "level": 4,
+    "method": "Nhân ma trận 2×2 theo lũy thừa nhị phân.",
+    "complexity": "O(log n), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-NumberTheory-17",
+    "title": "Tổng thương nguyên",
+    "level": 4,
+    "method": "Gom những mẫu số có cùng thương floor(n/d).",
+    "complexity": "O(√n), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-NumberTheory-18",
+    "title": "Đếm cặp nguyên tố cùng nhau",
+    "level": 4,
+    "method": "Sàng φ và tính tổng φ(2)..φ(n).",
+    "complexity": "O(n log log n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-NumberTheory-19",
+    "title": "Bảng nhân dưới giới hạn",
+    "level": 4,
+    "method": "Với mỗi a có floor(n/a) cách chọn b; gom theo thương.",
+    "complexity": "O(√n), bộ nhớ O(1)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Sequences-0",
+    "title": "Dãy con tăng dài nhất",
+    "level": 4,
+    "method": "LIS bằng mảng đuôi và lower_bound.",
+    "complexity": "O(n log n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Sequences-1",
+    "title": "Dãy con giảm dài nhất",
+    "level": 4,
+    "method": "Đổi dấu rồi tìm LIS.",
+    "complexity": "O(n log n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Sequences-2",
+    "title": "Dãy con không giảm dài nhất",
+    "level": 4,
+    "method": "Mảng đuôi và upper_bound.",
+    "complexity": "O(n log n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Sequences-3",
+    "title": "Đếm dãy con tăng nghiêm ngặt",
+    "level": 5,
+    "method": "Nén tọa độ; Fenwick cộng số dãy kết thúc ở giá trị nhỏ hơn hiện tại.",
+    "complexity": "O(n log n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Sequences-4",
+    "title": "Tổng lớn nhất không chọn hai phần tử kề",
+    "level": 3,
+    "method": "DP hai trạng thái chọn/bỏ phần tử.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Sequences-5",
+    "title": "Tích đoạn con lớn nhất",
+    "level": 3,
+    "method": "Giữ đồng thời tích nhỏ nhất và lớn nhất kết thúc tại mỗi vị trí.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Sequences-6",
+    "title": "Tổng đoạn con nhỏ nhất",
+    "level": 3,
+    "method": "Kadane phiên bản lấy min.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Sequences-7",
+    "title": "Dãy con đối xứng dài nhất",
+    "level": 4,
+    "method": "DP trên đoạn: bỏ một đầu hoặc ghép hai đầu bằng nhau.",
+    "complexity": "O(n²), bộ nhớ O(n²)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Sequences-8",
+    "title": "Đếm tập con có tổng bằng không",
+    "level": 5,
+    "method": "Chia đôi, liệt kê tổng mỗi nửa, tìm số cặp tổng đối nhau.",
+    "complexity": "O(n × 2^(n/2)), bộ nhớ O(2^(n/2))",
+    "tests": 5
+  },
+  {
+    "key": "v5-Sequences-9",
+    "title": "Số tổng tập con phân biệt",
+    "level": 4,
+    "method": "DP tập tổng đạt được; không cập nhật tại chỗ khi xét một phần tử.",
+    "complexity": "O(n × S), S là tổng trị tuyệt đối, bộ nhớ O(S)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Sequences-10",
+    "title": "Đoạn bằng nhau dài nhất",
+    "level": 2,
+    "method": "Duyệt độ dài đoạn hiện tại.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Sequences-11",
+    "title": "Đoạn luân phiên dấu dài nhất",
+    "level": 2,
+    "method": "Duyệt và bắt đầu lại khi không trái dấu.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Sequences-12",
+    "title": "Chênh lệch nhỏ nhất giữa hai phần tử",
+    "level": 2,
+    "method": "Sắp xếp; đáp án nằm giữa hai giá trị kề nhau.",
+    "complexity": "O(n log n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Sequences-13",
+    "title": "Chia mảng cân bằng",
+    "level": 5,
+    "method": "Chia đôi tổng tập con và tìm kiếm nhị phân gần một nửa tổng toàn dãy.",
+    "complexity": "O(n × 2^(n/2)), bộ nhớ O(2^(n/2))",
+    "tests": 5
+  },
+  {
+    "key": "v5-Sequences-14",
+    "title": "Tích hai phần tử lớn nhất",
+    "level": 2,
+    "method": "So sánh tích hai số nhỏ nhất với tích hai số lớn nhất.",
+    "complexity": "O(n log n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Sequences-15",
+    "title": "Kiểm tra chia đôi bằng tổng",
+    "level": 5,
+    "method": "Bài toán chia hai tập, kiểm tra chênh lệch nhỏ nhất bằng 0.",
+    "complexity": "O(n × 2^(n/2)), bộ nhớ O(2^(n/2))",
+    "tests": 5
+  },
+  {
+    "key": "v5-Sequences-16",
+    "title": "Đếm tập con có tổng dương",
+    "level": 5,
+    "method": "Chia đôi, sắp xếp tổng nửa sau, đếm các tổng vượt −s.",
+    "complexity": "O(n × 2^(n/2)), bộ nhớ O(2^(n/2))",
+    "tests": 5
+  },
+  {
+    "key": "v5-Sequences-17",
+    "title": "Đoạn tổng bằng không dài nhất",
+    "level": 4,
+    "method": "Lưu vị trí đầu tiên của mỗi tổng tiền tố.",
+    "complexity": "O(n log n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Sequences-18",
+    "title": "Đoạn tăng liên tiếp dài nhất",
+    "level": 2,
+    "method": "Duyệt và nối khi phần tử sau lớn hơn.",
+    "complexity": "O(n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Sequences-19",
+    "title": "Số lần xóa để được dãy tăng",
+    "level": 4,
+    "method": "Giữ lại một LIS, xóa n−LIS phần tử.",
+    "complexity": "O(n log n), bộ nhớ O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Graphs-0",
+    "title": "Đếm đỉnh",
+    "level": 1,
+    "method": "Đọc n.",
+    "complexity": "O(n+m), bộ nhớ O(n+m)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Graphs-1",
+    "title": "Đếm cạnh",
+    "level": 1,
+    "method": "Đọc m.",
+    "complexity": "O(n+m), bộ nhớ O(n+m)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Graphs-2",
+    "title": "Đếm đỉnh cô lập",
+    "level": 2,
+    "method": "Đếm danh sách kề rỗng.",
+    "complexity": "O(n+m), bộ nhớ O(n+m)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Graphs-3",
+    "title": "Bậc lớn nhất",
+    "level": 2,
+    "method": "Lấy độ dài danh sách kề lớn nhất.",
+    "complexity": "O(n+m), bộ nhớ O(n+m)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Graphs-4",
+    "title": "Bậc nhỏ nhất",
+    "level": 2,
+    "method": "Lấy độ dài danh sách kề nhỏ nhất.",
+    "complexity": "O(n+m), bộ nhớ O(n+m)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Graphs-5",
+    "title": "Đếm đỉnh bậc lẻ",
+    "level": 2,
+    "method": "Kiểm tra tính chẵn lẻ của bậc.",
+    "complexity": "O(n+m), bộ nhớ O(n+m)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Graphs-6",
+    "title": "Số thành phần liên thông",
+    "level": 3,
+    "method": "BFS từ mỗi đỉnh chưa thăm.",
+    "complexity": "O(n+m), bộ nhớ O(n+m)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Graphs-7",
+    "title": "Thành phần liên thông lớn nhất",
+    "level": 3,
+    "method": "BFS và lưu kích thước thành phần.",
+    "complexity": "O(n+m), bộ nhớ O(n+m)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Graphs-8",
+    "title": "Thành phần liên thông nhỏ nhất",
+    "level": 3,
+    "method": "BFS và lấy kích thước nhỏ nhất.",
+    "complexity": "O(n+m), bộ nhớ O(n+m)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Graphs-9",
+    "title": "Kiểm tra đồ thị liên thông",
+    "level": 3,
+    "method": "Đếm số thành phần.",
+    "complexity": "O(n+m), bộ nhớ O(n+m)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Graphs-10",
+    "title": "Hạng chu trình",
+    "level": 3,
+    "method": "Một rừng trên n đỉnh với c thành phần có n−c cạnh.",
+    "complexity": "O(n+m), bộ nhớ O(n+m)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Graphs-11",
+    "title": "Kiểm tra rừng",
+    "level": 3,
+    "method": "So sánh m với n−c.",
+    "complexity": "O(n+m), bộ nhớ O(n+m)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Graphs-12",
+    "title": "Kiểm tra cây",
+    "level": 3,
+    "method": "Kiểm tra liên thông và số cạnh n−1.",
+    "complexity": "O(n+m), bộ nhớ O(n+m)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Graphs-13",
+    "title": "Số đỉnh đến được từ đỉnh một",
+    "level": 3,
+    "method": "BFS từ đỉnh 1.",
+    "complexity": "O(n+m), bộ nhớ O(n+m)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Graphs-14",
+    "title": "Độ lệch tâm của đỉnh một",
+    "level": 3,
+    "method": "BFS và lấy khoảng cách hữu hạn lớn nhất.",
+    "complexity": "O(n+m), bộ nhớ O(n+m)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Graphs-15",
+    "title": "Tổng khoảng cách từ đỉnh một",
+    "level": 3,
+    "method": "BFS rồi cộng các khoảng cách không âm.",
+    "complexity": "O(n+m), bộ nhớ O(n+m)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Graphs-16",
+    "title": "Khoảng cách đến đỉnh cuối",
+    "level": 3,
+    "method": "BFS trên đồ thị không trọng số.",
+    "complexity": "O(n+m), bộ nhớ O(n+m)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Graphs-17",
+    "title": "Đếm đỉnh lá",
+    "level": 2,
+    "method": "Đếm danh sách kề có một phần tử.",
+    "complexity": "O(n+m), bộ nhớ O(n+m)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Graphs-18",
+    "title": "Đếm tam giác",
+    "level": 5,
+    "method": "Hướng cạnh từ đỉnh bậc nhỏ sang bậc lớn (hòa thì theo chỉ số), đánh dấu láng giềng để đếm tam giác một lần.",
+    "complexity": "O(m√m+n), bộ nhớ O(n+m)",
+    "tests": 5
+  },
+  {
+    "key": "v5-Graphs-19",
+    "title": "Kiểm tra đồ thị hai phía",
+    "level": 3,
+    "method": "Tô hai màu bằng BFS ở mọi thành phần.",
+    "complexity": "O(n+m), bộ nhớ O(n+m)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-01",
+    "title": "Năm nhuận",
+    "level": 2,
+    "method": "Biến đổi công thức và tính bằng số nguyên.",
+    "complexity": "Theo số chữ số hoặc O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-02",
+    "title": "Đồng hồ từ giây",
+    "level": 2,
+    "method": "Biến đổi công thức và tính bằng số nguyên.",
+    "complexity": "Theo số chữ số hoặc O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-03",
+    "title": "Căn bậc hai làm tròn lên",
+    "level": 2,
+    "method": "Biến đổi công thức và tính bằng số nguyên.",
+    "complexity": "Theo số chữ số hoặc O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-04",
+    "title": "Căn bậc ba nguyên",
+    "level": 2,
+    "method": "Biến đổi công thức và tính bằng số nguyên.",
+    "complexity": "Theo số chữ số hoặc O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-05",
+    "title": "Đường chéo đa giác",
+    "level": 2,
+    "method": "Biến đổi công thức và tính bằng số nguyên.",
+    "complexity": "Theo số chữ số hoặc O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-06",
+    "title": "Tổng bình phương liên tiếp",
+    "level": 2,
+    "method": "Biến đổi công thức và tính bằng số nguyên.",
+    "complexity": "Theo số chữ số hoặc O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-07",
+    "title": "Tổng lập phương liên tiếp",
+    "level": 2,
+    "method": "Biến đổi công thức và tính bằng số nguyên.",
+    "complexity": "Theo số chữ số hoặc O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-08",
+    "title": "Chữ số thứ k",
+    "level": 2,
+    "method": "Sinh các số đến khi đủ độ dài rồi truy cập vị trí.",
+    "complexity": "Theo số chữ số hoặc O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-09",
+    "title": "Mã Gray",
+    "level": 2,
+    "method": "XOR số ban đầu với số dịch phải một bit.",
+    "complexity": "Theo số chữ số hoặc O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-10",
+    "title": "Giải mã Gray",
+    "level": 2,
+    "method": "XOR các tiền tố dịch phải của mã Gray.",
+    "complexity": "Theo số chữ số hoặc O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-11",
+    "title": "Số que diêm",
+    "level": 2,
+    "method": "Biến đổi công thức và tính bằng số nguyên.",
+    "complexity": "Theo số chữ số hoặc O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-12",
+    "title": "Đổi sang cơ số âm hai",
+    "level": 2,
+    "method": "Chia lấy dư cho −2, điều chỉnh phần dư âm.",
+    "complexity": "Theo số chữ số hoặc O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-13",
+    "title": "Tách tích tối ưu",
+    "level": 2,
+    "method": "Quy hoạch động theo số hạng đầu tiên.",
+    "complexity": "Theo số chữ số hoặc O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-14",
+    "title": "Tháp Hà Nội",
+    "level": 2,
+    "method": "Dùng công thức 2^n−1 và lũy thừa modulo.",
+    "complexity": "Theo số chữ số hoặc O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-15",
+    "title": "Góc trong đa giác",
+    "level": 2,
+    "method": "Biến đổi công thức và tính bằng số nguyên.",
+    "complexity": "Theo số chữ số hoặc O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-16",
+    "title": "Tổng bit của đoạn đầu",
+    "level": 2,
+    "method": "Cộng số bit 1 của từng số.",
+    "complexity": "Theo số chữ số hoặc O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-17",
+    "title": "Tổng chữ số của đoạn đầu",
+    "level": 2,
+    "method": "Duyệt các số và tách chữ số.",
+    "complexity": "Theo số chữ số hoặc O(n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-18",
+    "title": "Số nghiệm bậc hai",
+    "level": 2,
+    "method": "Tính toán số nguyên theo mô tả.",
+    "complexity": "O(n) hoặc O(log n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-19",
+    "title": "Số ngày trong tháng",
+    "level": 2,
+    "method": "Tính toán số nguyên theo mô tả.",
+    "complexity": "O(n) hoặc O(log n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-20",
+    "title": "Phân loại tam giác",
+    "level": 3,
+    "method": "Sắp xếp cạnh, kiểm tra bất đẳng thức tam giác và bình phương cạnh.",
+    "complexity": "O(n) hoặc O(log n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-21",
+    "title": "Hướng rẽ trên mặt phẳng",
+    "level": 3,
+    "method": "Tính dấu tích có hướng.",
+    "complexity": "O(n) hoặc O(log n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-22",
+    "title": "Diện tích tam giác nguyên",
+    "level": 3,
+    "method": "Định thức tọa độ.",
+    "complexity": "O(n) hoặc O(log n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-23",
+    "title": "Độ dài giao hai đoạn",
+    "level": 2,
+    "method": "Tính toán số nguyên theo mô tả.",
+    "complexity": "O(n) hoặc O(log n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-24",
+    "title": "Đếm bội trong khoảng",
+    "level": 2,
+    "method": "Tính toán số nguyên theo mô tả.",
+    "complexity": "O(n) hoặc O(log n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-25",
+    "title": "Josephus vòng tròn",
+    "level": 3,
+    "method": "Truy hồi Josephus theo kích thước vòng.",
+    "complexity": "O(n) hoặc O(log n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-26",
+    "title": "Lũy thừa không modulo",
+    "level": 2,
+    "method": "Tính toán số nguyên theo mô tả.",
+    "complexity": "O(n) hoặc O(log n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-27",
+    "title": "Chữ số cuối của tháp mũ",
+    "level": 3,
+    "method": "Lũy thừa modulo với số mũ nguyên lớn.",
+    "complexity": "O(n) hoặc O(log n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-28",
+    "title": "Đổi cơ số dương",
+    "level": 2,
+    "method": "Chia lấy dư liên tiếp.",
+    "complexity": "O(n) hoặc O(log n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-29",
+    "title": "XOR một khoảng",
+    "level": 2,
+    "method": "Duyệt hoặc dùng chu kỳ XOR tiền tố.",
+    "complexity": "O(n) hoặc O(log n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-30",
+    "title": "AND một khoảng",
+    "level": 3,
+    "method": "Tìm tiền tố bit chung hoặc duyệt đoạn.",
+    "complexity": "O(n) hoặc O(log n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-31",
+    "title": "Thuế lũy tiến nguyên",
+    "level": 2,
+    "method": "Tính toán số nguyên theo mô tả.",
+    "complexity": "O(n) hoặc O(log n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-32",
+    "title": "Lát hình chữ nhật",
+    "level": 2,
+    "method": "Tính toán số nguyên theo mô tả.",
+    "complexity": "O(n) hoặc O(log n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-33",
+    "title": "Đồng hồ gặp nhau",
+    "level": 2,
+    "method": "Đếm bội chung theo chu kỳ LCM.",
+    "complexity": "O(n) hoặc O(log n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arithmetic-34",
+    "title": "Chia kẹo công bằng",
+    "level": 3,
+    "method": "Phương pháp vách ngăn cho các phần dương.",
+    "complexity": "O(n) hoặc O(log n)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-01",
+    "title": "Dãy tổng tiền tố",
+    "level": 2,
+    "method": "Cộng dồn từ trái sang phải.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-02",
+    "title": "Cực đại hậu tố",
+    "level": 2,
+    "method": "Quét từ phải sang trái, giữ cực đại.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-03",
+    "title": "Xoay phải k bước",
+    "level": 2,
+    "method": "Tách tại vị trí n−k và ghép hai đoạn.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-04",
+    "title": "Đưa số không về cuối",
+    "level": 2,
+    "method": "Lọc ổn định rồi bổ sung các số 0.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-05",
+    "title": "Phần tử lớn hơn kế tiếp",
+    "level": 3,
+    "method": "Ngăn xếp đơn điệu hoặc tìm kiếm bên phải.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-06",
+    "title": "Chỉ số nhỏ hơn trước đó",
+    "level": 3,
+    "method": "Ngăn xếp đơn điệu.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-07",
+    "title": "Cực đại cửa sổ",
+    "level": 3,
+    "method": "Deque đơn điệu hoặc duyệt cửa sổ.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-08",
+    "title": "Phân biệt trong cửa sổ",
+    "level": 3,
+    "method": "Bảng tần suất trượt.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-09",
+    "title": "Tổng cửa sổ cố định",
+    "level": 2,
+    "method": "Tổng trượt hoặc tiền tố.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-10",
+    "title": "Cặp có tổng đích",
+    "level": 3,
+    "method": "Bảng tần suất số bù.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-11",
+    "title": "Bộ ba tổng không",
+    "level": 3,
+    "method": "Duyệt bộ ba chỉ số.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-12",
+    "title": "Số dương còn thiếu",
+    "level": 3,
+    "method": "Đánh dấu các số 1..n+1.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-13",
+    "title": "Điểm cân bằng",
+    "level": 3,
+    "method": "Tổng toàn mảng và tổng tiền tố.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-14",
+    "title": "Nước mưa bị giữ",
+    "level": 4,
+    "method": "Cực đại tiền tố và hậu tố.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-15",
+    "title": "Hai thành bình chứa",
+    "level": 4,
+    "method": "Hai con trỏ hoặc duyệt cặp.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-16",
+    "title": "Mua bán cổ phiếu một lần",
+    "level": 3,
+    "method": "Giữ giá thấp nhất trước ngày bán.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-17",
+    "title": "Mua bán không giới hạn",
+    "level": 3,
+    "method": "Cộng mọi chênh lệch dương giữa hai ngày kề nhau.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-18",
+    "title": "Tổng vòng tròn",
+    "level": 4,
+    "method": "Kadane trên vòng hoặc duyệt điểm đầu và độ dài.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-19",
+    "title": "XOR lớn nhất của cặp",
+    "level": 4,
+    "method": "Trie bit hoặc duyệt cặp.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-20",
+    "title": "Đoạn không lặp dài nhất",
+    "level": 3,
+    "method": "Cửa sổ trượt và vị trí cuối của mỗi giá trị.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-21",
+    "title": "Đoạn ngắn đạt ngưỡng",
+    "level": 3,
+    "method": "Hai con trỏ trên mảng không âm.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-22",
+    "title": "Hạng ổn định",
+    "level": 3,
+    "method": "Sắp xếp các cặp giá trị và chỉ số.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-23",
+    "title": "Nén tọa độ",
+    "level": 3,
+    "method": "Sắp xếp tập giá trị, ánh xạ về thứ hạng.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-24",
+    "title": "Số bước tăng thành không giảm",
+    "level": 3,
+    "method": "Tham lam nâng phần tử lên cực đại trước đó.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-25",
+    "title": "Chu trình hoán vị",
+    "level": 3,
+    "method": "Duyệt các chu trình chưa thăm.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-26",
+    "title": "Đổi chỗ để sắp hoán vị",
+    "level": 4,
+    "method": "Mỗi chu trình dài c cần c−1 đổi chỗ.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-27",
+    "title": "Tích trừ chính mình",
+    "level": 3,
+    "method": "Tích tiền tố và hậu tố, xử lý số 0 tự nhiên.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-28",
+    "title": "Giao đa tập với dãy đầu",
+    "level": 2,
+    "method": "Giao hai tập hợp.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-29",
+    "title": "Gộp đoạn giao nhau",
+    "level": 4,
+    "method": "Sắp xếp đầu trái, mở rộng đoạn hiện tại.",
+    "complexity": "O(n²)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-30",
+    "title": "Phòng họp tối thiểu",
+    "level": 4,
+    "method": "Quét các thời điểm bắt đầu và kết thúc.",
+    "complexity": "O(n²)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-31",
+    "title": "Lịch họp nhiều nhất",
+    "level": 4,
+    "method": "Tham lam theo thời điểm kết thúc; đếm riêng khoảng rỗng.",
+    "complexity": "O(n²)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-32",
+    "title": "Chuyển vị ma trận",
+    "level": 3,
+    "method": "Đổi hàng thành cột.",
+    "complexity": "O(nm)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-33",
+    "title": "Duyệt ma trận xoắn ốc",
+    "level": 3,
+    "method": "Bóc lớp ngoài rồi quay ma trận còn lại.",
+    "complexity": "O(nm)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Arrays-34",
+    "title": "Đường đi ít chi phí",
+    "level": 3,
+    "method": "DP theo hàng và cột.",
+    "complexity": "O(nm)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-01",
+    "title": "Hai chuỗi đảo chữ",
+    "level": 2,
+    "method": "So sánh bảng tần suất.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-02",
+    "title": "Đếm mẫu chồng lấn",
+    "level": 3,
+    "method": "So khớp tại từng vị trí hoặc KMP.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-03",
+    "title": "Hàm tiền tố KMP",
+    "level": 4,
+    "method": "Truy hồi qua các biên của tiền tố.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-04",
+    "title": "Mảng Z",
+    "level": 4,
+    "method": "So khớp tiền tố với từng hậu tố.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-05",
+    "title": "Chu kỳ ngắn nhất",
+    "level": 3,
+    "method": "Thử các ước của độ dài.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-06",
+    "title": "Mọi biên của chuỗi",
+    "level": 3,
+    "method": "Kiểm tra các biên hoặc chuỗi liên kết KMP.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-07",
+    "title": "Tương đương phép quay",
+    "level": 3,
+    "method": "Tìm t trong s+s và kiểm tra độ dài.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-08",
+    "title": "Phép quay nhỏ nhất",
+    "level": 4,
+    "method": "So sánh mọi phép quay.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-09",
+    "title": "Khoảng cách sửa chuỗi",
+    "level": 4,
+    "method": "DP theo hai tiền tố.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-10",
+    "title": "Dãy con chung hai chuỗi",
+    "level": 4,
+    "method": "DP LCS.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-11",
+    "title": "Mẫu dấu hỏi và sao",
+    "level": 4,
+    "method": "DP khớp mẫu theo tiền tố.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-12",
+    "title": "Ngoặc đúng nhiều loại",
+    "level": 3,
+    "method": "Ngăn xếp ký tự mở.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-13",
+    "title": "Bổ sung ngoặc tối thiểu",
+    "level": 3,
+    "method": "Đếm ngoặc đóng thiếu và ngoặc mở còn dư.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-14",
+    "title": "Đoạn ngoặc đúng dài nhất",
+    "level": 4,
+    "method": "Ngăn xếp các chỉ số chưa ghép.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-15",
+    "title": "Mã hóa độ dài chạy",
+    "level": 2,
+    "method": "Nhóm các ký tự kề nhau bằng nhau.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-16",
+    "title": "Giải mã độ dài chạy",
+    "level": 2,
+    "method": "Lặp ký tự theo số lần xuất hiện.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-17",
+    "title": "Xóa cặp kề nhau",
+    "level": 3,
+    "method": "Ngăn xếp rút gọn các cặp.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-18",
+    "title": "Dãy con ký tự duy nhất",
+    "level": 4,
+    "method": "Ngăn xếp tham lam với số lần xuất hiện còn lại.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-19",
+    "title": "Ghép số lớn nhất",
+    "level": 4,
+    "method": "So sánh x+y và y+x.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-20",
+    "title": "Đọc số La Mã",
+    "level": 3,
+    "method": "Trừ chữ số đứng trước một chữ số lớn hơn.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-21",
+    "title": "Tên cột bảng tính",
+    "level": 2,
+    "method": "Tích lũy cơ số 26 không có chữ số 0.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-22",
+    "title": "Cộng số nguyên lớn",
+    "level": 2,
+    "method": "Cộng từng cột hoặc số nguyên đa độ chính xác.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-23",
+    "title": "Nhân số nguyên lớn",
+    "level": 3,
+    "method": "Nhân dài hoặc số nguyên đa độ chính xác.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-24",
+    "title": "So sánh phiên bản",
+    "level": 3,
+    "method": "So sánh từ điển danh sách số đã thêm đuôi 0.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-25",
+    "title": "Kiểm tra IPv4",
+    "level": 3,
+    "method": "Tách chuỗi và kiểm tra từng thành phần.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-26",
+    "title": "Chuẩn hóa đường dẫn",
+    "level": 3,
+    "method": "Ngăn xếp thành phần đường dẫn.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-27",
+    "title": "Tiền tố chung nhiều từ",
+    "level": 3,
+    "method": "Thu hẹp tiền tố chung qua từng từ.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-28",
+    "title": "Tần suất từ",
+    "level": 2,
+    "method": "Bảng đếm và sắp xếp khóa.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-29",
+    "title": "Dịch Caesar",
+    "level": 2,
+    "method": "Số học modulo 26.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-30",
+    "title": "Giải mã bàn phím T9",
+    "level": 2,
+    "method": "Bảng ánh xạ chữ sang phím.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-31",
+    "title": "Chuỗi con chung liên tiếp",
+    "level": 4,
+    "method": "DP hậu tố chung hoặc duyệt các chuỗi con.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-32",
+    "title": "Vị trí ký tự duy nhất đầu tiên",
+    "level": 2,
+    "method": "Đếm tần suất rồi quét lại chuỗi.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Strings-33",
+    "title": "Xen kẽ hai chuỗi",
+    "level": 2,
+    "method": "Ghép xen kẽ theo chỉ số.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-01",
+    "title": "Phân tích thừa số nguyên tố",
+    "level": 3,
+    "method": "Chia thử đến căn bậc hai.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-02",
+    "title": "Ước nguyên tố lớn nhất",
+    "level": 3,
+    "method": "Phân tích thừa số hoặc duyệt các ước.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-03",
+    "title": "Số thừa số phân biệt",
+    "level": 3,
+    "method": "Phân tích thừa số hoặc duyệt các ước.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-04",
+    "title": "Tổng số mũ nguyên tố",
+    "level": 3,
+    "method": "Phân tích thừa số hoặc duyệt các ước.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-05",
+    "title": "Số không chứa bình phương",
+    "level": 3,
+    "method": "Phân tích thừa số hoặc duyệt các ước.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-06",
+    "title": "Hàm Möbius",
+    "level": 4,
+    "method": "Phân tích thừa số hoặc duyệt các ước.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-07",
+    "title": "Tích nguyên tố phân biệt",
+    "level": 3,
+    "method": "Phân tích thừa số hoặc duyệt các ước.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-08",
+    "title": "Ước nguyên tố nhỏ nhất",
+    "level": 2,
+    "method": "Phân tích thừa số hoặc duyệt các ước.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-09",
+    "title": "Ước thứ k",
+    "level": 3,
+    "method": "Phân tích thừa số hoặc duyệt các ước.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-10",
+    "title": "Tổng GCD với một số",
+    "level": 3,
+    "method": "Duyệt i và Euclid.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-11",
+    "title": "LCM của đoạn đầu",
+    "level": 3,
+    "method": "Tích lũy LCM bằng GCD.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-12",
+    "title": "Số mũ nguyên tố trong giai thừa",
+    "level": 3,
+    "method": "Công thức Legendre.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-13",
+    "title": "Tổ hợp theo modulo bất kỳ",
+    "level": 4,
+    "method": "Pascal hoặc tổ hợp nguyên chính xác trước khi lấy dư.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-14",
+    "title": "Nghịch đảo modulo",
+    "level": 4,
+    "method": "Euclid mở rộng hoặc duyệt phần dư.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-15",
+    "title": "Phương trình đồng dư tuyến tính",
+    "level": 4,
+    "method": "Kiểm tra GCD và các nghiệm cách nhau m/g.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-16",
+    "title": "Ghép hai đồng dư",
+    "level": 4,
+    "method": "Định lý số dư Trung Hoa tổng quát.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-17",
+    "title": "Bậc nhân modulo",
+    "level": 4,
+    "method": "Duyệt lũy thừa trong nhóm nhân.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-18",
+    "title": "Căn nguyên thủy nhỏ nhất",
+    "level": 5,
+    "method": "Kiểm tra bậc nhân bằng các ước của p−1.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-19",
+    "title": "Số căn nguyên thủy",
+    "level": 4,
+    "method": "Số phần tử sinh của nhóm cyclic bằng φ(p−1).",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-20",
+    "title": "Nguyên tố tiếp theo",
+    "level": 3,
+    "method": "Tăng dần và thử chia.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-21",
+    "title": "Cặp nguyên tố sinh đôi",
+    "level": 3,
+    "method": "Sàng hoặc kiểm tra nguyên tố.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-22",
+    "title": "Phân tích Goldbach",
+    "level": 3,
+    "method": "Kiểm tra nguyên tố và chỉ xét p≤n/2.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-23",
+    "title": "Cặp bạn bè",
+    "level": 4,
+    "method": "Tính tổng ước của n và đối tác, kiểm tra hai chiều.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-24",
+    "title": "Hàm Carmichael",
+    "level": 5,
+    "method": "LCM chu kỳ nhóm nhân của từng lũy thừa nguyên tố.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-25",
+    "title": "Biểu diễn thành hai bình phương",
+    "level": 3,
+    "method": "Duyệt a và kiểm tra bình phương còn lại.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-26",
+    "title": "Tổng hai lập phương",
+    "level": 3,
+    "method": "Duyệt a, tìm căn bậc ba phần còn lại.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-27",
+    "title": "Bộ ba Pythagore nguyên thủy",
+    "level": 4,
+    "method": "Duyệt hai cạnh, kiểm tra căn và GCD.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-28",
+    "title": "Tổng cấp số nhân modulo",
+    "level": 4,
+    "method": "Tích lũy tổng và lũy thừa trong modulo.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-29",
+    "title": "Chữ số cuối khác không của giai thừa",
+    "level": 4,
+    "method": "Tách thừa số 10 hoặc dùng số nguyên lớn.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-30",
+    "title": "Ký hiệu Legendre",
+    "level": 4,
+    "method": "Tiêu chuẩn Euler.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-31",
+    "title": "Căn bậc hai modulo",
+    "level": 4,
+    "method": "Duyệt lớp dư, áp dụng được modulo hợp số.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-32",
+    "title": "Tổ hợp Lucas",
+    "level": 5,
+    "method": "Định lý Lucas theo chữ số cơ số p.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-NumberTheory-33",
+    "title": "Chu kỳ thập phân",
+    "level": 4,
+    "method": "Theo dõi phần dư khi chia dài.",
+    "complexity": "O(n²) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-01",
+    "title": "Ít đồng xu nhất",
+    "level": 3,
+    "method": "DP tổng nhỏ đến lớn.",
+    "complexity": "O(n³) hoặc O(2^n n) với n≤16",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-02",
+    "title": "Đổi tiền không xét thứ tự",
+    "level": 4,
+    "method": "Duyệt loại đồng trước, tổng sau.",
+    "complexity": "O(n³) hoặc O(2^n n) với n≤16",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-03",
+    "title": "Ghép tiền có thứ tự",
+    "level": 4,
+    "method": "Duyệt tổng trước, chọn đồng cuối.",
+    "complexity": "O(n³) hoặc O(2^n n) với n≤16",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-04",
+    "title": "Số tập con đạt tổng",
+    "level": 4,
+    "method": "DP tổng giảm dần để không dùng lại chỉ số.",
+    "complexity": "O(n³) hoặc O(2^n n) với n≤16",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-05",
+    "title": "Ba lô trọng lượng",
+    "level": 3,
+    "method": "Tập tổng khả đạt của ba lô 0/1.",
+    "complexity": "O(n³) hoặc O(2^n n) với n≤16",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-06",
+    "title": "Ếch nhảy trên cột",
+    "level": 3,
+    "method": "Quy hoạch động theo tiền tố và trạng thái.",
+    "complexity": "O(n³) hoặc O(2^n n) với n≤16",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-07",
+    "title": "Ít lần nhảy nhất",
+    "level": 3,
+    "method": "Quy hoạch động theo tiền tố và trạng thái.",
+    "complexity": "O(n³) hoặc O(2^n n) với n≤16",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-08",
+    "title": "Dãy tăng có tổng lớn nhất",
+    "level": 4,
+    "method": "Quy hoạch động theo tiền tố và trạng thái.",
+    "complexity": "O(n³) hoặc O(2^n n) với n≤16",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-09",
+    "title": "Đếm dãy tăng dài nhất",
+    "level": 5,
+    "method": "Quy hoạch động theo tiền tố và trạng thái.",
+    "complexity": "O(n³) hoặc O(2^n n) với n≤16",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-10",
+    "title": "Dãy tăng rồi giảm",
+    "level": 4,
+    "method": "Quy hoạch động theo tiền tố và trạng thái.",
+    "complexity": "O(n³) hoặc O(2^n n) với n≤16",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-11",
+    "title": "Dãy nhấp nhô dài nhất",
+    "level": 4,
+    "method": "Hai trạng thái kết thúc bằng tăng hoặc giảm.",
+    "complexity": "O(n³) hoặc O(2^n n) với n≤16",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-12",
+    "title": "Dãy con cấp số cộng",
+    "level": 5,
+    "method": "DP theo vị trí cuối và công sai.",
+    "complexity": "O(n³) hoặc O(2^n n) với n≤16",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-13",
+    "title": "Tập chia hết lớn nhất",
+    "level": 4,
+    "method": "Sắp xếp và DP chuỗi chia hết.",
+    "complexity": "O(n³) hoặc O(2^n n) với n≤16",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-14",
+    "title": "Dãy con lặp lại",
+    "level": 5,
+    "method": "LCS của dãy với chính nó, cấm ghép cùng chỉ số.",
+    "complexity": "O(n³) hoặc O(2^n n) với n≤16",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-15",
+    "title": "Chia đoạn đối xứng",
+    "level": 4,
+    "method": "Quy hoạch động theo tiền tố và trạng thái.",
+    "complexity": "O(n³) hoặc O(2^n n) với n≤16",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-16",
+    "title": "Gộp tệp liền kề",
+    "level": 5,
+    "method": "DP trên khoảng với điểm chia cuối.",
+    "complexity": "O(n³) hoặc O(2^n n) với n≤16",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-17",
+    "title": "Nhân chuỗi ma trận",
+    "level": 5,
+    "method": "DP thứ tự đặt ngoặc chuỗi ma trận.",
+    "complexity": "O(n³) hoặc O(2^n n) với n≤16",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-18",
+    "title": "Bắn bóng tối ưu",
+    "level": 6,
+    "method": "DP trên khoảng, chọn bóng bắn cuối.",
+    "complexity": "O(n³) hoặc O(2^n n) với n≤16",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-19",
+    "title": "Cắt thanh tối ưu",
+    "level": 4,
+    "method": "Ba lô vô hạn theo độ dài.",
+    "complexity": "O(n³) hoặc O(2^n n) với n≤16",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-20",
+    "title": "Chia thành k đoạn tối ưu",
+    "level": 5,
+    "method": "Quy hoạch động theo tiền tố và trạng thái.",
+    "complexity": "O(n³) hoặc O(2^n n) với n≤16",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-21",
+    "title": "Dãy con tổng chia hết",
+    "level": 4,
+    "method": "DP theo lớp dư của tổng.",
+    "complexity": "O(n³) hoặc O(2^n n) với n≤16",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-22",
+    "title": "Số Catalan",
+    "level": 4,
+    "method": "Công thức Catalan.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-23",
+    "title": "Hoán vị không điểm cố định",
+    "level": 4,
+    "method": "D(n)=(n−1)(D(n−1)+D(n−2)).",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-24",
+    "title": "Lát bảng ba hàng",
+    "level": 4,
+    "method": "Phân loại phần ghép trái nhất của bảng 3 hàng.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-25",
+    "title": "Số Tribonacci",
+    "level": 4,
+    "method": "Quy hoạch động hoặc truy hồi.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-26",
+    "title": "Phân hoạch tập hợp",
+    "level": 4,
+    "method": "Số Bell từ tam giác Stirling.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-27",
+    "title": "Phân hoạch số nguyên",
+    "level": 4,
+    "method": "Đổi tiền bằng các số nguyên 1..n.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-28",
+    "title": "Phân hoạch thành phần phân biệt",
+    "level": 4,
+    "method": "DP tổng giảm dần theo từng số hạng.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-29",
+    "title": "Chuỗi nhị phân không kề nhau",
+    "level": 4,
+    "method": "Hai trạng thái theo bit kết thúc.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-30",
+    "title": "Chuỗi nhị phân tránh ba bit",
+    "level": 4,
+    "method": "DP ký tự cuối và độ dài đoạn cùng bit.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-31",
+    "title": "Đi bộ về gốc",
+    "level": 4,
+    "method": "DP số bước và độ cao.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-32",
+    "title": "Xếp quân hậu",
+    "level": 5,
+    "method": "Quay lui theo hàng, đánh dấu cột và đường chéo.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Sequences-33",
+    "title": "Cây nhị phân có nhãn",
+    "level": 4,
+    "method": "Catalan dạng cây nhân n! cách gán nhãn.",
+    "complexity": "O(n³) hoặc tốt hơn",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-01",
+    "title": "Đường ngắn có trọng số",
+    "level": 4,
+    "method": "Dijkstra với hàng đợi ưu tiên.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-02",
+    "title": "Chu trình âm ở bất kỳ đâu",
+    "level": 5,
+    "method": "Bellman–Ford với siêu nguồn, kiểm tra lần n.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-03",
+    "title": "Ma trận đường ngắn",
+    "level": 4,
+    "method": "Floyd–Warshall.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-04",
+    "title": "Đếm cầu của đồ thị",
+    "level": 4,
+    "method": "Tarjan hoặc xóa từng cạnh và đếm thành phần.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-05",
+    "title": "Liệt kê đỉnh khớp",
+    "level": 4,
+    "method": "Tarjan hoặc xóa từng đỉnh.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-06",
+    "title": "Thành phần liên thông mạnh",
+    "level": 5,
+    "method": "Bao đóng đạt được và nhóm các đỉnh đạt nhau hai chiều.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-07",
+    "title": "Thứ tự topo nhỏ nhất",
+    "level": 4,
+    "method": "Kahn với heap đỉnh vào bằng 0.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-08",
+    "title": "Phát hiện chu trình có hướng",
+    "level": 4,
+    "method": "Kahn: tồn tại đỉnh không thể loại bỏ.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-09",
+    "title": "Đường dài nhất trên DAG",
+    "level": 4,
+    "method": "DP trên thứ tự topo.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-10",
+    "title": "Đếm đường trên DAG",
+    "level": 4,
+    "method": "Cộng số đường theo thứ tự topo.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-11",
+    "title": "Cây khung nhỏ nhất",
+    "level": 4,
+    "method": "Kruskal hoặc duyệt các tập n−1 cạnh trong giới hạn nhỏ.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-12",
+    "title": "Cây khung có trọng số kế tiếp",
+    "level": 6,
+    "method": "Liệt kê cây khung và lấy tổng phân biệt nhỏ thứ hai.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-13",
+    "title": "Luồng cực đại",
+    "level": 5,
+    "method": "Edmonds–Karp trên mạng dư.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-14",
+    "title": "Ghép cặp hai phía",
+    "level": 5,
+    "method": "Tìm đường tăng trong ghép cặp hai phía.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-15",
+    "title": "Đường kính cây có trọng số",
+    "level": 4,
+    "method": "Hai lần duyệt cây hoặc khoảng cách mọi cặp.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-16",
+    "title": "Tổ tiên chung trên cây",
+    "level": 4,
+    "method": "Lưu cha và leo tổ tiên.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-17",
+    "title": "Kích thước cây con",
+    "level": 4,
+    "method": "DP cây theo thứ tự duyệt ngược.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-18",
+    "title": "Trọng tâm cây",
+    "level": 4,
+    "method": "Kích thước các thành phần sau khi bỏ một đỉnh.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-19",
+    "title": "Tổng khoảng cách trên cây",
+    "level": 4,
+    "method": "Mỗi cạnh đóng góp w×s×(n−s).",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-20",
+    "title": "Chu trình Euler từ đỉnh một",
+    "level": 5,
+    "method": "Hierholzer với thứ tự cạnh xác định.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-21",
+    "title": "Đếm cây khung",
+    "level": 5,
+    "method": "Duyệt tổ hợp cạnh và kiểm tra liên thông.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-22",
+    "title": "Số màu ít nhất",
+    "level": 6,
+    "method": "Quay lui tô màu, thử số màu tăng dần.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-23",
+    "title": "Tập độc lập lớn nhất",
+    "level": 5,
+    "method": "Duyệt tập con đỉnh bằng bitmask.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-24",
+    "title": "Clique lớn nhất",
+    "level": 5,
+    "method": "Duyệt tập con và kiểm tra mọi cặp.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-25",
+    "title": "Đếm đường Hamilton",
+    "level": 6,
+    "method": "Hoán vị hoặc DP bitmask theo tập đỉnh đã đi.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-26",
+    "title": "Người du lịch",
+    "level": 6,
+    "method": "DP tập con hoặc liệt kê hoán vị trong giới hạn nhỏ.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-27",
+    "title": "Bao đóng đạt được",
+    "level": 4,
+    "method": "Warshall theo quan hệ đạt được.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-28",
+    "title": "Cạnh thừa của DAG",
+    "level": 5,
+    "method": "Kiểm tra đường thay thế cho mỗi cạnh.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-29",
+    "title": "Đường có cạnh nặng nhất nhỏ nhất",
+    "level": 5,
+    "method": "Floyd với phép kết hợp max thay cho cộng.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-30",
+    "title": "Mê cung ô vuông",
+    "level": 4,
+    "method": "BFS các ô đi được.",
+    "complexity": "O(nm)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-31",
+    "title": "Nước đi quân mã",
+    "level": 4,
+    "method": "BFS trên đồ thị các ô.",
+    "complexity": "O(n²)",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-32",
+    "title": "Kết nối tăng dần",
+    "level": 4,
+    "method": "Disjoint Set Union với nén đường đi.",
+    "complexity": "O((n+m)α(n))",
+    "tests": 5
+  },
+  {
+    "key": "v6-Graphs-33",
+    "title": "Tâm đồ thị có trọng số",
+    "level": 4,
+    "method": "Khoảng cách mọi cặp, lấy bán kính đồ thị.",
+    "complexity": "Theo thuật toán; n≤7, m≤12",
+    "tests": 5
+  }
+]

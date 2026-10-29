@@ -18,6 +18,11 @@ app:
   worker-token: ${WORKER_TOKEN:}
   demo: ${DEMO_DATA:false}
   max-queue: ${MAX_QUEUE:500}
+  survival:
+    rating-ranges: ${SURVIVAL_RATING_RANGES:150,250,350,400}
+    rank-thresholds: ${SURVIVAL_RANK_THRESHOLDS:1100,1300,1500,1700,1900}
+    k-factor: ${SURVIVAL_K_FACTOR:32}
+    accept-seconds: ${SURVIVAL_ACCEPT_SECONDS:20}
 logging:
   level:
     vn.codegrade: INFO

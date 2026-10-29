@@ -25,10 +25,11 @@ class SystemIntegrationTest {
  @Autowired Store db; @Autowired Identity identity; @Autowired Catalog catalog; @Autowired Commands commands;
  @Autowired Submissions judge; @Autowired Survival rooms; @Autowired Contests contests;
  @Autowired ClientSocket clients; @LocalServerPort int port;
+ @Autowired vn.codegrade.room.Matchmaking matchmaking; @Autowired vn.codegrade.room.Progression progression;
  User admin,author;List<User> coders;ObjectNode fixture;
  @BeforeEach void setup() throws Exception {
   db.atomic(()->{
-   for(String t:List.of("submissions","rooms","contests","solved","commands","drafts","events","audit","problems","sessions","users","categories"))db.sql.update("DELETE FROM "+t);
+   for(String t:List.of("reward_events","match_results","match_queue","progression","room_presence","submissions","rooms","contests","solved","commands","drafts","events","audit","problems","sessions","users","categories"))db.sql.update("DELETE FROM "+t);
    db.sql.update("INSERT INTO categories VALUES('algorithms','Algorithms','Tests')");
    admin=identity.user(identity.create("admin","Admin","test-password-123","ADMIN"));
    author=identity.user(identity.create("author","Author","test-password-123","AUTHOR"));
@@ -95,7 +96,7 @@ class SystemIntegrationTest {
   for(int i=0;i<4;i++)call(coders.get(i),"SUBMIT",submitPayload(r));
   assertEquals("ROUND_GRADING",rooms.load(id).path("state").asText());
  }
- @Test void firstConfirmedAcWinsFinalImmediatelyAndLateResultCannotChangeWinner() {
+ @Test void finalWaitsForEarlierPendingAdmissionAndWorkerOrderCannotChooseWinner() {
   ObjectNode r=start(lobby(5,List.of(1),4));String id=r.path("id").asText();
   for(int i=0;i<2;i++){everyoneAc(r);r=nextRound(rooms.load(id));}
   assertEquals("FINAL",r.path("current").path("kind").asText());
@@ -105,15 +106,16 @@ class SystemIntegrationTest {
   call(coders.get(1),"SUBMIT",payload);
   JsonNode second=db.tree(judge.claim("test-worker"));
   grade(second,true);
-  ObjectNode finished=rooms.load(id);
+  assertEquals("ROUND_GRADING",rooms.load(id).path("state").asText());
+  grade(first,true);ObjectNode finished=rooms.load(id);
   assertEquals("FINISHED",finished.path("state").asText());
-  assertEquals(coders.get(1).id(),finished.path("winnerId").asText());
-  assertEquals(1,identity.user(coders.get(1).id()).wins());
+  assertEquals(coders.getFirst().id(),finished.path("winnerId").asText());
+  assertEquals(1,identity.user(coders.getFirst().id()).wins());
   assertThrows(Store.Fault.class,()->call(coders.getFirst(),"SUBMIT",payload));
-  grade(first,true);
+  assertFalse(db.tree(judge.complete("test-worker",data("id",first.path("id").asText(),"leaseToken",first.path("leaseToken").asText()))).path("accepted").asBoolean());
   assertEquals(finished,rooms.load(id));
-  assertEquals(1,identity.user(coders.get(1).id()).wins());
-  assertEquals(0,identity.user(coders.getFirst().id()).wins());
+  assertEquals(0,identity.user(coders.get(1).id()).wins());
+  assertEquals(1,identity.user(coders.getFirst().id()).wins());
  }
  @Test void finalAcDoesNotWaitForOpponentToSubmit() {
   ObjectNode r=start(lobby(5,List.of(1),4));String id=r.path("id").asText();
@@ -122,11 +124,12 @@ class SystemIntegrationTest {
   assertEquals("FINISHED",rooms.load(id).path("state").asText());
   assertEquals(coders.getFirst().id(),rooms.load(id).path("winnerId").asText());
  }
- @Test void queuedSubmissionStillFinishesAfterEmptyRoomIsDeleted() {
+ @Test void queuedSubmissionStillFinishesAndEmptyRoomHistoryIsPreserved() {
   ObjectNode r=start(lobby(5,List.of(1),4));String rid=r.path("id").asText();
   JsonNode receipt=call(coders.getFirst(),"SUBMIT",submitPayload(r));
   for(int i=0;i<5;i++)call(coders.get(i),"ROOM_LEAVE",data("roomId",rid));
-  assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM rooms WHERE id=?",Integer.class,rid));
+  assertEquals(1,db.sql.queryForObject("SELECT COUNT(*) FROM rooms WHERE id=?",Integer.class,rid));
+  assertEquals("UNRESOLVED",rooms.load(rid).path("state").asText());
   gradeNext(true);
   assertEquals("AC",db.one("SELECT status FROM submissions WHERE id=?",receipt.path("id").asText()).get("status"));
  }
@@ -523,5 +526,192 @@ class SystemIntegrationTest {
   var results=call(coders.getFirst(),"PROBLEMS",data("search",code.toLowerCase(Locale.ROOT)));assertEquals(1,results.size());assertEquals(first.path("id").asText(),results.get(0).path("id").asText());
   var safe=call(coders.getFirst(),"QUESTION_GET",data("id",first.path("id").asText()));assertEquals(code,safe.path("publicId").asText());assertFalse(safe.has("answer"));assertFalse(safe.has("testcases"));
   assertNotEquals(code,createProblem(1,false).path("publicId").asText());assertEquals("CG-10000",Catalog.publicId(10000));
+ }
+ void moreCoders(int count) {
+  while(coders.size()<count){int i=coders.size();coders.add(identity.user(identity.create("extra"+i,"Extra "+i,"test-password-123","CODER")));}
+ }
+ ObjectNode matched(String mode) {
+  for(int i=0;i<4;i++)createProblem(1,true);
+  JsonNode found=null;for(int i=0;i<5;i++)found=call(coders.get(i),"MATCH_QUEUE_JOIN",data("mode",mode));
+  String id=found.path("roomId").asText();assertFalse(id.isBlank());
+  for(int i=0;i<5;i++)call(coders.get(i),"MATCH_ACCEPT",data("roomId",id));
+  ObjectNode r=rooms.load(id);assertEquals("COUNTDOWN",r.path("state").asText());
+  return nextRound(r);
+ }
+ @Test void practiceSupportsEverySizeFromTwoToTenWithNoRankChanges() {
+  moreCoders(10);for(int i=0;i<6;i++)createProblem(1,true);
+  for(int n=2;n<=10;n++) {
+   ObjectNode r=(ObjectNode)call(coders.getFirst(),"ROOM_CREATE",data("capacity",n,"name","Practice "+n));
+   for(int i=1;i<n;i++)r=(ObjectNode)call(coders.get(i),"ROOM_JOIN",data("roomId",r.path("code").asText()));
+   assertEquals(n,r.path("players").size());r=start(r);String rid=r.path("id").asText();
+   for(int rounds=0;rounds<6&&!r.path("state").asText().equals("FINISHED");rounds++){everyoneAc(r);r=rooms.load(rid);if(!r.path("state").asText().equals("FINISHED"))r=nextRound(r);}
+   assertEquals("FINISHED",r.path("state").asText());assertEquals(n,r.path("results").size());
+   for(int i=0;i<n;i++)assertEquals(1000,progression.get(coders.get(i).id()).path("rating").asInt());
+  }
+  assertEquals(30,db.sql.queryForObject("SELECT SUM(exp) FROM reward_events WHERE user_id=? AND kind='PRACTICE'",Integer.class,coders.getFirst().id()));
+ }
+ @Test void normalRequiresFiveAndLeavesSixthWaiting() {
+  for(int i=0;i<4;i++)assertEquals("WAITING",call(coders.get(i),"MATCH_QUEUE_JOIN",data("mode","NORMAL")).path("state").asText());
+  assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM rooms",Integer.class));
+  var found=call(coders.get(4),"MATCH_QUEUE_JOIN",data("mode","NORMAL"));assertEquals("MATCH_FOUND",found.path("state").asText());
+  assertEquals(5,found.path("room").path("players").size());
+  assertEquals("WAITING",call(coders.get(5),"MATCH_QUEUE_JOIN",data("mode","NORMAL")).path("state").asText());
+  String rid=found.path("roomId").asText();for(int i=0;i<4;i++)call(coders.get(i),"MATCH_ACCEPT",data("roomId",rid));
+  assertEquals("LOBBY",rooms.load(rid).path("state").asText());
+  assertThrows(Store.Fault.class,()->call(coders.getFirst(),"ROOM_START",data("roomId",rid)));
+  assertThrows(Store.Fault.class,()->call(coders.get(5),"ROOM_JOIN",data("roomId",rid)));
+  assertThrows(Store.Fault.class,()->call(coders.getFirst(),"ROOM_CREATE",data("mode","NORMAL")));
+  call(coders.get(4),"MATCH_DECLINE",data());
+  assertEquals("CLOSED",rooms.load(rid).path("state").asText());
+  assertEquals(1,db.sql.queryForObject("SELECT COUNT(*) FROM rooms WHERE state='LOBBY'",Integer.class));
+ }
+ @Test void tenAndFifteenQueueEntriesCreateOnlyDistinctFivePlayerRooms() throws Exception {
+  moreCoders(15);
+  var pool=Executors.newFixedThreadPool(8);
+  try {var jobs=new ArrayList<Future<?>>();for(var u:coders)jobs.add(pool.submit(()->call(u,"MATCH_QUEUE_JOIN",data("mode","NORMAL"))));for(var j:jobs)j.get(20,TimeUnit.SECONDS);}
+  finally{pool.shutdownNow();}
+  assertEquals(3,db.sql.queryForObject("SELECT COUNT(*) FROM rooms",Integer.class));
+  Set<String> seen=new HashSet<>();for(var row:db.sql.queryForList("SELECT document FROM rooms")) {var r=db.read((String)row.get("document"));assertEquals(5,r.path("players").size());for(var p:r.path("players"))assertTrue(seen.add(p.path("id").asText()));}
+ }
+ @Test void rankedChecksWholeGroupSpreadAtEveryTenSecondBoundaryAndCapsAt400() {
+  int[] ratings={1200,1300,1400,1450,1580};
+  for(int i=0;i<5;i++){progression.get(coders.get(i).id());db.sql.update("UPDATE progression SET rating=? WHERE user_id=?",ratings[i],coders.get(i).id());call(coders.get(i),"MATCH_QUEUE_JOIN",data("mode","RANKED"));}
+  for(int seconds:new int[]{0,10,20}) {
+   db.sql.update("UPDATE match_queue SET joined_at=?,last_seen=?",db.now()-seconds*1000L,db.now());matchmaking.tick();
+   assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM rooms",Integer.class));
+  }
+  db.sql.update("UPDATE match_queue SET joined_at=?,last_seen=?",db.now()-30_001,db.now());matchmaking.tick();
+  assertEquals(1,db.sql.queryForObject("SELECT COUNT(*) FROM rooms",Integer.class));
+  String rid=call(coders.getFirst(),"MATCH_SNAPSHOT",data()).path("roomId").asText();call(coders.getFirst(),"MATCH_DECLINE",data());
+  db.sql.update("UPDATE match_queue SET state='WAITING',room_id=NULL,rating=CASE WHEN user_id=? THEN 1701 ELSE 1200 END,joined_at=?,last_seen=?",coders.get(4).id(),db.now()-1_000_000,db.now());
+  matchmaking.tick();assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM rooms WHERE state='LOBBY'",Integer.class));
+  assertEquals(400,call(coders.getFirst(),"MATCH_QUEUE_STATUS",data()).path("ratingRange").asInt());
+ }
+ @Test void rankedCompatibleFiveMatchImmediatelyAndReplayDoesNotDuplicate() {
+  String rid=db.id();JsonNode last=null;
+  for(int i=0;i<5;i++)last=db.tree(commands.execute(coders.get(i),"MATCH_QUEUE_JOIN",data("mode","RANKED"),i==4?rid:db.id()));
+  assertEquals("MATCH_FOUND",last.path("state").asText());
+  assertEquals(last.toString(),db.tree(commands.execute(coders.get(4),"MATCH_QUEUE_JOIN",data("mode","RANKED"),rid)).toString());
+  assertEquals(1,db.sql.queryForObject("SELECT COUNT(*) FROM rooms",Integer.class));
+  assertThrows(Store.Fault.class,()->call(coders.getFirst(),"MATCH_QUEUE_JOIN",data("mode","NORMAL")));
+ }
+ @Test void matchTimeoutRequeuesAcceptedPlayersAndKeepsQueueAcrossServiceRestart() {
+  JsonNode last=null;for(int i=0;i<5;i++)last=call(coders.get(i),"MATCH_QUEUE_JOIN",data("mode","NORMAL"));String rid=last.path("roomId").asText();
+  for(int i=0;i<4;i++)call(coders.get(i),"MATCH_ACCEPT",data("roomId",rid));
+  ObjectNode r=rooms.load(rid);r.put("acceptDeadline",0);writeRoom(r);
+  new vn.codegrade.room.Matchmaking(db,rooms,progression,identity).tick();
+  assertEquals("CLOSED",rooms.load(rid).path("state").asText());
+  assertEquals(4,db.sql.queryForObject("SELECT COUNT(*) FROM match_queue WHERE state='WAITING'",Integer.class));
+  assertEquals("WAITING",call(coders.getFirst(),"MATCH_SNAPSHOT",data()).path("state").asText());
+  assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM reward_events",Integer.class));
+ }
+ @Test void normalAndRankedSettlementAwardsExpExactlyOnceAndPreservesContestElo() {
+  for(String mode:List.of("NORMAL","RANKED")) {
+   ObjectNode r=matched(mode);String rid=r.path("id").asText();
+   for(int round=0;round<5&&!r.path("state").asText().equals("FINISHED");round++){everyoneAc(r);r=rooms.load(rid);if(!r.path("state").asText().equals("FINISHED"))r=nextRound(r);}
+   assertEquals("FINISHED",r.path("state").asText());assertEquals(5,r.path("results").size());
+   assertEquals(300,db.sql.queryForObject("SELECT SUM(exp) FROM match_results WHERE room_id=?",Integer.class,rid));
+   db.atomic(()->{progression.settle(rooms.load(rid));return null;});
+   assertEquals(5,db.sql.queryForObject("SELECT COUNT(*) FROM reward_events WHERE event_key=?",Integer.class,"match:"+rid));
+   assertEquals(1200,identity.user(coders.getFirst().id()).elo());
+   int rating=progression.get(coders.getFirst().id()).path("rating").asInt();assertEquals(mode.equals("RANKED")?1016:1000,rating);
+  }
+ }
+ @Test void firstIndependentAcAwardsExpButExamplesAndReplayDoNot() {
+  var q=createProblem(6,false);var p=data("problemId",q.path("id").asText(),"source","pass","language","PY311");
+  call(coders.getFirst(),"RUN_EXAMPLES",p);gradeNext(true);assertEquals(0,progression.get(coders.getFirst().id()).path("exp").asInt());
+  String rid=db.id();commands.execute(coders.getFirst(),"SUBMIT",p,rid);gradeNext(true);commands.execute(coders.getFirst(),"SUBMIT",p,rid);
+  call(coders.getFirst(),"SUBMIT",p);gradeNext(true);assertEquals(150,progression.get(coders.getFirst().id()).path("exp").asInt());
+ }
+ @Test void competitiveSubmissionClearsLegacyDraftAndNeverReturnsProofs() {
+  ObjectNode r=start(lobby(2,List.of(1),3));String pid=r.path("current").path("problemId").asText();
+  call(coders.getFirst(),"DRAFT_SAVE",data("problemId",pid,"language","PY311","source","old code"));
+  var ack=call(coders.getFirst(),"SUBMIT",submitPayload(r));assertFalse(ack.has("receipt"));
+  assertEquals(0,call(coders.getFirst(),"DRAFT_GET",data("problemId",pid)).size());
+  assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM receipts",Integer.class));
+  assertThrows(Store.Fault.class,()->call(coders.getFirst(),"RECEIPT_GET",data("id",ack.path("id").asText())));
+  assertThrows(Store.Fault.class,()->call(coders.getFirst(),"DRAFT_SAVE",data("roomId",r.path("id").asText(),"problemId",pid,"language","PY311","source","late code")));
+  assertEquals("print(sum(map(int,input().split())))",db.one("SELECT source_code FROM submissions WHERE id=?",ack.path("id").asText()).get("source_code"));
+ }
+ @Test void bankExpansionIsIdempotentAndPreservesAuthorConflictsAndSnapshots() throws Exception {
+  var baseline=(ObjectNode)db.json.readTree(getClass().getResourceAsStream("/dataset-upgrade-6.json")).get(0).deepCopy();
+  db.sql.update("INSERT INTO categories VALUES('arithmetic','Số học','Số học')");
+  var saved=(ObjectNode)createProblem(1,false);String id=saved.path("id").asText(),code=saved.path("publicId").asText();
+  baseline.put("id",id).put("version",7);db.sql.update("UPDATE problems SET version=7,document=? WHERE id=?",db.write(baseline),id);
+  var expansion=new vn.codegrade.db.SeedBankExpansion(db,catalog,identity);expansion.apply();expansion.apply();
+  assertEquals(201,db.sql.queryForObject("SELECT COUNT(*) FROM problems",Integer.class));
+  assertEquals(8,catalog.document(id).path("version").asInt());assertEquals(5,catalog.document(id).path("testcases").size());assertEquals(code,catalog.document(id).path("publicId").asText());
+  var changed=(ObjectNode)catalog.document(id);((ObjectNode)changed.path("general")).put("questionName","AUTHOR changed title");call(author,"QUESTION_SAVE",changed);expansion.apply();
+  assertEquals("AUTHOR changed title",catalog.document(id).path("general").path("questionName").asText());
+  assertEquals(1,db.sql.queryForObject("SELECT COUNT(*) FROM audit WHERE action='SEED_V6_CONFLICT' AND entity_id=?",Integer.class,id));
+ }
+ @Test void rankedWindowsIncludeTheirBoundaryAndExcludeTheNextPoint() {
+  for(int[] c:List.of(new int[]{0,150,1},new int[]{0,151,0},new int[]{10,250,1},new int[]{10,251,0},new int[]{20,350,1},new int[]{20,351,0},new int[]{30,400,1},new int[]{30,401,0})) {
+   db.sql.update("DELETE FROM match_queue");db.sql.update("DELETE FROM rooms");
+   for(int i=0;i<5;i++){progression.get(coders.get(i).id());db.sql.update("UPDATE progression SET rating=? WHERE user_id=?",1000+(i==4?c[1]:0),coders.get(i).id());call(coders.get(i),"MATCH_QUEUE_JOIN",data("mode","RANKED"));}
+   db.sql.update("UPDATE match_queue SET joined_at=?",db.now()-c[0]*1000L);matchmaking.tick();
+   assertEquals(c[2],db.sql.queryForObject("SELECT COUNT(*) FROM rooms WHERE state='LOBBY'",Integer.class),Arrays.toString(c));
+  }
+ }
+ @Test void tiesSplitOccupiedRewardsAndCancelledMatchesNeverReward() {
+  var ids=coders.subList(0,5).stream().map(User::id).toList();
+  var r=data("id",db.id(),"state","UNRESOLVED","mode","RANKED","participants",ids,"winnerId",ids.getFirst());
+  db.atomic(()->{progression.settle(r);return null;});assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM reward_events",Integer.class));
+  r.put("state","FINISHED");db.atomic(()->{progression.settle(r);return null;});
+  assertEquals(300,db.sql.queryForObject("SELECT SUM(exp) FROM match_results",Integer.class));
+  for(int i=1;i<5;i++){var result=db.one("SELECT * FROM match_results WHERE user_id=?",ids.get(i));assertEquals(2,((Number)result.get("placement")).intValue());assertEquals(50,((Number)result.get("exp")).intValue());assertEquals(996,((Number)result.get("rating_after")).intValue());}
+ }
+ @Test void multipleConnectionsAndAcceptCancelRaceCannotDuplicateMembership() throws Exception {
+  var pool=Executors.newFixedThreadPool(2);
+  try {
+   var joins=new ArrayList<Future<Boolean>>();for(int i=0;i<2;i++)joins.add(pool.submit(()->{try{call(coders.getFirst(),"MATCH_QUEUE_JOIN",data("mode","NORMAL"));return true;}catch(Store.Fault e){return false;}}));
+   int count=0;for(var f:joins)if(f.get())count++;assertEquals(1,count);
+   JsonNode found=null;for(int i=1;i<5;i++)found=call(coders.get(i),"MATCH_QUEUE_JOIN",data("mode","NORMAL"));String rid=found.path("roomId").asText();
+   for(int i=0;i<3;i++)call(coders.get(i),"MATCH_ACCEPT",data("roomId",rid));
+   var accept=pool.submit(()->{try{call(coders.get(3),"MATCH_ACCEPT",data("roomId",rid));}catch(Store.Fault ignored){}});
+   var cancel=pool.submit(()->call(coders.get(4),"MATCH_DECLINE",data()));accept.get();cancel.get();
+   assertEquals("CLOSED",rooms.load(rid).path("state").asText());assertEquals(4,db.sql.queryForObject("SELECT COUNT(*) FROM match_queue WHERE state='WAITING'",Integer.class));
+  }finally{pool.shutdownNow();}
+ }
+ @Test void validationBacklogCannotStarveRealCompetitiveSubmissions() {
+  ObjectNode r=start(lobby(2,List.of(1),3));var extra=createProblem(1,false);call(author,"QUESTION_VALIDATE",data("id",extra.path("id").asText()));
+  db.sql.update("UPDATE submissions SET received_at=0 WHERE status='QUEUED'");
+  var ack=call(coders.getFirst(),"SUBMIT",submitPayload(r));var job=db.tree(judge.claim("test-worker"));assertEquals(ack.path("id").asText(),job.path("id").asText());
+ }
+ @Test void legacySolvedProblemCannotBeFarmedAfterInstallingProgression() {
+  var q=createProblem(1,false);String pid=q.path("id").asText();db.sql.update("INSERT INTO solved VALUES(?,?)",coders.getFirst().id(),pid);
+  call(coders.getFirst(),"SUBMIT",data("problemId",pid,"language","PY311","source","pass"));gradeNext(true);
+  assertEquals(0,progression.get(coders.getFirst().id()).path("exp").asInt());
+ }
+ @Test void leavingAfterEliminationCannotImprovePlacement() {
+  ObjectNode r=start(lobby(5,List.of(1),4));String rid=r.path("id").asText();everyoneAc(r);r=nextRound(rooms.load(rid));
+  call(coders.get(4),"ROOM_LEAVE",data("roomId",rid));
+  everyoneAc(r);r=nextRound(rooms.load(rid));everyoneAc(r);r=rooms.load(rid);assertEquals("FINISHED",r.path("state").asText());
+  assertEquals(4,db.one("SELECT placement FROM match_results WHERE room_id=? AND user_id=?",rid,coders.get(4).id()).get("placement"));
+ }
+ @Test void retiredProofCommandCannotReplayLegacySignedResponse() {
+  String rid=db.id();var p=data("id","legacy");String fingerprint=Store.hash("RECEIPT_GET"+commands.canonical(p));
+  db.sql.update("INSERT INTO commands VALUES(?,?,?,?,?)",coders.getFirst().id(),rid,fingerprint,"{\"signature\":\"old\",\"payload\":\"old\"}",db.now());
+  assertThrows(Store.Fault.class,()->commands.execute(coders.getFirst(),"RECEIPT_GET",p,rid));
+  var stripped=Commands.withoutProofs(data("receipt",data("signature","old"),"nested",data("certificate",data("signature","old"))));assertFalse(stripped.has("receipt"));assertFalse(stripped.path("nested").has("certificate"));
+ }
+ @Test void earlierInfrastructureFailureVoidsFinalRatherThanChargingRankLoss() {
+  ObjectNode r=start(lobby(2,List.of(1),3));call(coders.getFirst(),"SUBMIT",submitPayload(r));var first=db.tree(judge.claim("test-worker"));
+  call(coders.get(1),"SUBMIT",submitPayload(r));var second=db.tree(judge.claim("test-worker"));grade(second,true);
+  for(int i=0;i<3;i++) {judge.complete("test-worker",data("id",first.path("id").asText(),"leaseToken",first.path("leaseToken").asText(),"systemError",true));if(i<2)first=db.tree(judge.claim("test-worker"));}
+  var current=rooms.load(r.path("id").asText());assertEquals("RESCUE",current.path("nextKind").asText());assertFalse(current.has("winnerId"));assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM reward_events",Integer.class));
+ }
+ @Test void existingFrozenRoomKeepsItsLegacyTestsUntilTheMatchEnds() throws Exception {
+  ObjectNode r=start(lobby(2,List.of(1),3));var original=db.json.readTree(getClass().getResourceAsStream("/dataset-upgrade-6.json")).get(0);
+  ((ObjectNode)r.path("frozenProblem")).set("testcases",original.path("testcases"));writeRoom(r);
+  var ack=call(coders.getFirst(),"SUBMIT",submitPayload(r));var frozen=db.read((String)db.one("SELECT snapshot FROM submissions WHERE id=?",ack.path("id").asText()).get("snapshot"));
+  assertEquals(original.path("testcases").size(),frozen.path("testcases").size());assertTrue(frozen.path("testcases").size()>5);
+ }
+ @Test void deferredContestProblemStillWorksInIndependentPractice() throws Exception {
+  ObjectNode q=(ObjectNode)createProblem(1,false);String pid=q.path("id").asText();var baseline=db.json.readTree(getClass().getResourceAsStream("/dataset-upgrade-6.json")).get(0);
+  q.set("testcases",baseline.path("testcases"));db.sql.update("UPDATE problems SET document=? WHERE id=?",db.write(q),pid);
+  var c=data("startsAt",db.now()-1000,"endsAt",db.now()+60000,"problemIds",List.of(pid));db.sql.update("INSERT INTO contests VALUES(?,?,?)",db.id(),author.id(),db.write(c));
+  var ack=call(coders.getFirst(),"SUBMIT",data("problemId",pid,"source","pass","language","PY311"));
+  var snapshot=db.read((String)db.one("SELECT snapshot FROM submissions WHERE id=?",ack.path("id").asText()).get("snapshot"));assertEquals(baseline.path("testcases").size(),snapshot.path("testcases").size());
  }
 }

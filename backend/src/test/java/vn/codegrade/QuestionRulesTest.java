@@ -15,9 +15,9 @@ class QuestionRulesTest {
  @Test void displayDoesNotSkipHiddenTests() {assertEquals(q.path("testcases").size(),QuestionRules.active(q).size());assertEquals("HIDE",q.path("testcases").get(1).path("display").asText());}
  @Test void entireBundledBankIsExecutableWithoutExposingReferenceAnswers() throws Exception {
   var bank=new ObjectMapper().readTree(getClass().getResourceAsStream("/dataset.json"));
-  assertEquals(120,bank.size());var levels=new java.util.HashSet<Integer>();var counts=new java.util.HashMap<String,Integer>();
-  for(var item:bank){assertDoesNotThrow(()->QuestionRules.validate(item));assertEquals("CPP11",item.path("answer").path("language").asText());assertTrue(item.path("answer").path("sampleAnswer").asText().contains("int main()"));levels.add(item.path("difficulty").asInt());counts.merge(item.path("general").path("categoryId").asText(),1,Integer::sum);assertTrue(item.path("testcases").size()>=10);}
-  assertEquals(java.util.Set.of(1,2,3,4,5,6),levels);assertEquals(6,counts.size());counts.values().forEach(n->assertEquals(20,n));
+  assertEquals(320,bank.size());var levels=new java.util.HashSet<Integer>();var counts=new java.util.HashMap<String,Integer>();
+  for(var item:bank){assertDoesNotThrow(()->QuestionRules.validate(item));assertFalse(item.path("answer").path("sampleAnswer").asText().isBlank());levels.add(item.path("difficulty").asInt());counts.merge(item.path("general").path("categoryId").asText(),1,Integer::sum);assertEquals(5,item.path("testcases").size());}
+  assertEquals(java.util.Set.of(1,2,3,4,5,6),levels);assertEquals(java.util.Map.of("arithmetic",54,"arrays",54,"strings",53,"numbertheory",53,"sequences",53,"graphs",53),counts);
  }
  @Test void examplesModeNeedsExample() {for(var t:q.path("testcases"))((ObjectNode)t).put("useasexample",false);assertThrows(Fault.class,()->QuestionRules.validate(q));}
  @Test void negativeMarkRejected() {((ObjectNode)q.path("testcases").get(0)).put("mark",-0.1);assertThrows(Fault.class,()->QuestionRules.validate(q));}

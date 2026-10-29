@@ -1,0 +1,27 @@
+{
+  "kind": "Existing CodeGrade MySQL volume upgraded from Flyway v5 to v6 without reset",
+  "before": {
+    "problems": 120,
+    "submissions": 314,
+    "completed": 314,
+    "commands": 1113
+  },
+  "historical_rows_unchanged": {
+    "problems": true,
+    "submissions": true,
+    "completed": true,
+    "commands": true
+  },
+  "after": {
+    "problems": 320,
+    "testcases": 1675,
+    "five_case_problems": 315,
+    "validated_versions": 320
+  },
+  "pending_legacy_problems": 5,
+  "deferred_until": "2026-10-31T14:05:00+07:00",
+  "deferred_reason": "Five problems belong to an ongoing contest; preserve its statement/tests until it ends, then retry automatically.",
+  "backup_path": "C:\\Users\\Minh\\AppData\\Local\\Temp\\codegrade-v6-before.sql",
+  "backup_bytes": 265707021,
+  "original_problem_mapping_sha256": "8df4c6c6aef2e1b8b49b8d19c64577dd1729e306eab369dcce0267afe0d0ffe1"
+}

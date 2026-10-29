@@ -26,7 +26,7 @@ public final class QuestionRules {
         integer(q,"answerboxlines",1,200); integer(q,"precheck",0,4);
         integer(q,"giveupallowed",0,2); integer(q,"displayfeedback",0,2);
         integer(q,"difficulty",1,6);
-        require(q.path("testcases").isArray() && q.path("testcases").size()<=200,"Tối đa 200 test case");
+        require(q.path("testcases").isArray() && q.path("testcases").size()<=5,"Tối đa 5 testcase; đề công bố cần đúng 5");
         var tests=active(q);
         int proto=q.path("advancedCustomisation").path("prototypetype").asInt(0);
         require(proto!=1,"Không tạo prototype built-in từ giao diện");
@@ -64,6 +64,12 @@ public final class QuestionRules {
         if(g.path("status").asText().equals("ready")) executable(q);
     }
     public static void executable(JsonNode q) {
+        executable(q,true);
+    }
+    /** Only for frozen rooms/contests already active when the five-case bank was installed. */
+    public static void executableSnapshot(JsonNode q) { executable(q,false); }
+    private static void executable(JsonNode q,boolean fiveCases) {
+        if(fiveCases)require(q.path("testcases").size()==5 && active(q).size()==5,"Đề dùng để chấm cần đúng 5 testcase có nội dung");
         var c=q.path("customisation"); var a=q.path("advancedCustomisation");
         require(!active(q).isEmpty(),"Đề công bố phải có test case");
         require(!c.path("iscombinatortemplate").asBoolean() && c.path("template").asText().isBlank() &&

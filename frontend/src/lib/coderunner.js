@@ -30,6 +30,8 @@ export function validate(q){
  if(!Array.isArray(q.languages)||!q.languages.length||q.languages.some(l=>!languageNames[l])) errors.push('Cần chọn ngôn ngữ hợp lệ.');
  if(q.penaltyregime&&!/^\s*\d+(?:\.\d+)?(?:\s*,\s*\d+(?:\.\d+)?)*(?:\s*,\s*\.{3})?\s*$/.test(q.penaltyregime)) errors.push('Penalty regime: ví dụ 10, 20, ...');
  const tests=activeTests(q);
+ if(q.testcases.length>5)errors.push('Tối đa 5 testcase.');
+ if(q.general.status==='ready'&&(q.testcases.length!==5||tests.length!==5))errors.push('Đề công bố cần đúng 5 testcase có nội dung.');
  if(!tests.length && q.advancedCustomisation.prototypetype!==2) errors.push('Cần ít nhất một test có nội dung.');
  if(tests.some(t=>t.testcode!=='')&&tests.some(t=>t.testcode==='')) errors.push('Testcode phải có ở tất cả hoặc trống ở tất cả test có nội dung.');
  if(q.precheck===2&&!tests.some(t=>t.useasexample)) errors.push('Precheck Examples cần ít nhất một Use as example.');
@@ -48,4 +50,4 @@ export function validate(q){
  if(a.attachments!==-1&&a.attachmentsrequired>a.attachments) errors.push('Số file bắt buộc không được vượt số file cho phép.');
  return errors;
 }
-export function serialized(q){return {...q,testcases:q.testcases.filter(t=>t.testcode||t.stdin||t.expected||t.extra||t.useasexample||t.display!=='SHOW'||t.hiderestiffail||t.mark!==1||t.testtype!==0)};}
+export function serialized(q){return {...q,testcases:q.testcases.map(t=>({...t}))};}

@@ -92,7 +92,7 @@ public class ClientSocket extends TextWebSocketHandler {
                 }
                 var events=db.sql.queryForList("SELECT id,type,payload,created_at FROM events WHERE id>? AND (user_id IS NULL OR user_id=?) ORDER BY id LIMIT 200",c.cursor,c.user.id());
                 for(var e:events) {
-                    send(c,Map.of("v",1,"type","EVENT","seq",e.get("id"),"event",e.get("type"),"data",db.read((String)e.get("payload")),"serverTime",db.now()));
+                    send(c,Map.of("v",1,"type","EVENT","seq",e.get("id"),"event",e.get("type"),"data",Commands.withoutProofs(db.read((String)e.get("payload"))),"serverTime",db.now()));
                     c.cursor=((Number)e.get("id")).longValue();
                 }
             } catch(Exception e) { LoggerFactory.getLogger(ClientSocket.class).warn("Event delivery deferred"); }

@@ -15,9 +15,9 @@ import com.google.re2j.Pattern;
 
 @Service
 public class Submissions {
-    private final Store db; private final Catalog catalog; private final Survival survival;
+    private final Store db; private final Catalog catalog; private final Survival survival; private final vn.codegrade.room.Progression progression;
     @Value("${app.max-queue}") int maxQueue;
-    public Submissions(Store db,Catalog catalog,Survival survival) { this.db=db; this.catalog=catalog; this.survival=survival; }
+    public Submissions(Store db,Catalog catalog,Survival survival,vn.codegrade.room.Progression progression) { this.db=db; this.catalog=catalog; this.survival=survival;this.progression=progression; }
     public Object accept(User u,JsonNode p,String requestId,String mode) {
         String pid=p.path("problemId").asText(), source=p.path("source").asText(), lang=p.path("language").asText();
         require(QuestionRules.LANGUAGES.contains(lang),"Ngôn ngữ: CPP11, CPP17, CPP20, PY311");
@@ -41,7 +41,14 @@ public class Submissions {
             }
         }
         if(!contest.isBlank()) checkContest(u,contest,pid);
-        QuestionRules.executable(q);
+        boolean legacyActive=!room.isBlank()||!contest.isBlank();
+        if(!legacyActive&&q.path("testcases").size()!=5)for(var row:db.sql.queryForList("SELECT document FROM contests")) {
+            var c=db.read((String)row.get("document"));
+            if(c.path("startsAt").asLong()<=db.now()&&db.now()<=c.path("endsAt").asLong())
+                for(var id:c.path("problemIds"))if(id.asText().equals(pid))legacyActive=true;
+        }
+        if(legacyActive&&q.path("testcases").size()!=5)QuestionRules.executableSnapshot(q);
+        else QuestionRules.executable(q);
         boolean languageAllowed=false; for(var l:q.path("languages")) if(l.asText().equals(lang)) languageAllowed=true;
         require(languageAllowed,"Ngôn ngữ không được bật cho đề này");
         var tests=new ArrayList<JsonNode>();
@@ -68,8 +75,8 @@ public class Submissions {
             require(received<=survival.load(room).path("current").path("deadline").asLong(),"Vòng đã hết hạn");
         db.sql.update("INSERT INTO submissions(id,user_id,problem_id,request_id,source_code,language,mode,room_id,round_id,contest_id,received_at,status,snapshot,rank_eligible,admission_order) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             id,u.id(),pid,requestId,source,lang,mode,room.isBlank()?null:room,round.isBlank()?null:round,contest.isBlank()?null:contest,received,"QUEUED",db.write(frozen),u.coder()&&mode.equals("OFFICIAL"),admissionOrder);
-        Object proof=ReceiptLedger.sign(db,id,u.id(),Map.of("admissionOrder",admissionOrder,"submissionId",id,"roundId",round,"receivedAt",received,"sourceHash",Store.hash(source),"language",lang));
-        Object data=Map.of("receipt",proof,"id",id,"userId",u.id(),"roundId",round,"receivedAt",received,"status","QUEUED","mode",mode);
+        if(mode.equals("OFFICIAL")&&(!room.isBlank()||!contest.isBlank()))db.sql.update("DELETE FROM drafts WHERE user_id=? AND problem_id=?",u.id(),pid);
+        Object data=Map.of("admissionOrder",admissionOrder,"id",id,"userId",u.id(),"roundId",round,"receivedAt",received,"status","QUEUED","mode",mode);
         db.event(u.id(),"submission_received",data);
         if(!room.isBlank() && mode.equals("OFFICIAL")) survival.submissionEvent(room,"room_submission_received",data);
         return data;
@@ -147,8 +154,8 @@ public class Submissions {
     }
     public Object claim(String worker) {
         return db.atomic(()->{
-            // Aging first, then competitive work, then practice. Prevent permanent practice starvation.
-            var rows=db.sql.queryForList("SELECT * FROM submissions WHERE status='QUEUED' ORDER BY CASE WHEN received_at<? THEN 0 WHEN round_id IS NOT NULL THEN 1 ELSE 2 END,received_at LIMIT 1",db.now()-30_000);
+            // Batch reference validation must not block live games; age real user work first.
+            var rows=db.sql.queryForList("SELECT * FROM submissions WHERE status='QUEUED' ORDER BY CASE WHEN mode='VALIDATE' THEN 3 WHEN received_at<? THEN 0 WHEN round_id IS NOT NULL THEN 1 ELSE 2 END,received_at,admission_order LIMIT 1",db.now()-30_000);
             if(rows.isEmpty()) return Map.of("job",false);
             var s=rows.getFirst(); String lease=db.id(); long until=db.now()+30_000;
             JsonNode q=db.read((String)s.get("snapshot"));
@@ -226,10 +233,13 @@ public class Submissions {
         ObjectNode result=db.obj().put("verdict",verdict).put("score",score);
         if(rawResult.isObject()) result.setAll((ObjectNode)rawResult); else result.putArray("cases");
         db.sql.update("UPDATE submissions SET status=?,score=?,result=?,completed_at=?,completed_tests=?,lease_token=NULL,lease_until=NULL WHERE id=?",verdict,score,db.write(result),db.now(),result.path("cases").size(),s.get("id"));
-        if("AC".equals(verdict) && "OFFICIAL".equals(s.get("mode")) && Boolean.TRUE.equals(s.get("rank_eligible")) &&
+        boolean firstSolve="AC".equals(verdict) && "OFFICIAL".equals(s.get("mode")) && Boolean.TRUE.equals(s.get("rank_eligible")) &&
             db.sql.queryForObject("SELECT COUNT(*) FROM users WHERE id=? AND role='CODER'",Integer.class,s.get("user_id"))>0 &&
-            db.sql.queryForObject("SELECT COUNT(*) FROM solved WHERE user_id=? AND problem_id=?",Integer.class,s.get("user_id"),s.get("problem_id"))==0)
+            db.sql.queryForObject("SELECT COUNT(*) FROM solved WHERE user_id=? AND problem_id=?",Integer.class,s.get("user_id"),s.get("problem_id"))==0;
+        if(firstSolve)
             db.sql.update("INSERT INTO solved(user_id,problem_id) VALUES(?,?)",s.get("user_id"),s.get("problem_id"));
+        if(firstSolve&&s.get("room_id")==null&&s.get("contest_id")==null)
+            progression.practiceAc((String)s.get("user_id"),(String)s.get("problem_id"),q.path("difficulty").asInt());
         if("VALIDATE".equals(s.get("mode")) && "AC".equals(verdict)) {
             ObjectNode current=(ObjectNode)catalog.document((String)s.get("problem_id"));
             if(current.path("version").asInt()==q.path("version").asInt()) {

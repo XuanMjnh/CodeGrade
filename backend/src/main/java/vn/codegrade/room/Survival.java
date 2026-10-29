@@ -14,12 +14,13 @@ import java.security.SecureRandom;
 
 @Service
 public class Survival {
-    private final Store db; private final Catalog catalog; private final Identity identity;
+    private final Store db; private final Catalog catalog; private final Identity identity; private final Progression progression;
     private final SecureRandom random=new SecureRandom();
-    public Survival(Store db,Catalog catalog,Identity identity) { this.db=db; this.catalog=catalog; this.identity=identity; }
+    public Survival(Store db,Catalog catalog,Identity identity,Progression progression) { this.db=db; this.catalog=catalog; this.identity=identity; this.progression=progression; }
     public ObjectNode load(String id) { return (ObjectNode)db.read((String)db.one("SELECT document FROM rooms WHERE id=? OR invite_code=?",id,id.toUpperCase(Locale.ROOT)).get("document")); }
     private void save(ObjectNode r,String event) {
-        if(Set.of("round_result","match_finished","match_unresolved","tie_break").contains(event))vn.codegrade.judge.ReceiptLedger.closeRound(db,r);
+        if(Set.of("FINISHED","UNRESOLVED","CLOSED").contains(r.path("state").asText()))
+            db.sql.update("UPDATE match_queue SET state='COMPLETED' WHERE room_id=? AND state='STARTED'",r.path("id").asText());
         r.put("version",r.path("version").asLong()+1);
         db.sql.update("UPDATE rooms SET state=?,version=?,document=?,updated_at=? WHERE id=?",r.path("state").asText(),r.path("version").asLong(),db.write(r),db.now(),r.path("id").asText());
         // Store a private event per member; no source code or hidden tests in snapshots.
@@ -28,7 +29,7 @@ public class Survival {
     }
     public ObjectNode publicState(ObjectNode r) {
         ObjectNode out=r.deepCopy();
-        out.remove(List.of("bank","used","frozenProblem","baseRanks"));
+        out.remove(List.of("bank","used","frozenProblem","baseRanks","certificate","initialRatings"));
         if(r.has("current") && r.path("current").has("problemId"))
             out.set("problem",catalog.publicQuestion(r.path("frozenProblem")));
         return out;
@@ -52,19 +53,25 @@ public class Survival {
             var result=new ArrayList<Object>();
             for(var row:db.sql.queryForList("SELECT document FROM rooms ORDER BY updated_at DESC LIMIT 100")) {
                 var r=(ObjectNode)db.read((String)row.get("document"));
+                if(!r.path("mode").asText("PRACTICE").equals("PRACTICE"))continue;
                 ObjectNode entry=db.obj().put("id",r.path("id").asText()).put("code",r.path("code").asText()).put("state",r.path("state").asText())
-                    .put("hostName",r.path("hostName").asText()).put("count",alive(r).size());
+                    .put("hostName",r.path("hostName").asText()).put("count",alive(r).size()).put("capacity",r.path("capacity").asInt(10)).put("name",r.path("name").asText(r.path("hostName").asText()));
                 entry.set("selectedDifficulties",r.path("selectedDifficulties")); result.add(entry);
             }
             return result;
         }
         if(type.equals("ROOM_CREATE")) {
             require(u.coder(),"Chỉ Coder tạo phòng Code Survival");
+            require(p.path("mode").asText("PRACTICE").equals("PRACTICE"),"Normal/Ranked chỉ tạo qua matchmaking");
+            available(u.id(),"");
+            int capacity=p.path("capacity").asInt(10);require(capacity>=2&&capacity<=10,"Sức chứa 2–10");
+            String name=p.path("name").asText("Phòng của "+u.displayName()).trim();require(!name.isBlank()&&name.length()<=100,"Tên phòng 1–100 ký tự");
             JsonNode selected=p.has("selectedDifficulties")?p.path("selectedDifficulties"):db.tree(List.of(1,2,3)); levels(selected);
             ObjectNode r=db.obj(); String id=db.id(),code;
             do { code=String.format("%08X",random.nextInt()).substring(0,6); }
             while(db.sql.queryForObject("SELECT COUNT(*) FROM rooms WHERE invite_code=?",Integer.class,code)>0);
             r.put("id",id).put("code",code).put("state","LOBBY").put("version",0).put("hostId",u.id()).put("hostName",u.displayName());
+            r.put("mode","PRACTICE").put("capacity",capacity).put("name",name);
             r.put("roundSeconds",120).put("finalSeconds",150); r.set("selectedDifficulties",selected.deepCopy());
             r.putArray("players").add(player(u,"ALIVE"));
             r.putArray("used"); r.putArray("history"); r.put("createdAt",db.now());
@@ -74,15 +81,17 @@ public class Survival {
         }
         ObjectNode r=load(p.path("roomId").asText());
         if(type.equals("ROOM_JOIN")) {
+            if(!r.path("mode").asText("PRACTICE").equals("PRACTICE")) {member(r,u.id());touch(r.path("id").asText(),u.id());return publicState(r);}
             boolean exists=false; for(var player:r.path("players")) if(player.path("id").asText().equals(u.id())) exists=true;
             if(!exists) {
-                boolean play=u.coder() && r.path("state").asText().equals("LOBBY") && alive(r).size()<10 && !p.path("spectate").asBoolean();
+                boolean play=u.coder() && r.path("state").asText().equals("LOBBY") && alive(r).size()<r.path("capacity").asInt(10) && !p.path("spectate").asBoolean();
                 require(r.path("players").size()<100,"Phòng đã đủ số kết nối xem");
+                if(play)available(u.id(),r.path("id").asText());
                 r.withArray("players").add(player(u,play?"ALIVE":"SPECTATOR"));
                 save(r,play?"player_joined":"spectator_joined");
             } else if(r.path("state").asText().equals("LOBBY") && u.coder() &&
-                member(r,u.id()).path("status").asText().equals("LEFT") && alive(r).size()<10) {
-                member(r,u.id()).put("status","ALIVE"); save(r,"player_joined");
+                member(r,u.id()).path("status").asText().equals("LEFT") && alive(r).size()<r.path("capacity").asInt(10)) {
+                available(u.id(),r.path("id").asText());member(r,u.id()).put("status","ALIVE"); save(r,"player_joined");
             }
             if(!Set.of("LEFT","FORFEIT").contains(member(r,u.id()).path("status").asText())) touch(r.path("id").asText(),u.id());
             return publicState(r);
@@ -92,35 +101,35 @@ public class Survival {
         switch(type) {
             case "ROOM_SNAPSHOT": return publicState(r);
             case "ROOM_CONFIG":
+                require(r.path("mode").asText("PRACTICE").equals("PRACTICE"),"Luật ghép trận do server quyết định");
                 require(r.path("hostId").asText().equals(u.id()),"Chỉ host thay đổi cấu hình");
                 require(r.path("state").asText().equals("LOBBY"),"Cấu hình đã khóa từ COUNTDOWN");
                 int seconds=p.path("roundSeconds").asInt(r.path("roundSeconds").asInt(120)),fin=p.path("finalSeconds").asInt(r.path("finalSeconds").asInt(150));
                 require(seconds>=30&&seconds<=3600&&fin>=30&&fin<=3600,"Time must be 30–3600 seconds");r.put("roundSeconds",seconds).put("finalSeconds",fin);
                 levels(p.path("selectedDifficulties")); r.set("selectedDifficulties",p.path("selectedDifficulties"));
+                int capacity=p.path("capacity").asInt(r.path("capacity").asInt(10));require(capacity>=Math.max(2,alive(r).size())&&capacity<=10,"Sức chứa không hợp lệ");r.put("capacity",capacity);
+                String name=p.path("name").asText(r.path("name").asText("Code Survival"));require(!name.isBlank()&&name.length()<=100,"Tên phòng 1–100 ký tự");r.put("name",name);
                 save(r,"room_difficulties_updated"); break;
             case "ROOM_LEAVE":
+                require(r.path("mode").asText("PRACTICE").equals("PRACTICE")||!Set.of("LOBBY","COUNTDOWN").contains(r.path("state").asText()),"Dùng từ chối nhận trận trước khi bắt đầu");
+                if(Set.of("FINISHED","CLOSED","UNRESOLVED").contains(r.path("state").asText()))return publicState(r);
+                if(Set.of("LEFT","FORFEIT").contains(me.path("status").asText()))return publicState(r);
+                boolean wasAlive=me.path("status").asText().equals("ALIVE");
+                if(wasAlive)me.put("eliminatedStage",r.path("history").size());
                 db.sql.update("DELETE FROM room_presence WHERE room_id=? AND user_id=?",r.path("id").asText(),u.id());
-                me.put("status",r.path("state").asText().equals("LOBBY")?"LEFT":"FORFEIT");
+                me.put("status",r.path("state").asText().equals("LOBBY")||!wasAlive?"LEFT":"FORFEIT");
                 if(r.path("state").asText().equals("LOBBY") && r.path("hostId").asText().equals(u.id())) {
                     var remaining=alive(r);
                     if(remaining.isEmpty()) r.put("state","CLOSED");
                     else { r.put("hostId",remaining.getFirst()); r.put("hostName",identity.historicalUser(remaining.getFirst()).displayName()); }
                 }
                 boolean empty=true;for(var person:r.path("players"))if(!Set.of("LEFT","FORFEIT").contains(person.path("status").asText()))empty=false;
-                if(empty){db.sql.update("DELETE FROM rooms WHERE id=?",r.path("id").asText());db.sql.update("DELETE FROM room_presence WHERE room_id=?",r.path("id").asText());return Map.of("deleted",true);}
+                if(empty){r.put("state","UNRESOLVED").put("reason","Mọi người đã bỏ cuộc");save(r,"match_unresolved");return publicState(r);}
                 save(r,"player_left"); break;
             case "ROOM_START":
+                require(r.path("mode").asText("PRACTICE").equals("PRACTICE"),"Trận ghép tự bắt đầu sau 5 xác nhận");
                 require(r.path("hostId").asText().equals(u.id()),"Chỉ host bắt đầu");
-                require(r.path("state").asText().equals("LOBBY"),"Phòng đã bắt đầu");
-                require(alive(r).size()>=5 && alive(r).size()<=10,"Cần 5–10 Coder");
-                levels(r.path("selectedDifficulties"));
-                var bank=eligible(r);
-                int need=RoundRanking.mainRounds(alive(r).size())+1;
-                require(bank.size()>=need,"Thiếu nguồn đề: cần "+need+" bài hợp lệ gồm 1 dự phòng trong mức "+r.path("selectedDifficulties")+"; hiện có "+bank.size());
-                r.set("bank",db.tree(bank)); // Freeze versions/eligibility. Never reveal unselected questions.
-                r.set("participants",db.tree(alive(r)));
-                r.put("lockedAt",db.now()).put("state","COUNTDOWN").put("nextAt",db.now()+10_000L);
-                save(r,"room_config_locked"); break;
+                begin(r);break;
             case "ROOM_INVALIDATE":
                 require(u.admin(),"Chỉ admin hủy vòng có đề lỗi");
                 require(Set.of("ROUND_ACTIVE","ROUND_GRADING","ROUND_RESULT").contains(r.path("state").asText()),"Không có vòng để hủy");
@@ -136,6 +145,36 @@ public class Survival {
         }
         return publicState(r);
     }
+    private void available(String uid,String exceptRoom) {
+        require(db.sql.queryForObject("SELECT COUNT(*) FROM match_queue WHERE user_id=? AND state IN ('WAITING','MATCH_FOUND','ACCEPTED','STARTED')",Integer.class,uid)==0,"Bạn đang ghép trận hoặc thi đấu");
+        for(var row:db.sql.queryForList("SELECT id,document FROM rooms WHERE state NOT IN ('FINISHED','CLOSED','UNRESOLVED')")) {
+            if(row.get("id").equals(exceptRoom))continue;
+            for(var p:db.read((String)row.get("document")).path("players"))require(!p.path("id").asText().equals(uid)||!p.path("status").asText().equals("ALIVE"),"Bạn đang ở phòng khác");
+        }
+    }
+    public ObjectNode createMatched(String mode,List<User> users,long deadline) {
+        require(Set.of("NORMAL","RANKED").contains(mode)&&users.size()==5&&users.stream().map(User::id).distinct().count()==5,"Cần đúng 5 Coder khác nhau");
+        ObjectNode r=db.obj().put("id",db.id()).put("code",db.id().substring(0,8).toUpperCase(Locale.ROOT)).put("mode",mode).put("capacity",5)
+            .put("state","LOBBY").put("version",0).put("hostId","").put("hostName","Server").put("name",mode)
+            .put("roundSeconds",120).put("finalSeconds",150).put("acceptDeadline",deadline).put("createdAt",db.now());
+        r.set("selectedDifficulties",db.tree(List.of(1,2,3)));r.putArray("used");r.putArray("history");var players=r.putArray("players");
+        ObjectNode ratings=r.putObject("initialRatings");
+        for(var u:users){require(u.coder(),"Chỉ CODER được ghép");players.add(player(u,"ALIVE"));ratings.put(u.id(),progression.get(u.id()).path("rating").asInt());touch(r.path("id").asText(),u.id());}
+        db.sql.update("INSERT INTO rooms(id,invite_code,state,version,document,updated_at) VALUES(?,?,?,?,?,?)",r.path("id").asText(),r.path("code").asText(),"LOBBY",0,db.write(r),db.now());
+        return r;
+    }
+    public void begin(ObjectNode r) {
+        require(r.path("state").asText().equals("LOBBY"),"Phòng đã bắt đầu");
+        int count=alive(r).size();boolean practice=r.path("mode").asText("PRACTICE").equals("PRACTICE");
+        for(String uid:alive(r))require(identity.user(uid).coder(),"Người chơi phải là CODER đang hoạt động");
+        require(practice?count>=2&&count<=r.path("capacity").asInt(10):count==5,"Practice cần 2–10; Normal/Ranked cần đúng 5 người");
+        levels(r.path("selectedDifficulties"));var bank=eligible(r);int need=RoundRanking.mainRounds(count)+1;
+        require(bank.size()>=need,"Thiếu nguồn đề: cần "+need+" bài đã xác thực; hiện có "+bank.size());
+        r.set("bank",db.tree(bank));r.set("participants",db.tree(alive(r)));
+        r.put("lockedAt",db.now()).put("state","COUNTDOWN").put("nextAt",db.now()+10_000);
+        save(r,"room_config_locked");
+    }
+    public void cancelMatched(ObjectNode r) {r.put("state","CLOSED").put("reason","Trận chưa đủ 5 người xác nhận");save(r,"match_cancelled");}
     private ObjectNode player(User u,String status) {
         return db.obj().put("id",u.id()).put("name",u.displayName()).put("status",status).put("joinedAt",db.now());
     }
@@ -180,7 +219,18 @@ public class Survival {
     }
     @Scheduled(fixedDelay=250)
     public void tick() {
-        db.atomic(()->{for(var row:db.sql.queryForList("SELECT room_id,MAX(last_seen) AS seen FROM room_presence GROUP BY room_id")){if(((Number)row.get("seen")).longValue()<db.now()-90000){db.sql.update("DELETE FROM rooms WHERE id=?",row.get("room_id"));db.sql.update("DELETE FROM room_presence WHERE room_id=?",row.get("room_id"));}}return null;});
+        db.atomic(()->{
+            for(var row:db.sql.queryForList("SELECT document FROM rooms WHERE state IN ('ROUND_ACTIVE','ROUND_GRADING','ROUND_RESULT')")) {
+                ObjectNode r=(ObjectNode)db.read((String)row.get("document"));boolean changed=false;
+                for(var p:r.path("players")) if(p.path("status").asText().equals("ALIVE")) {
+                    var seen=db.sql.queryForList("SELECT last_seen FROM room_presence WHERE room_id=? AND user_id=?",r.path("id").asText(),p.path("id").asText());
+                    if(seen.isEmpty()||((Number)seen.getFirst().get("last_seen")).longValue()<db.now()-90_000) {
+                        ((ObjectNode)p).put("status","FORFEIT").put("eliminatedStage",r.path("history").size());changed=true;
+                    }
+                }
+                if(changed)save(r,"player_disconnected");
+            }return null;
+        });
         for(var row:db.sql.queryForList("SELECT id FROM rooms WHERE state IN ('COUNTDOWN','ROUND_ACTIVE','ROUND_GRADING','ROUND_RESULT')")) {
             try { db.atomic(()->{ advance(load((String)row.get("id"))); return null; }); }
             catch(Exception e) { org.slf4j.LoggerFactory.getLogger(Survival.class).error("Room tick failed {}",row.get("id"),e); }
@@ -188,14 +238,23 @@ public class Survival {
     }
     public void advance(ObjectNode r) {
         String state=r.path("state").asText(); long now=db.now();
-        if((state.equals("COUNTDOWN") || state.equals("ROUND_RESULT")) && now>=r.path("nextAt").asLong()) startRound(r);
+        if(!Set.of("LOBBY","COUNTDOWN","FINISHED","CLOSED","UNRESOLVED").contains(state)&&alive(r).isEmpty()) {r.put("state","UNRESOLVED").put("reason","Không còn thí sinh");save(r,"match_unresolved");return;}
+        if(!Set.of("LOBBY","COUNTDOWN","FINISHED","CLOSED","UNRESOLVED").contains(state)&&alive(r).size()==1) {finishMatch(r,alive(r).getFirst());return;}
+        if((state.equals("COUNTDOWN") || state.equals("ROUND_RESULT")) && now>=r.path("nextAt").asLong()) {
+            if(state.equals("COUNTDOWN")&&!r.path("mode").asText("PRACTICE").equals("PRACTICE")) {
+                int confirmed=db.sql.queryForObject("SELECT COUNT(*) FROM match_queue WHERE room_id=? AND state='STARTED' AND last_seen>=?",Integer.class,r.path("id").asText(),now-30_000);
+                if(confirmed!=5){cancelMatched(r);db.sql.update("UPDATE match_queue SET state=CASE WHEN last_seen>=? THEN 'WAITING' ELSE 'EXPIRED' END,room_id=NULL WHERE room_id=?",now-30_000,r.path("id").asText());return;}
+            }
+            startRound(r);
+        }
         else if(state.equals("ROUND_ACTIVE") || state.equals("ROUND_GRADING")) {
             String round=r.path("current").path("id").asText();
-            // The first confirmed AC wins a final, even while other jobs are pending.
-            if(alive(r).size()<=2) {
-                var accepted=db.sql.queryForList("SELECT user_id FROM submissions WHERE round_id=? AND mode='OFFICIAL' AND status='AC' ORDER BY completed_at,admission_order",round);
+            // A confirmed AC can finish early, but cannot jump an earlier pending admission.
+            if(alive(r).size()<=2 && db.sql.queryForObject("SELECT COUNT(*) FROM submissions WHERE round_id=? AND mode='OFFICIAL' AND status='SE'",Integer.class,round)==0) {
+                var accepted=db.sql.queryForList("SELECT user_id,received_at FROM submissions WHERE round_id=? AND mode='OFFICIAL' AND status='AC' ORDER BY received_at,admission_order",round);
                 for(var s:accepted) if(alive(r).contains((String)s.get("user_id"))) {
-                    settle(r,(String)s.get("user_id")); return;
+                    int earlier=db.sql.queryForObject("SELECT COUNT(*) FROM submissions WHERE round_id=? AND mode='OFFICIAL' AND status IN ('QUEUED','RUNNING') AND received_at<=?",Integer.class,round,s.get("received_at"));
+                    if(earlier==0){settle(r,(String)s.get("user_id")); return;}
                 }
             }
             if(state.equals("ROUND_ACTIVE")) {
@@ -294,7 +353,9 @@ public class Survival {
         }
     }
     private void finishMatch(ObjectNode r,String winner) {
+        if(r.path("state").asText().equals("FINISHED"))return;
         r.put("state","FINISHED").put("winnerId",winner).put("finishedAt",db.now());
+        progression.settle(r);
         db.sql.update("UPDATE users SET wins=wins+1 WHERE id=? AND role='CODER'",winner);
         save(r,"match_finished"); db.event(null,"leaderboard_changed",Map.of("roomId",r.path("id").asText()));
     }

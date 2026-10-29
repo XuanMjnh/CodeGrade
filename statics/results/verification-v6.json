@@ -1,0 +1,66 @@
+{
+  "version": "6.0.0",
+  "date": "2026-10-29",
+  "backend": {
+    "tests": 90,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "backend_suites": [
+    {
+      "name": "vn.codegrade.FairnessExperimentTest",
+      "tests": 1,
+      "time_seconds": 0.512
+    },
+    {
+      "name": "vn.codegrade.ProblemNumberMigrationTest",
+      "tests": 1,
+      "time_seconds": 0.896
+    },
+    {
+      "name": "vn.codegrade.ProgressionTest",
+      "tests": 4,
+      "time_seconds": 0.014
+    },
+    {
+      "name": "vn.codegrade.QuestionRulesTest",
+      "tests": 11,
+      "time_seconds": 0.37
+    },
+    {
+      "name": "vn.codegrade.RoundRankingTest",
+      "tests": 7,
+      "time_seconds": 0.03
+    },
+    {
+      "name": "vn.codegrade.SystemIntegrationTest",
+      "tests": 66,
+      "time_seconds": 93.075
+    }
+  ],
+  "frontend": {
+    "tests": 68,
+    "pass": 68,
+    "fail": 0,
+    "build": "passed"
+  },
+  "ui": {
+    "dom_live_checks": 7,
+    "native_browser": "Not run: automated Edge launch blocked by environment policy"
+  },
+  "dataset_sha256": "edb6427a34d5d0a3dbe3d7906fc4a212181ce543faf2f4f239947f764d37033b",
+  "reports": [
+    "dataset-v6-verification.json",
+    "survival-v6-smoke.json",
+    "survival-v6-ui.json",
+    "judge-v6-smoke.json",
+    "restart-v6.json",
+    "project-upgrade-v6.json",
+    "network-v6.json",
+    "fairness-v6.json"
+  ],
+  "dataset_regeneration": "byte-for-byte reproducible",
+  "application_url": "http://localhost:8080",
+  "isolated_test_project": "stopped; database volume preserved"
+}
