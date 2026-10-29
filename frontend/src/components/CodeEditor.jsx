@@ -7,7 +7,7 @@ import {tags} from '@lezer/highlight';
 import {EditorView} from '@codemirror/view';
 const theme=EditorView.theme({
  '&':{backgroundColor:'var(--color-surface-code)',color:'var(--color-editor-ink)',fontSize:'14px'},
- '.cm-content':{fontFamily:'inherit',padding:'16px 0',minHeight:'420px'},
+ '.cm-content':{fontFamily:'inherit',padding:'16px 0',minHeight:'100%'},
  '.cm-gutters':{backgroundColor:'var(--color-surface-code)',color:'var(--color-editor-gutter)',border:'none'},
  '.cm-activeLine,.cm-activeLineGutter':{backgroundColor:'var(--color-editor-active)'},
  '.cm-cursor':{borderLeftColor:'var(--color-accent)'},
@@ -17,7 +17,7 @@ const theme=EditorView.theme({
 },{dark:false});
 const highlighting=syntaxHighlighting(HighlightStyle.define([{tag:tags.keyword,color:'var(--syntax-keyword)'},{tag:tags.string,color:'var(--syntax-string)'},{tag:tags.comment,color:'var(--syntax-comment)'},{tag:[tags.number,tags.typeName],color:'var(--syntax-number)'},{tag:tags.function(tags.variableName),color:'var(--syntax-function)'}]));
 const basicSetup={lineNumbers:true,foldGutter:true,highlightActiveLine:true,autocompletion:true};
-export default function CodeEditor({value,onChange,language}){
+export default function CodeEditor({value,onChange,language,label="Source code",height="460px",readOnly=false}){
  const view=useRef(null);
  const extensions=useMemo(()=>[highlighting,language==='PY311'?python():cpp()],[language]);
  useEffect(()=>{
@@ -27,5 +27,5 @@ export default function CodeEditor({value,onChange,language}){
   document.fonts?.addEventListener('loadingdone',measure);
   return()=>{active=false;document.fonts?.removeEventListener('loadingdone',measure);};
  },[]);
- return <CodeMirror value={value} onChange={onChange} onCreateEditor={editor=>{view.current=editor;editor.requestMeasure();}} height="460px" theme={theme} extensions={extensions} indentWithTab={false} basicSetup={basicSetup} aria-label="Source code"/>;
+ return <CodeMirror readOnly={readOnly} editable={!readOnly} value={value} onChange={onChange} onCreateEditor={editor=>{view.current=editor;editor.requestMeasure();}} height={height} theme={theme} extensions={extensions} indentWithTab={false} basicSetup={basicSetup} aria-label={label}/>;
 }

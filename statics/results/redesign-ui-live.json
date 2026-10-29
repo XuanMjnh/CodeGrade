@@ -1,0 +1,27 @@
+{
+  "kind": "JSDOM current React bundle + real WebSocket/MySQL server; not native browser layout verification",
+  "checks": [
+    "Real authentication and three mode choices",
+    "Official EXP, level, rank and rating render",
+    "Ranked queue joins, waits for five, cancels, and has no manual room creation",
+    "Normal queue joins and cancels against live backend",
+    "Practice capacities 2–10, room creation and second account joining by invite",
+    "Host configuration broadcasts to another live client",
+    "Retired proof UI absent and lobby leave releases memberships",
+    "Coder profile, leaderboard, submissions, contests and announcements mount with live resources",
+    "Coder authoring permission preserved",
+    "Practice statement and real CodeMirror editor mount against a published problem",
+    "Author studio panels, sticky support, real reference editor and unsaved route guard work",
+    "Admin activity loads on demand and receives 13991 bytes of metadata without historical payloads",
+    "Admin users, declined role-change confirmation, categories and authoring permissions preserved",
+    "Responsive navigation toggle has controlled ARIA state and Escape handling",
+    "Real JSON import/save round trip preserves all five test documents and server version",
+    "Five real Normal clients show match found, accept, and enter the server countdown",
+    "Real competition editors submit reference solutions through 3 rounds; server settles five official results and the winner screen",
+    "Observed authoritative match states: COUNTDOWN, ROUND_ACTIVE, ROUND_GRADING, ROUND_RESULT, FINISHED"
+  ],
+  "passed": 18,
+  "errors": [],
+  "checkedAt": "2026-10-29T15:29:42.940753+00:00",
+  "javascriptAsset": "/assets/index-87OKlNgG.js"
+}

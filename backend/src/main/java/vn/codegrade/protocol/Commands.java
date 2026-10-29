@@ -71,7 +71,14 @@ public class Commands {
                 case "DRAFT_CLEAR" -> {db.sql.update("DELETE FROM drafts WHERE user_id=? AND problem_id=?",u.id(),p.path("problemId").asText());yield Map.of("cleared",true);}
                 case "DRAFT_GET" -> db.sql.queryForList("SELECT language,source_code,updated_at FROM drafts WHERE user_id=? AND problem_id=?",u.id(),p.path("problemId").asText());
                 case "USERS","USER_SET" -> identity.admin(u,type,p);
-                case "AUDIT" -> { require(u.admin(),"Cần quyền admin"); var rows=db.sql.queryForList("SELECT * FROM audit ORDER BY id DESC LIMIT 100");for(var row:rows)row.put("payload",db.write(withoutProofs(db.read((String)row.get("payload")))));yield rows; }
+                case "AUDIT" -> {
+                    require(u.admin(),"Cần quyền admin");
+                    // The activity table needs metadata only; historical payloads can be megabytes each.
+                    boolean summary=p.path("summaryOnly").asBoolean(false);
+                    var rows=db.sql.queryForList("SELECT "+(summary?"id,actor_id,action,entity_id,created_at":"*")+" FROM audit ORDER BY id DESC LIMIT 100");
+                    if(!summary)for(var row:rows)row.put("payload",db.write(withoutProofs(db.read((String)row.get("payload")))));
+                    yield rows;
+                }
                 case "SYNC" -> sync(u);
                 default -> {
                     if(type.startsWith("MATCH_")) yield matchmaking.command(u,type,p);

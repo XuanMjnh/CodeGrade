@@ -1,0 +1,48 @@
+{
+  "checkedAt": "2026-10-29T15:33:50.807091+00:00",
+  "dependencyInstall": {
+    "command": "npm ci",
+    "exitCode": 0,
+    "existingHighAdvisories": 2
+  },
+  "frontend": {
+    "tests": {
+      "command": "npm test",
+      "exitCode": 0,
+      "tests": 119,
+      "pass": 119,
+      "fail": 0
+    },
+    "build": {
+      "command": "npm run build",
+      "exitCode": 0
+    }
+  },
+  "backend": {
+    "command": "mvn -B test",
+    "exitCode": 0,
+    "tests": 92,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "backendChange": "Backward-compatible optional AUDIT summaryOnly metadata projection; no schema or gameplay change",
+  "historicalAuditPayloadBytes": 138740241,
+  "nativeBrowserLayoutVerified": false,
+  "screenshots": false,
+  "limitations": [
+    "Native browser capture unavailable; responsive layout requires visual review.",
+    "Vite warns about the single JavaScript bundle size."
+  ],
+  "deployment": {
+    "url": "http://localhost:8080",
+    "health": {
+      "status": "UP",
+      "service": "CodeGrade Network"
+    },
+    "javascriptAsset": "/assets/index-Bubx318p.js",
+    "matchesLocalProductionBuild": true,
+    "javascriptSha256": "a3b3b669c9c04ba628b06e088afae50db2555f515d9c44e583af58b4e5eb7eb8",
+    "checkedAt": "2026-10-29T15:34:06.314578+00:00"
+  }
+}

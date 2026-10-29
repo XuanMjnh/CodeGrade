@@ -1,0 +1,44 @@
+
+* { box-sizing: border-box; }
+html { color: var(--color-text-primary); font-family: var(--font-family-primary); font-size: var(--font-size-sm); font-weight: var(--font-weight-base); line-height: var(--line-height-base); font-synthesis: none; background: var(--color-surface-muted); }
+body { margin: 0; background: var(--color-surface-muted); }
+[hidden] { display: none !important; }
+button, input, select, textarea { font: inherit; }
+a { color: var(--color-accent-text); text-underline-offset: var(--space-1); text-decoration-thickness: 1px; }
+a:hover { text-decoration: underline; }
+a:active { color: var(--color-text-primary); }
+button, .button { min-height: var(--control-size); border: 1px solid transparent; border-radius: var(--radius-xs); padding: var(--space-3) var(--space-5); background: var(--color-accent); color: var(--color-text-on-accent); font-weight: var(--font-weight-semibold); display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); cursor: pointer; text-decoration: none; transition: background var(--motion-duration-instant), border-color var(--motion-duration-instant); overflow-wrap: anywhere; }
+button:hover, .button:hover { background: var(--color-accent-hover); text-decoration: none; }
+button:active, .button:active { background: var(--color-accent-active); }
+button.secondary, .button.secondary, button.light { background: var(--color-surface-base); color: var(--color-secondary-ink); border-color: var(--color-border-strong); }
+button.secondary:hover:not(:disabled):not([aria-busy=true]), .button.secondary:hover:not([aria-disabled=true]), button.light:hover:not(:disabled):not([aria-busy=true]) { background: var(--color-secondary-soft); border-color:var(--color-secondary-ink); }
+button.secondary:active:not(:disabled):not([aria-busy=true]), .button.secondary:active:not([aria-disabled=true]), button.light:active:not(:disabled):not([aria-busy=true]) { background: var(--color-secondary-soft); border-color: var(--color-secondary-ink); }
+button.ghost, button.link { color: var(--color-text-secondary); background: transparent; }
+button.ghost:hover:not(:disabled):not([aria-busy=true]), button.link:hover:not(:disabled):not([aria-busy=true]) { color: var(--color-secondary-ink); background: var(--color-secondary-soft); }
+button.link { padding: var(--space-1) var(--space-2); justify-content: flex-start; text-align: left; color: var(--color-accent-text); }
+button.link:hover { text-decoration: underline; }
+button.danger-text { color: var(--color-danger); }
+button.danger-text:hover:not(:disabled):not([aria-busy=true]) { color: var(--color-danger); background:var(--color-danger-soft); }
+button.is-active, button[aria-pressed=true] { color: var(--color-accent-text); background: var(--color-accent-soft); border-color: var(--color-accent-text); }
+button:disabled, .button[aria-disabled=true], button[aria-busy=true], input:disabled, select:disabled, textarea:disabled { color: var(--color-disabled-text); background: var(--color-disabled-surface); border-color: var(--color-border); cursor: not-allowed; }
+button[aria-busy=true] { cursor: progress; }
+button[aria-invalid=true], .button[data-state=error] { border-color: var(--color-danger); }
+:where(button, a, input, select, textarea, summary, [tabindex]):focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; scroll-margin-block:120px 32px; }
+input:not([type=checkbox]):not([type=file]), select, textarea { min-height: var(--control-size); border: 1px solid var(--color-border-strong); border-radius: var(--radius-xs); padding: var(--space-3) var(--space-4); color: var(--color-text-primary); background: var(--color-surface-base); max-width: 100%; min-width: 0; }
+input:not([type=checkbox]), textarea { width: 100%; }
+input::placeholder, textarea::placeholder { color: var(--color-text-tertiary); opacity: 1; }
+input:hover:not(:disabled), select:hover:not(:disabled), textarea:hover:not(:disabled) { border-color: var(--color-text-secondary); }
+input:user-invalid, select:user-invalid, textarea:user-invalid, [aria-invalid=true] { border-color: var(--color-danger); }
+input[type=checkbox] { width: var(--space-5); height: var(--space-5); accent-color: var(--color-accent-text); margin: 0; flex-shrink: 0; }
+textarea { resize: vertical; min-height: calc(var(--control-size) * 2); }
+pre, code, textarea.code-input { font-family: var(--font-family-code); }
+pre { overflow: auto; font-size: var(--font-size-xs); line-height: var(--line-height-copy); }
+label { font-weight: var(--font-weight-medium); }
+form > label, .room-status label { display: grid; gap: var(--space-2); margin-bottom: var(--space-5); }
+form > button { margin-top: var(--space-4); }
+h1, h2, h3, p { margin: 0 0 var(--space-5); }
+h1 { font-size: var(--font-size-xl); line-height: var(--line-height-heading); letter-spacing: -.03em; font-weight: var(--font-weight-bold); font-family: var(--font-family-heading); }
+h2 { font-size: var(--font-size-lg); line-height: var(--line-height-copy); letter-spacing: -.02em; font-weight: var(--font-weight-semibold); font-family: var(--font-family-heading); }
+h3 { font-size: var(--font-size-md); line-height: var(--line-height-copy); font-weight: var(--font-weight-semibold); }
+p { line-height: var(--line-height-copy); }
+small, .muted { color: var(--color-text-secondary); }

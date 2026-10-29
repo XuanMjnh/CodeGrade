@@ -6,6 +6,8 @@ Học phần Lập trình mạng, năm học 2026–2027. Thông tin nhóm nằm
 
 ## Chức năng
 
+Giao diện đã được tổ chức lại thành Question Studio năm bước và đấu trường Code Survival với HUD, chọn mode, tìm trận và kết quả theo dữ liệu server. Xem [bàn giao UI/UX](report/UI-Redesign.md) để biết các file thay đổi, kiểm thử và giới hạn xác minh hiển thị. Kết quả mới nằm trong [redesign-verification.json](statics/results/redesign-verification.json) và [redesign-ui-live.json](statics/results/redesign-ui-live.json); các báo cáo v6 bên dưới là mốc trước redesign.
+
 Practice cá nhân, Contest, ngân hàng đề, chấm bài và lịch sử, bảng xếp hạng, hồ sơ, bookmark, bình luận và quản trị ADMIN / AUTHOR / CODER được giữ. Một engine Code Survival dùng chung cho ba mode; không tạo game PvP riêng.
 
 | Survival | Cách vào | Số người bắt đầu | EXP | Rating Survival |

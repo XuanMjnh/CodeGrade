@@ -734,4 +734,15 @@ class SystemIntegrationTest {
   var ack=call(coders.getFirst(),"SUBMIT",data("problemId",pid,"source","pass","language","PY311"));
   var snapshot=db.read((String)db.one("SELECT snapshot FROM submissions WHERE id=?",ack.path("id").asText()).get("snapshot"));assertEquals(baseline.path("testcases").size(),snapshot.path("testcases").size());
  }
+ @Test void auditSummaryOmitsLargePayloadWithoutChangingLegacyResponseOrPermissions() throws Exception {
+  db.audit(admin.id(),"LARGE_EVENT","entity",data("details","x".repeat(1_100_000),"receipt",data("signature","legacy")));
+  var summary=call(admin,"AUDIT",data("summaryOnly",true));
+  assertEquals(1,summary.size());assertEquals("LARGE_EVENT",summary.get(0).path("action").asText());
+  assertEquals(admin.id(),summary.get(0).path("actor_id").asText());assertTrue(summary.get(0).has("created_at"));
+  assertFalse(summary.get(0).has("payload"));assertTrue(db.write(summary).length()<1000);
+  var legacy=call(admin,"AUDIT",data());var payload=db.read(legacy.get(0).path("payload").asText());
+  assertEquals(1_100_000,payload.path("details").asText().length());assertFalse(payload.has("receipt"));
+  assertThrows(Store.Fault.class,()->call(author,"AUDIT",data("summaryOnly",true)));
+ }
+
 }
