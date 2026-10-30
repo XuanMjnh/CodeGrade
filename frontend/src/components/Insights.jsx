@@ -4,43 +4,45 @@ import { t } from '../lib/locale';
 import { cn } from '../lib/utils';
 const metricTones = {
   total:
-    'border-t-[#3b82f6] [&_.stat-card-icon]:bg-blue-50 [&_.stat-card-icon]:text-blue-600 aria-pressed:border-blue-400 aria-pressed:bg-linear-to-b aria-pressed:from-blue-50/60 aria-pressed:to-card aria-pressed:ring-1 aria-pressed:ring-blue-300',
-  ac: 'border-t-success [&_.stat-card-icon]:bg-success-soft [&_.stat-card-icon]:text-success [&_.stat-card-value]:text-success aria-pressed:border-success aria-pressed:bg-success-soft',
-  star: 'border-t-orange-500 [&_.stat-card-icon]:bg-orange-50 [&_.stat-card-icon]:text-orange-600 [&_.stat-card-value]:text-amber-700 aria-pressed:border-orange-500 aria-pressed:bg-orange-50',
+    'border-blue-500/20 [&_.stat-card-icon]:bg-blue-500/10 [&_.stat-card-icon]:text-blue-600 hover:border-blue-400/40 hover:bg-blue-50/20 aria-pressed:border-blue-500 aria-pressed:bg-blue-50/50 aria-pressed:ring-2 aria-pressed:ring-blue-500/20',
+  ac: 'border-emerald-500/20 [&_.stat-card-icon]:bg-emerald-500/10 [&_.stat-card-icon]:text-emerald-600 [&_.stat-card-value]:text-emerald-600 hover:border-emerald-400/40 hover:bg-emerald-50/20 aria-pressed:border-emerald-500 aria-pressed:bg-emerald-50/50 aria-pressed:ring-2 aria-pressed:ring-emerald-500/20',
+  star: 'border-amber-500/20 [&_.stat-card-icon]:bg-amber-500/10 [&_.stat-card-icon]:text-amber-600 [&_.stat-card-value]:text-amber-600 hover:border-amber-400/40 hover:bg-amber-50/20 aria-pressed:border-amber-500 aria-pressed:bg-amber-50/50 aria-pressed:ring-2 aria-pressed:ring-amber-500/20',
   category:
-    'border-t-violet-500 [&_.stat-card-icon]:bg-violet-50 [&_.stat-card-icon]:text-violet-600',
-  live: 'border-t-success [&_.stat-card-icon]:bg-success-soft [&_.stat-card-icon]:text-success [&_.stat-card-value]:text-success',
+    'border-purple-500/20 [&_.stat-card-icon]:bg-purple-500/10 [&_.stat-card-icon]:text-purple-600 hover:border-purple-400/40 hover:bg-purple-50/20 aria-pressed:border-purple-500 aria-pressed:bg-purple-50/50 aria-pressed:ring-2 aria-pressed:ring-purple-500/20',
+  live: 'border-emerald-500/20 [&_.stat-card-icon]:bg-emerald-500/10 [&_.stat-card-icon]:text-emerald-600 [&_.stat-card-value]:text-emerald-600 aria-pressed:border-emerald-500 aria-pressed:ring-2 aria-pressed:ring-emerald-500/20',
   upcoming:
-    'border-t-action [&_.stat-card-icon]:bg-action-soft [&_.stat-card-icon]:text-action-text',
-  joined: 'border-t-warning [&_.stat-card-icon]:bg-warning-soft [&_.stat-card-icon]:text-warning',
+    'border-orange-500/20 [&_.stat-card-icon]:bg-action/10 [&_.stat-card-icon]:text-action-text aria-pressed:border-action aria-pressed:ring-2 aria-pressed:ring-action/20',
+  joined: 'border-amber-500/20 [&_.stat-card-icon]:bg-amber-500/10 [&_.stat-card-icon]:text-amber-600 aria-pressed:border-amber-500 aria-pressed:ring-2 aria-pressed:ring-amber-500/20',
   pending:
-    'border-t-input [&_.stat-card-icon]:bg-muted [&_.stat-card-icon]:text-muted-foreground [&_.stat-card-value]:text-muted-foreground',
+    'border-border/80 [&_.stat-card-icon]:bg-muted [&_.stat-card-icon]:text-muted-foreground aria-pressed:border-foreground/30 aria-pressed:ring-2 aria-pressed:ring-muted-foreground/20',
+  score:
+    'border-amber-500/20 [&_.stat-card-icon]:bg-amber-500/10 [&_.stat-card-icon]:text-amber-600 [&_.stat-card-value]:text-amber-600 aria-pressed:border-amber-500 aria-pressed:ring-2 aria-pressed:ring-amber-500/20',
 };
 export { useServerTime as useNow } from '../hooks/use-server-time';
 export function StatGrid({ items, label = 'Tổng quan', className = '' }) {
   return (
     <section
-      className={'stat-grid grid gap-4 sm:grid-cols-2 xl:grid-cols-4 ' + (className || '')}
+      className={'stat-grid grid gap-2.5 sm:grid-cols-2 xl:grid-cols-4 ' + (className || '')}
       aria-label={t(label)}
     >
       {items.map(({ label, value, note, tone, icon, badge, onClick, active }, i) => (
         <div
           className={cn(
-            'stat-card flex min-h-32 min-w-0 flex-col justify-between gap-3 rounded-[14px] border border-t-[3px] bg-card p-5 shadow-subtle',
+            'stat-card flex items-center gap-3 rounded-xl border bg-card px-3.5 py-2.5 shadow-xs transition-all',
             tone,
             metricTones[tone] || metricTones.total,
             !className &&
               [
-                'min-h-0 bg-action-soft border-t-action [&_.stat-card-value]:text-action-text',
-                'min-h-0 bg-success-soft border-t-success [&_.stat-card-value]:text-success',
-                'min-h-0 bg-warning-soft border-gold border-t-gold [&_.stat-card-value]:text-warning',
-                'min-h-0 bg-card border-t-primary',
+                'min-h-0 bg-action-soft/40 border-action/30 [&_.stat-card-value]:text-action-text',
+                'min-h-0 bg-success-soft/40 border-success/30 [&_.stat-card-value]:text-success',
+                'min-h-0 bg-warning-soft/40 border-gold/40 [&_.stat-card-value]:text-warning',
+                'min-h-0 bg-card border-primary/30',
               ][i % 4],
             !className &&
-              '[&_.stat-card-label]:text-sm [&_.stat-card-label]:font-normal [&_.stat-card-label]:normal-case [&_.stat-card-label]:tracking-normal [&_.stat-card-value]:text-[28px] [&_.stat-card-value]:font-semibold',
+              '[&_.stat-card-label]:text-xs [&_.stat-card-label]:font-normal [&_.stat-card-label]:normal-case [&_.stat-card-label]:tracking-normal [&_.stat-card-value]:text-lg [&_.stat-card-value]:font-semibold',
             active && 'is-active',
             onClick &&
-              'is-clickable cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-raised focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              'is-clickable cursor-pointer hover:border-foreground/25 hover:shadow-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
           )}
           key={i}
           onClick={onClick}
@@ -58,32 +60,36 @@ export function StatGrid({ items, label = 'Tổng quan', className = '' }) {
               : undefined
           }
         >
-          <div className="stat-card-head flex items-center gap-2.5">
-            {icon && (
-              <span
-                className="stat-card-icon flex size-[38px] shrink-0 items-center justify-center rounded-md border border-current/10"
-                aria-hidden="true"
-              >
-                {icon}
-              </span>
-            )}
-            <span className="stat-card-label text-[10px] font-bold tracking-wide text-muted-foreground uppercase">
-              {t(label)}
+          {icon && (
+            <span
+              className="stat-card-icon flex size-8.5 shrink-0 items-center justify-center rounded-lg text-sm"
+              aria-hidden="true"
+            >
+              {icon}
             </span>
-            {badge && (
-              <span className="stat-card-badge ml-auto rounded-full bg-accent px-2 py-0.5 text-xs font-medium text-accent-foreground">
-                {badge}
-              </span>
-            )}
-          </div>
-          <strong className="stat-card-value block font-heading text-[30px] leading-tight font-extrabold tracking-tight tabular-nums">
-            {value ?? '—'}
-          </strong>
-          {note && (
-            <small className="stat-card-note block text-[11px] text-muted-foreground">
-              {t(note)}
-            </small>
           )}
+          <div className="min-w-0 flex-1">
+            <div className="stat-card-head flex items-center justify-between gap-1">
+              <span className="stat-card-label text-[10px] sm:text-[11px] font-bold tracking-wider text-muted-foreground uppercase truncate">
+                {t(label)}
+              </span>
+              {badge && (
+                <span className="stat-card-badge shrink-0 rounded-full bg-accent px-1.5 py-0.2 text-[10px] font-semibold text-accent-foreground">
+                  {badge}
+                </span>
+              )}
+            </div>
+            <div className="flex items-baseline gap-2 mt-0.5">
+              <strong className="stat-card-value font-heading text-lg sm:text-xl font-extrabold tracking-tight tabular-nums leading-none">
+                {value ?? '—'}
+              </strong>
+              {note && (
+                <small className="stat-card-note text-[11px] text-muted-foreground/80 truncate">
+                  {t(note)}
+                </small>
+              )}
+            </div>
+          </div>
         </div>
       ))}
     </section>
@@ -93,11 +99,11 @@ export function InsightPanel({ title, action, children, className = '' }) {
   return (
     <section
       className={
-        'paper rounded-[14px] border bg-card text-card-foreground shadow-subtle insight-panel space-y-4 px-6 py-[22px] ' +
+        'paper rounded-xl border bg-card text-card-foreground shadow-xs insight-panel p-3.5 sm:p-4 ' +
         className
       }
     >
-      <div className="insight-panel-head mb-[18px] flex flex-wrap items-center justify-between gap-3 [&_h2]:font-heading [&_h2]:text-base [&_h2]:font-bold">
+      <div className="insight-panel-head mb-2.5 flex flex-wrap items-center justify-between gap-2 border-b border-border/50 pb-2 [&_h2]:font-heading [&_h2]:text-xs sm:[&_h2]:text-sm [&_h2]:font-bold [&_h2]:tracking-tight">
         <h2>{t(title)}</h2>
         {action}
       </div>
@@ -107,16 +113,16 @@ export function InsightPanel({ title, action, children, className = '' }) {
 }
 export function ProgressRows({ items, empty = 'Chưa có dữ liệu.' }) {
   return !items.length ? (
-    <p className="muted text-sm leading-relaxed text-muted-foreground">{t(empty)}</p>
+    <p className="muted text-xs leading-relaxed text-muted-foreground py-2">{t(empty)}</p>
   ) : (
-    <div className="progress-rows space-y-5 text-xs [&_small]:text-muted-foreground">
+    <div className="progress-rows grid grid-cols-1 min-[480px]:grid-cols-2 gap-2 text-xs">
       {items.map((c, i) => (
         <div
           key={c.id || i}
           className={
-            'progress-row-item space-y-2' +
+            'progress-row-item rounded-lg border border-border/60 bg-muted/20 p-2 transition-all space-y-1' +
             (c.onClick
-              ? ' is-clickable cursor-pointer transition-colors hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+              ? ' is-clickable cursor-pointer hover:bg-muted/60 hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
               : '')
           }
           onClick={c.onClick}
@@ -133,9 +139,11 @@ export function ProgressRows({ items, empty = 'Chưa có dữ liệu.' }) {
               : undefined
           }
         >
-          <div className="inline-group between flex flex-wrap items-center justify-between gap-3">
-            <span data-user-content>{c.name}</span>
-            <small>
+          <div className="inline-group between flex items-center justify-between gap-1.5">
+            <span className="truncate text-xs font-semibold text-foreground capitalize" data-user-content>
+              {c.name}
+            </span>
+            <small className="shrink-0 font-mono text-[10px] font-bold text-muted-foreground tabular-nums">
               {c.value} / {c.total}
             </small>
           </div>
@@ -144,6 +152,7 @@ export function ProgressRows({ items, empty = 'Chưa có dữ liệu.' }) {
             data-verdict={c.name}
             value={c.value}
             max={Math.max(1, c.total)}
+            className="h-1"
           />
         </div>
       ))}
@@ -152,28 +161,40 @@ export function ProgressRows({ items, empty = 'Chưa có dữ liệu.' }) {
 }
 export function ProblemPicks({ items }) {
   return (
-    <ol className="problem-picks divide-y text-xs [&>li]:flex [&>li]:items-center [&>li]:gap-3 [&>li]:py-3 [&_a]:font-semibold [&_a]:text-foreground [&_small]:mt-1 [&_small]:block [&_small]:text-[11px] [&_small]:text-muted-foreground">
+    <ol className="problem-picks space-y-1.5 text-xs">
       {items.map((p, i) => (
         <li key={p.id}>
-          <span className="pick-number flex size-7 shrink-0 items-center justify-center rounded-md border bg-muted font-mono text-[10px]">
-            {String(i + 1).padStart(2, '0')}
-          </span>
-          <div>
-            <a href={'#/solve/' + p.id} data-user-content>
-              {p.title}
-            </a>
-            <small data-user-content>
-              {p.publicId} · {p.category}
-            </small>
-          </div>
-          <span
-            className={
-              'badge inline-flex items-center gap-1.5 rounded-full border bg-secondary px-2.5 py-1 text-xs font-medium level-' +
-              p.difficulty
-            }
+          <a
+            href={'#/solve/' + p.id}
+            className="group flex items-center gap-2 rounded-lg border border-border/50 bg-muted/20 px-2.5 py-1.5 transition-all hover:bg-muted/60 hover:border-primary/40"
+            data-user-content
           >
-            {t('Mức')} {p.difficulty}
-          </span>
+            <span className="pick-number flex size-5 shrink-0 items-center justify-center rounded bg-primary/10 font-mono text-[10px] font-bold text-primary">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <div className="min-w-0 flex-1 truncate">
+              <span
+                className="block truncate text-xs font-semibold text-foreground transition-colors group-hover:text-primary"
+                data-user-content
+              >
+                {p.title}
+              </span>
+              <small
+                className="block truncate text-[10px] text-muted-foreground leading-tight"
+                data-user-content
+              >
+                {p.publicId} · {p.category}
+              </small>
+            </div>
+            <span
+              className={
+                'badge inline-flex shrink-0 items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-semibold border level-' +
+                p.difficulty
+              }
+            >
+              {t('Mức')} {p.difficulty}
+            </span>
+          </a>
         </li>
       ))}
     </ol>

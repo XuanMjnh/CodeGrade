@@ -282,7 +282,7 @@ export default function AppShell({ user, status, page, revision, children }) {
           tabIndex={-1}
           className="main min-h-[calc(100vh-200px)] w-full min-w-0 outline-none"
         >
-          <div className="space-y-6">{children}</div>
+          <div className="space-y-4 sm:space-y-5">{children}</div>
         </main>
         {!focused && (
           <div className="min-w-0 min-[851px]:sticky min-[851px]:top-[104px]">

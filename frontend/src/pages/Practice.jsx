@@ -15,6 +15,7 @@ import { StatGrid, InsightPanel, ProgressRows, ProblemPicks } from '../component
 import { t as trUI } from '../lib/locale';
 import React, { useState, useEffect } from 'react';
 import { live } from '../lib/live';
+import { cn } from '../lib/utils';
 import { Heading, Badge, ErrorBox, Loading, useResource, go } from '../components/ui';
 function focusLibrary() {
   const el = document.getElementById('problem-library');
@@ -59,20 +60,32 @@ export default function Practice({ user, revision }) {
     }));
     P(1);
   }
-  const sortHead = (key, label) => (
-    <UiTableHead
-      aria-sort={sort.key === key ? (sort.dir === 1 ? 'ascending' : 'descending') : 'none'}
-    >
-      <UiButton
-        className="sort-button h-auto justify-start bg-transparent p-0 text-xs font-medium text-muted-foreground shadow-none hover:bg-transparent hover:text-foreground"
-        onClick={() => sortBy(key)}
-        variant="ghost"
+  const sortHead = (key, label) => {
+    const isSorted = sort.key === key;
+    return (
+      <UiTableHead
+        aria-sort={isSorted ? (sort.dir === 1 ? 'ascending' : 'descending') : 'none'}
+        className="py-3 px-4 font-bold text-xs uppercase tracking-wider"
       >
-        {label}
-        <span aria-hidden="true">{sort.key === key ? (sort.dir === 1 ? ' ↑' : ' ↓') : ' ↕'}</span>
-      </UiButton>
-    </UiTableHead>
-  );
+        <UiButton
+          className={cn(
+            'sort-button h-auto justify-start bg-transparent p-0 text-xs font-bold uppercase tracking-wider shadow-none hover:bg-transparent transition-colors',
+            isSorted ? 'text-primary' : 'text-muted-foreground hover:text-foreground',
+          )}
+          onClick={() => sortBy(key)}
+          variant="ghost"
+        >
+          {label}
+          <span
+            aria-hidden="true"
+            className={cn('ml-1 text-[11px]', isSorted ? 'text-primary' : 'text-muted-foreground/60')}
+          >
+            {isSorted ? (sort.dir === 1 ? ' ↑' : ' ↓') : ' ↕'}
+          </span>
+        </UiButton>
+      </UiTableHead>
+    );
+  };
   const author = user.role !== 'CODER';
   const rows = (data || [])
     .filter(
@@ -111,7 +124,7 @@ export default function Practice({ user, revision }) {
         }}
         action={
           <>
-            <ActionLink asChild variant="outline">
+            <ActionLink asChild variant="outline" size="sm">
               <a
                 className="button secondary border border-input bg-card text-foreground shadow-xs hover:bg-accent hover:text-accent-foreground"
                 href="#/practice"
@@ -125,6 +138,7 @@ export default function Practice({ user, revision }) {
             </ActionLink>
             {author && (
               <UiButton
+                size="sm"
                 className="primary bg-primary text-primary-foreground hover:bg-primary/90"
                 onClick={() => go('/edit')}
                 variant="default"
@@ -133,7 +147,7 @@ export default function Practice({ user, revision }) {
               </UiButton>
             )}
             <a
-              className="banner-text-link inline-flex items-center gap-1 text-primary underline-offset-4 hover:underline"
+              className="banner-text-link inline-flex items-center gap-1 text-xs font-semibold text-primary underline-offset-4 hover:underline"
               href="#/survival"
             >
               <Icon name="fa-solid fa-fire" aria-hidden="true" /> Code Survival{' '}
@@ -200,7 +214,7 @@ export default function Practice({ user, revision }) {
           },
         ]}
       />
-      <div className="insight-grid grid min-w-0 gap-4 sm:grid-cols-2 practice-insights items-start">
+      <div className="insight-grid grid min-w-0 gap-3 sm:grid-cols-2 practice-insights">
         <InsightPanel title="Tiến độ theo danh mục">
           {!all ? (
             <Loading />
@@ -224,18 +238,18 @@ export default function Practice({ user, revision }) {
           ) : summary.next.length ? (
             <ProblemPicks items={summary.next} />
           ) : (
-            <p className="muted text-sm leading-relaxed text-muted-foreground">
+            <p className="muted text-xs leading-relaxed text-muted-foreground py-2">
               {trUI('Bạn đã hoàn thành các bài hiện có.')}
             </p>
           )}
-          <p className="panel-footnote text-sm leading-relaxed text-muted-foreground">
-            <Icon name="fa-solid fa-circle-info" aria-hidden="true" />{' '}
+          <p className="panel-footnote mt-2 flex items-center gap-1.5 text-[11px] leading-tight text-muted-foreground">
+            <Icon name="fa-solid fa-circle-info" aria-hidden="true" className="size-3 shrink-0 text-muted-foreground/70" />{' '}
             {trUI('Ưu tiên bài chưa AC ở mức độ thấp trước.')}
           </p>
         </InsightPanel>
       </div>
       <div
-        className="subheading my-6 flex flex-wrap items-center justify-between gap-4 [&_h2]:text-lg [&_h2]:text-success [&_small]:text-xs [&_small]:text-muted-foreground"
+        className="subheading my-4 flex flex-wrap items-center justify-between gap-3 [&_h2]:text-base sm:[&_h2]:text-lg [&_h2]:font-bold [&_h2]:text-success [&_small]:text-xs [&_small]:text-muted-foreground"
         id="problem-library"
         tabIndex={-1}
       >
@@ -245,20 +259,14 @@ export default function Practice({ user, revision }) {
         </small>
       </div>
       {user.role === 'ADMIN' && (
-        <div className="alert my-3 rounded-lg border border-border bg-muted/60 px-4 py-3 text-sm leading-relaxed">
+        <div className="alert my-2.5 rounded-lg border border-border bg-muted/60 px-3.5 py-2.5 text-xs sm:text-sm leading-relaxed">
           {trUI(
             'Admin có thể giải mọi bài. Kết quả không cập nhật Elo, số bài AC hoặc số lần thắng trong bảng xếp hạng.',
           )}
         </div>
       )}
-      <div className="library-toolbar mb-4 flex flex-wrap items-center gap-3 [&_input]:min-w-40 [&_input]:flex-1">
-        <p className="scope-note text-sm leading-relaxed text-muted-foreground">
-          <Icon name="fa-solid fa-circle-info" aria-hidden="true" />{' '}
-          {trUI(
-            'Luyện tập cá nhân không cộng EXP. Thành tích AC được ghi lại theo quy định của tài khoản.',
-          )}
-        </p>
-        <div className="filters my-4 flex flex-wrap items-center gap-3 rounded-[14px] border bg-card p-4 [&_input]:min-w-40 [&_input]:flex-1">
+      <div className="library-toolbar mb-3">
+        <div className="filters my-2 flex flex-wrap items-center gap-2.5 rounded-xl border bg-card p-3 sm:p-3.5 [&_input]:min-w-40 [&_input]:flex-1">
           <UiButton
             className={
               'secondary border border-input bg-card text-foreground shadow-xs hover:bg-accent hover:text-accent-foreground bookmark-filter ' +
@@ -333,7 +341,7 @@ export default function Practice({ user, revision }) {
         <Loading />
       ) : (
         <div
-          className="paper text-card-foreground shadow-xs table-wrap min-w-0 overflow-x-auto rounded-[14px] border bg-card"
+          className="paper text-card-foreground shadow-subtle table-wrap min-w-0 overflow-x-auto rounded-xl border border-border/80 bg-card [&_thead]:bg-linear-to-b [&_thead]:from-muted/70 [&_thead]:to-muted/40 [&_thead_th]:border-b [&_thead_th]:border-border/80"
           data-pagination="manual"
           role="region"
           aria-label={trUI('Bảng dữ liệu')}
@@ -341,28 +349,32 @@ export default function Practice({ user, revision }) {
         >
           <UiTable className="problem-library-table" paginate={false}>
             <UiTableHeader>
-              <UiTableRow>
+              <UiTableRow className="hover:bg-transparent">
                 {sortHead('publicId', trUI('Mã bài'))}
                 {sortHead('title', trUI('Bài tập'))}
                 {sortHead('category', trUI('Danh mục'))}
                 {sortHead('difficulty', trUI('Độ khó'))}
                 {sortHead('solved', trUI('Trạng thái'))}
-                <UiTableHead>
+                <UiTableHead className="py-3 px-4 text-right">
                   <span className="sr-only">Thao tác</span>
                 </UiTableHead>
               </UiTableRow>
             </UiTableHeader>
-            <UiTableBody>
+            <UiTableBody className="[&_tr:nth-child(even)]:bg-card">
               {rows.slice((currentPage - 1) * 20, currentPage * 20).map((p) => (
-                <UiTableRow key={p.id}>
-                  <UiTableCell>
-                    <code className="problem-id font-mono text-xs text-muted-foreground">
+                <UiTableRow
+                  key={p.id}
+                  className="group border-b border-border/40 bg-card transition-colors hover:bg-muted/40"
+                >
+                  <UiTableCell className="py-2.5 px-4">
+                    <code className="problem-id font-mono text-xs font-bold text-orange-600 bg-orange-50/90 dark:bg-orange-950/40 dark:text-orange-400 px-2 py-0.5 rounded-md border border-orange-200/80 dark:border-orange-900/60 shadow-2xs">
                       {p.publicId}
                     </code>
                   </UiTableCell>
-                  <UiTableCell>
-                    <UiButton
-                      className="ghost bg-transparent text-muted-foreground shadow-none hover:bg-muted hover:text-foreground bookmark-button size-8 p-0"
+                  <UiTableCell className="py-2.5 px-4">
+                    <div className="flex items-center gap-2">
+                      <UiButton
+                        className="ghost bg-transparent text-muted-foreground/40 shadow-none hover:bg-amber-50 hover:text-amber-500 bookmark-button size-7 p-0 transition-colors"
                       disabled={bookmarkBusy === p.id}
                       aria-busy={bookmarkBusy === p.id}
                       aria-pressed={!!p.starred}
@@ -408,40 +420,83 @@ export default function Practice({ user, revision }) {
                       }}
                       variant="ghost"
                     >
-                      <Icon
-                        name={(p.starred ? 'fa-solid' : 'fa-regular') + ' fa-star'}
-                        aria-hidden="true"
-                      />
-                    </UiButton>
-                    <a
-                      href={'#/solve/' + p.id}
-                      className="problem-title font-semibold text-success hover:text-action-text"
-                      data-user-content
+                        <Icon
+                          name="star"
+                          className={cn(
+                            'size-4 transition-all',
+                            p.starred
+                              ? 'fill-amber-400 text-amber-500 scale-110'
+                              : 'text-muted-foreground/40 hover:text-amber-500',
+                          )}
+                          aria-hidden="true"
+                        />
+                      </UiButton>
+                      <a
+                        href={'#/solve/' + p.id}
+                        className="problem-title font-bold text-sm text-foreground hover:text-primary transition-colors group-hover:text-primary"
+                        data-user-content
+                      >
+                        {p.title}
+                      </a>
+                      {p.status === 'draft' && (
+                        <span className="rounded-full bg-amber-100 text-amber-800 text-[10px] font-semibold px-2 py-0.5">
+                          {trUI('Bản nháp')}
+                        </span>
+                      )}
+                    </div>
+                  </UiTableCell>
+                  <UiTableCell className="py-2.5 px-4" data-user-content>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-muted/90 text-foreground/80 border border-border/70 capitalize">
+                      {p.category}
+                    </span>
+                  </UiTableCell>
+                  <UiTableCell className="py-2.5 px-4">
+                    <Badge
+                      tone={'level-' + p.difficulty}
+                      className="font-bold px-2.5 py-0.5 rounded-full shadow-2xs text-xs"
                     >
-                      {p.title}
-                    </a>
-                    {p.status === 'draft' && <small>Bản nháp</small>}
-                  </UiTableCell>
-                  <UiTableCell data-user-content>{p.category}</UiTableCell>
-                  <UiTableCell>
-                    <Badge tone={'level-' + p.difficulty}>Mức {p.difficulty}</Badge>
-                  </UiTableCell>
-                  <UiTableCell>
-                    <Badge tone={p.solved ? 'success' : ''}>
-                      {p.solved ? 'Accepted' : trUI('Chưa AC')}
+                      {trUI('Mức')} {p.difficulty}
                     </Badge>
                   </UiTableCell>
-                  <UiTableCell>
+                  <UiTableCell className="py-2.5 px-4">
+                    <Badge
+                      tone={p.solved ? 'success' : ''}
+                      className={cn(
+                        'font-bold px-2.5 py-0.5 rounded-full shadow-2xs text-xs',
+                        p.solved
+                          ? 'border-emerald-300 bg-emerald-50 text-emerald-700 ring-1 ring-emerald-500/20'
+                          : 'border-border/70 bg-muted/80 text-muted-foreground',
+                      )}
+                    >
+                      {p.solved ? (
+                        <span className="inline-flex items-center gap-1">
+                          <Icon name="circle-check" className="size-3 text-emerald-600" />
+                          Accepted
+                        </span>
+                      ) : (
+                        trUI('Chưa AC')
+                      )}
+                    </Badge>
+                  </UiTableCell>
+                  <UiTableCell className="py-2.5 px-4 text-right">
                     {author && (user.role === 'ADMIN' || p.author_id === user.id) ? (
                       <UiButton
-                        className="ghost bg-transparent text-muted-foreground shadow-none hover:bg-muted hover:text-foreground"
+                        size="sm"
+                        className="h-7 px-2.5 text-xs font-semibold text-foreground/80 border border-border/80 bg-card hover:bg-accent hover:text-accent-foreground shadow-2xs rounded-lg inline-flex items-center gap-1"
                         onClick={() => go('/edit/' + p.id)}
-                        variant="ghost"
+                        variant="outline"
                       >
-                        Sửa đề
+                        <Icon name="pen-to-square" className="size-3" />
+                        {trUI('Sửa đề')}
                       </UiButton>
                     ) : (
-                      <a href={'#/solve/' + p.id}>Giải bài</a>
+                      <a
+                        href={'#/solve/' + p.id}
+                        className="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all shadow-2xs"
+                      >
+                        <span>{trUI('Giải bài')}</span>
+                        <Icon name="arrow-right" className="size-3" />
+                      </a>
                     )}
                   </UiTableCell>
                 </UiTableRow>

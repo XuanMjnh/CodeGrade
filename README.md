@@ -117,7 +117,7 @@ Cần Docker Desktop/Engine hoạt động. Môi trường kiểm thử có 12 C
 ```powershell
 # Chỉ tạo .env khi chưa có; giữ bí mật mật khẩu được sinh.
 py -3.11 scripts/init_env.py --demo
-docker compose up -d --build --scale worker=4
+docker compose up -d --build --scale worker=2
 docker compose ps
 docker compose logs --tail 50 server worker
 ```
