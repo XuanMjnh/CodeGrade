@@ -369,3 +369,894 @@ button.category-chip:hover { background:var(--color-accent-soft); color:var(--co
 @media(max-width:767px) {.progression-strip { gap:20px; padding:20px; }.progression-identity { width:100%; }.progression-rank { padding-left:16px; }.progression-rank strong { font-size:15px; }.progression-strip .exp-meter { min-width:145px; } }
 .profile-identity .avatar-frame-silver { outline:2px solid var(--color-border-strong);outline-offset:3px; }
 .profile-identity .avatar-frame-gold { outline:2px solid var(--color-warning);outline-offset:3px; }
+
+/* ==========================================================================
+   LEADERBOARD REDESIGN - BỐ CỤC, BOX, BUTTON & BỤC PODIUM
+   ========================================================================== */
+
+.leaderboard-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+}
+
+/* 1. Thống kê tổng quan (Stats Overview Grid & Boxes) */
+.leaderboard-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.lb-stat-box {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  background: var(--color-surface-base);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 2px 10px rgba(35, 48, 40, 0.04);
+  transition: transform var(--motion-duration-instant), box-shadow var(--motion-duration-instant);
+}
+
+.lb-stat-box:hover {
+  box-shadow: 0 4px 16px rgba(35, 48, 40, 0.08);
+  transform: translateY(-1px);
+}
+
+.lb-stat-box-highlight {
+  border-color: var(--color-primary);
+  background: linear-gradient(135deg, var(--color-primary-soft) 0%, var(--color-surface-base) 70%);
+}
+
+.lb-stat-icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-xs);
+  background: var(--color-surface-muted);
+  color: var(--color-primary);
+  font-size: 20px;
+}
+
+.lb-stat-box:nth-child(1) .lb-stat-icon {
+  background: #e8f4fd;
+  color: #1976d2;
+}
+
+.lb-stat-box:nth-child(2) .lb-stat-icon {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.lb-stat-box:nth-child(3) .lb-stat-icon {
+  background: #fff8e1;
+  color: #f57f17;
+}
+
+.lb-stat-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.lb-stat-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: 2px;
+}
+
+.lb-stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.lb-stat-value {
+  font-family: var(--font-family-heading);
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.lb-stat-box-highlight .lb-stat-value {
+  color: var(--color-primary);
+}
+
+.lb-stat-detail {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+
+/* Button nhảy nhanh đến vị trí */
+.lb-jump-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  min-height: 28px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--color-surface-base);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all var(--motion-duration-instant);
+}
+
+.lb-jump-btn:hover {
+  background: var(--color-primary);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(36, 116, 76, 0.25);
+}
+
+/* 2. Tiêu chí xếp hạng & Hộp điều khiển (Control Box & Buttons) */
+.lb-control-card {
+  background: var(--color-surface-base);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-5) var(--space-6);
+  box-shadow: 0 2px 10px rgba(35, 48, 40, 0.04);
+}
+
+.lb-control-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.lb-control-title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.lb-control-title i {
+  color: var(--color-primary);
+}
+
+.lb-metric-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.lb-metric-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 8px 18px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all var(--motion-duration-instant);
+}
+
+.lb-metric-btn i {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  transition: color var(--motion-duration-instant);
+}
+
+.lb-metric-btn:hover {
+  color: var(--color-text-primary);
+  background: var(--color-surface-hover);
+  border-color: var(--color-border-strong);
+  transform: translateY(-1px);
+}
+
+.lb-metric-btn.active {
+  color: #ffffff;
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: 0 4px 12px rgba(36, 116, 76, 0.3);
+}
+
+.lb-metric-btn.active i {
+  color: #ffffff;
+}
+
+/* Hộp ghi chú quy tắc (Scope Box) */
+.lb-scope-box {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: 10px 14px;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xs);
+}
+
+.lb-scope-icon {
+  font-size: 14px;
+  color: var(--color-primary);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.lb-scope-text {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+/* 3. BỤC VINH QUANG (PODIUM TOP 3) - REFINED ARCHITECTURAL FINISH */
+.lb-podium-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-7) var(--space-6) 0;
+  background: var(--color-surface-base);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 2px 14px rgba(35, 48, 40, 0.04);
+  position: relative;
+  overflow: hidden;
+}
+
+.lb-podium-header {
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+.lb-podium-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  margin-bottom: 4px;
+}
+
+.lb-podium-kicker i {
+  color: #c59b27;
+}
+
+.lb-podium-title {
+  margin: 0;
+  font-family: var(--font-family-heading);
+  font-size: 21px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  letter-spacing: -0.025em;
+}
+
+/* Khung 3 cột bục vinh danh */
+.lb-podium-container {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr 1fr;
+  align-items: end;
+  width: 100%;
+  max-width: 740px;
+  gap: 16px;
+  z-index: 1;
+}
+
+.lb-podium-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+
+/* Vương miện vị trí #1 */
+.lb-podium-crown-slot {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+}
+
+.lb-podium-crown {
+  font-size: 24px;
+  color: #c59b27;
+  filter: drop-shadow(0 2px 4px rgba(197, 155, 39, 0.25));
+  display: inline-block;
+}
+
+/* Avatar và Huy hiệu */
+.lb-podium-avatar-wrapper {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.lb-podium-avatar {
+  border-radius: var(--radius-pill);
+  font-family: var(--font-family-heading);
+  font-weight: 700;
+  text-transform: uppercase;
+  background: var(--color-surface-base);
+  transition: transform var(--motion-duration-instant);
+}
+
+/* Avatar #1: Gold */
+.place-1 .lb-podium-avatar {
+  width: 78px;
+  height: 78px;
+  font-size: 28px;
+  color: #8c6d1f;
+  background: #fdfbf7;
+  border: 2px solid #d4af37;
+  outline: 3px solid rgba(212, 175, 55, 0.2);
+  outline-offset: 2px;
+  box-shadow: 0 6px 20px rgba(197, 155, 39, 0.16);
+}
+
+/* Avatar #2: Silver */
+.place-2 .lb-podium-avatar {
+  width: 64px;
+  height: 64px;
+  font-size: 22px;
+  color: #475569;
+  background: #f8fafc;
+  border: 2px solid #94a3b8;
+  outline: 3px solid rgba(148, 163, 184, 0.2);
+  outline-offset: 2px;
+  box-shadow: 0 4px 16px rgba(100, 116, 139, 0.12);
+}
+
+/* Avatar #3: Bronze */
+.place-3 .lb-podium-avatar {
+  width: 64px;
+  height: 64px;
+  font-size: 22px;
+  color: #8d4f26;
+  background: #fdfbf9;
+  border: 2px solid #b87333;
+  outline: 3px solid rgba(184, 115, 51, 0.2);
+  outline-offset: 2px;
+  box-shadow: 0 4px 16px rgba(184, 115, 51, 0.12);
+}
+
+/* Huy hiệu #1, #2, #3 trên avatar */
+.lb-podium-badge {
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  min-height: 20px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  white-space: nowrap;
+}
+
+.place-1 .lb-podium-badge {
+  background: #b8860b;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.place-2 .lb-podium-badge {
+  background: #64748b;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.place-3 .lb-podium-badge {
+  background: #9a5327;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Thông tin người dùng trên bục */
+.lb-podium-meta {
+  width: 100%;
+  padding: 0 6px;
+  margin-bottom: 6px;
+}
+
+.lb-podium-name {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.place-1 .lb-podium-name {
+  font-size: 16px;
+}
+
+.lb-podium-username {
+  display: block;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+
+/* Thẻ điểm số (Score Pill) - Tinh tế, không nhựa */
+.lb-podium-score-pill {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 4px 12px;
+  border-radius: var(--radius-xs);
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+}
+
+.place-1 .lb-podium-score-pill {
+  background: #fdfbf5;
+  border-color: #e8dbb9;
+}
+
+.place-2 .lb-podium-score-pill {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.place-3 .lb-podium-score-pill {
+  background: #faf6f2;
+  border-color: #ecdcd2;
+}
+
+.lb-podium-score-val {
+  font-family: var(--font-family-heading);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.place-1 .lb-podium-score-val {
+  font-size: 18px;
+  color: #8c6d1f;
+}
+
+.place-2 .lb-podium-score-val {
+  color: #475569;
+}
+
+.place-3 .lb-podium-score-val {
+  color: #8d4f26;
+}
+
+.lb-podium-score-sub {
+  font-size: 10px;
+  color: var(--color-text-secondary);
+  margin-top: 1px;
+}
+
+/* THÂN BỤC (PEDESTAL STANDS) - CHẤT LIỆU SATIN / KIẾN TRÚC MỜ CAO CẤP */
+.lb-podium-pillar {
+  width: 100%;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding-top: 12px;
+  position: relative;
+  transition: transform var(--motion-duration-instant);
+}
+
+/* Chiều cao bục: #1 CAO NHẤT (140px), #2 Cao nhì (95px), #3 Thấp nhất (65px) */
+.pillar-1 {
+  height: 140px;
+  background: linear-gradient(180deg, #fbf7ee 0%, #f3ead3 100%);
+  border: 1px solid #dccba3;
+  border-top: 3px solid #c59b27;
+  border-bottom: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 -2px 12px rgba(197, 155, 39, 0.08);
+}
+
+.pillar-2 {
+  height: 95px;
+  background: linear-gradient(180deg, #f8fafc 0%, #edf2f7 100%);
+  border: 1px solid #cbd5e1;
+  border-top: 3px solid #94a3b8;
+  border-bottom: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.pillar-3 {
+  height: 65px;
+  background: linear-gradient(180deg, #fbf6f2 0%, #f2e6dc 100%);
+  border: 1px solid #d8c7ba;
+  border-top: 3px solid #b87333;
+  border-bottom: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.lb-pillar-surface {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Số thứ hạng in chìm tinh tế, không bóng nhựa */
+.lb-pillar-number {
+  font-family: var(--font-family-heading);
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.pillar-1 .lb-pillar-number {
+  font-size: 34px;
+  color: #8c6d1f;
+  opacity: 0.9;
+}
+
+.pillar-2 .lb-pillar-number {
+  color: #64748b;
+  opacity: 0.85;
+}
+
+.pillar-3 .lb-pillar-number {
+  color: #9a5327;
+  opacity: 0.85;
+}
+
+.lb-pillar-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.pillar-1 .lb-pillar-label {
+  color: #8c6d1f;
+  opacity: 0.85;
+}
+
+.pillar-2 .lb-pillar-label {
+  color: #64748b;
+  opacity: 0.8;
+}
+
+.pillar-3 .lb-pillar-label {
+  color: #9a5327;
+  opacity: 0.8;
+}
+
+/* Chân đế sân khấu - Đường hairline thanh thoát */
+.lb-podium-stage-ground {
+  width: 100%;
+  height: 2px;
+  background: var(--color-border);
+  margin-top: 0;
+  z-index: 2;
+}
+
+/* 4. BẢNG XẾP HẠNG CHI TIẾT (RANKINGS TABLE BOX) */
+.lb-table-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.lb-table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.lb-table-title {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--font-size-lg);
+  font-family: var(--font-family-heading);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.lb-table-title i {
+  color: var(--color-primary);
+  font-size: 16px;
+}
+
+.lb-table-subtitle {
+  margin: 3px 0 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.lb-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--color-surface-base);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all var(--motion-duration-instant);
+}
+
+.lb-btn-outline:hover {
+  background: var(--color-primary);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(36, 116, 76, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Card chứa bảng */
+.lb-table-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-base);
+  box-shadow: 0 4px 16px rgba(35, 48, 40, 0.04);
+  overflow: hidden;
+  margin-bottom: 0;
+}
+
+.lb-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.lb-table th {
+  background: var(--color-surface-muted);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 14px 18px;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.lb-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.lb-table tbody tr {
+  transition: background var(--motion-duration-instant);
+}
+
+.lb-table tbody tr:hover {
+  background: var(--color-surface-hover);
+}
+
+/* Cột Rank & Badge */
+.lb-th-rank, .lb-td-rank {
+  width: 80px;
+  text-align: center;
+}
+
+.lb-rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-family-heading);
+  font-size: 13px;
+  font-weight: 700;
+  background: var(--color-surface-muted);
+  color: var(--color-text-secondary);
+}
+
+.lb-rank-badge.rank-pos-1 {
+  background: #fff8e1;
+  color: #e65100;
+  border: 1px solid #ffb300;
+  font-size: 15px;
+  box-shadow: 0 2px 6px rgba(255, 179, 0, 0.25);
+}
+
+.lb-rank-badge.rank-pos-2 {
+  background: #eceff1;
+  color: #37474f;
+  border: 1px solid #b0bec5;
+  font-size: 15px;
+}
+
+.lb-rank-badge.rank-pos-3 {
+  background: #efebe9;
+  color: #c65316;
+  border: 1px solid #ffb74d;
+  font-size: 15px;
+}
+
+/* Cột Coder Cell */
+.lb-coder-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lb-mini-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-pill);
+  font-size: 14px;
+  font-weight: 700;
+  background: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  flex-shrink: 0;
+}
+
+.lb-coder-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.lb-coder-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.lb-coder-username {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+/* Tag (Bạn) */
+.lb-me-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: #ffffff;
+}
+
+/* Hàng của bản thân (my-rank) */
+.lb-table tbody tr.lb-row-me {
+  background: var(--color-primary-soft) !important;
+  box-shadow: inset 4px 0 0 var(--color-primary);
+}
+
+.lb-table tbody tr.lb-row-me td {
+  font-weight: var(--font-weight-medium);
+}
+
+/* Top 3 rows styling */
+.lb-table tbody tr.lb-row-top-1 {
+  background: rgba(255, 248, 225, 0.4);
+}
+
+.lb-table tbody tr.lb-row-top-2 {
+  background: rgba(236, 239, 241, 0.35);
+}
+
+.lb-table tbody tr.lb-row-top-3 {
+  background: rgba(239, 235, 233, 0.3);
+}
+
+/* 5. RESPONSIVE BREAKPOINTS */
+@media (max-width: 900px) {
+  .leaderboard-stats-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
+  .lb-podium-container {
+    max-width: 100%;
+  }
+
+  .pillar-1 { height: 135px; }
+  .pillar-2 { height: 100px; }
+  .pillar-3 { height: 70px; }
+}
+
+@media (max-width: 600px) {
+  .lb-podium-container {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .lb-podium-col {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    text-align: left;
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-surface-base);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xs);
+    gap: var(--space-3);
+  }
+
+  .lb-podium-crown-slot {
+    display: none;
+  }
+
+  .lb-podium-avatar-wrapper {
+    margin-bottom: 0;
+  }
+
+  .place-1 .lb-podium-avatar,
+  .place-2 .lb-podium-avatar,
+  .place-3 .lb-podium-avatar {
+    width: 48px;
+    height: 48px;
+    font-size: 18px;
+  }
+
+  .lb-podium-meta {
+    flex: 1;
+    padding: 0;
+    margin-bottom: 0;
+  }
+
+  .lb-podium-score-pill {
+    margin-bottom: 0;
+  }
+
+  .lb-podium-pillar {
+    display: none;
+  }
+
+  .lb-podium-stage-ground {
+    display: none;
+  }
+}
+/* Căn chỉnh các cột số liệu trong bảng xếp hạng */
+.lb-th-stat, .lb-td-stat {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.lb-td-stat .rank-inline {
+  justify-content: flex-end;
+}
+
+.lb-th-coder, .lb-td-coder {
+  text-align: left;
+}
