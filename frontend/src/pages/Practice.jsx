@@ -1,4 +1,4 @@
-import { Button as ActionLink, Button as UiButton } from '../components/ui/button';
+import { Button as UiButton } from '../components/ui/button';
 import Icon from '../components/Icon';
 import { Input as UiInput } from '../components/ui/input';
 import { NativeSelect as UiNativeSelect } from '../components/ui/native-select';
@@ -16,7 +16,7 @@ import { t as trUI } from '../lib/locale';
 import React, { useState, useEffect } from 'react';
 import { live } from '../lib/live';
 import { cn } from '../lib/utils';
-import { Heading, Badge, ErrorBox, Loading, useResource, go } from '../components/ui';
+import { Badge, ErrorBox, Loading, useResource, go } from '../components/ui';
 function focusLibrary() {
   const el = document.getElementById('problem-library');
   if (el) {
@@ -111,55 +111,6 @@ export default function Practice({ user, revision }) {
     currentPage = Math.min(page, totalPages);
   return (
     <>
-      <Heading
-        kind="practice"
-        title={trUI('Thư viện bài tập')}
-        highlight={{
-          label: 'Tiến độ của bạn',
-          value: all ? summary.solved + ' / ' + summary.total : null,
-          detail: 'Bài đã AC',
-          onClick: () => {
-            focusLibrary();
-          },
-        }}
-        action={
-          <>
-            <ActionLink asChild variant="outline" size="sm">
-              <a
-                className="button secondary border border-input bg-card text-foreground shadow-xs hover:bg-accent hover:text-accent-foreground"
-                href="#/practice"
-                onClick={(e) => {
-                  e.preventDefault();
-                  focusLibrary();
-                }}
-              >
-                <Icon name="fa-solid fa-compass" aria-hidden="true" /> {trUI('Khám phá kho bài')}
-              </a>
-            </ActionLink>
-            {author && (
-              <UiButton
-                size="sm"
-                className="primary bg-primary text-primary-foreground hover:bg-primary/90"
-                onClick={() => go('/edit')}
-                variant="default"
-              >
-                <Icon name="fa-solid fa-plus" aria-hidden="true" /> {trUI('Tạo câu hỏi')}
-              </UiButton>
-            )}
-            <a
-              className="banner-text-link inline-flex items-center gap-1 text-xs font-semibold text-primary underline-offset-4 hover:underline"
-              href="#/survival"
-            >
-              <Icon name="fa-solid fa-fire" aria-hidden="true" /> Code Survival{' '}
-              <Icon name="fa-solid fa-arrow-right" aria-hidden="true" />
-            </a>
-          </>
-        }
-      >
-        {trUI(
-          'Luyện tập theo danh mục, chinh phục từng mức độ và giữ lại những bài bạn muốn quay lại.',
-        )}
-      </Heading>
       <StatGrid
         className="practice-stats-grid grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
         label="Tổng quan luyện tập"
@@ -253,10 +204,22 @@ export default function Practice({ user, revision }) {
         id="problem-library"
         tabIndex={-1}
       >
-        <h2>{trUI('Kho bài tập')}</h2>
-        <small>
-          {rows.length} {trUI('bài phù hợp')}
-        </small>
+        <div className="flex items-center gap-3">
+          <h2>{trUI('Kho bài tập')}</h2>
+          <small>
+            {rows.length} {trUI('bài phù hợp')}
+          </small>
+        </div>
+        {author && (
+          <UiButton
+            size="sm"
+            className="primary bg-primary text-primary-foreground hover:bg-primary/90"
+            onClick={() => go('/edit')}
+            variant="default"
+          >
+            <Icon name="fa-solid fa-plus" aria-hidden="true" /> {trUI('Tạo câu hỏi')}
+          </UiButton>
+        )}
       </div>
       {user.role === 'ADMIN' && (
         <div className="alert my-2.5 rounded-lg border border-border bg-muted/60 px-3.5 py-2.5 text-xs sm:text-sm leading-relaxed">

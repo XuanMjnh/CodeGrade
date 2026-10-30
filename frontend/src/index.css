@@ -32,6 +32,34 @@
   --color-inverse: var(--inverse);
   --color-inverse-muted: var(--inverse-muted);
   --color-surface-strong: var(--surface-strong);
+
+  /* Unified Green palette (đồng bộ tông Xanh thương hiệu và trạng thái) */
+  --color-emerald-50: var(--success-soft);
+  --color-emerald-100: #d6ecdd;
+  --color-emerald-200: #c3dfcb;
+  --color-emerald-500: var(--primary);
+  --color-emerald-600: var(--primary);
+  --color-emerald-700: var(--success);
+  --color-emerald-800: #1b5437;
+
+  /* Unified Yellow / Gold palette (đồng bộ tông Vàng cảnh báo, sao và huân chương) */
+  --color-amber-50: var(--warning-soft);
+  --color-amber-100: #feefc6;
+  --color-amber-200: #fae3a2;
+  --color-amber-400: var(--gold);
+  --color-amber-500: #d97706;
+  --color-amber-600: var(--warning);
+  --color-amber-700: var(--warning);
+  --color-amber-800: #6b4700;
+
+  /* Unified Orange palette (đồng bộ tông Cam hành động, đếm ngược và mã bài) */
+  --color-orange-50: var(--action-soft);
+  --color-orange-100: #ffe2cf;
+  --color-orange-200: #fcd9c3;
+  --color-orange-500: var(--action);
+  --color-orange-600: var(--action);
+  --color-orange-700: var(--action-text);
+  --color-orange-800: var(--action-active);
   --radius-sm: 6px;
   --radius-md: 6px;
   --radius-lg: 8px;

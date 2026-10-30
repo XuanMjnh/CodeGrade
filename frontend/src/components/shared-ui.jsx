@@ -30,12 +30,12 @@ export {
 export { useResource } from '../hooks/use-resource';
 const tones = {
   success: 'border-success/40 bg-success-soft text-success',
-  warning: 'border-amber-200 bg-amber-50 text-amber-900',
+  warning: 'border-warning/40 bg-warning-soft text-warning',
   danger: 'border-red-200 bg-red-50 text-red-800',
-  'level-1': 'border-[#146347]/40 bg-[#eaf6ef] text-[#146347]',
+  'level-1': 'border-success/40 bg-success-soft text-success',
   'level-2': 'border-[#086479]/40 bg-[#e8f7fc] text-[#086479]',
   'level-3': 'border-[#2458a6]/40 bg-[#edf3ff] text-[#2458a6]',
-  'level-4': 'border-[#7a4b00]/40 bg-[#fff6e5] text-[#7a4b00]',
+  'level-4': 'border-warning/40 bg-warning-soft text-warning',
   'level-5': 'border-[#7831a3]/40 bg-[#f6edff] text-[#7831a3]',
   'level-6': 'border-[#a72844]/40 bg-[#fff0f3] text-[#a72844]',
 };
@@ -123,7 +123,7 @@ export function ErrorBox({ error }) {
     </Alert>
   );
 }
-export function Heading({ eyebrow = '', title, children, action, kind, highlight }) {
+export function Heading({ eyebrow = '', title, children, action, kind, highlight, className }) {
   const section =
     kind ||
     (eyebrow.includes('WORKSPACE')
@@ -144,7 +144,7 @@ export function Heading({ eyebrow = '', title, children, action, kind, highlight
                     ? 'admin'
                     : 'practice');
   return (
-    <PageBanner kind={section} title={title} action={action} highlight={highlight}>
+    <PageBanner kind={section} title={title} action={action} highlight={highlight} className={className}>
       {children}
     </PageBanner>
   );

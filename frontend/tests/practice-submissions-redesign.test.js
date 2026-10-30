@@ -145,7 +145,7 @@ test('practice component renders modern stats grid with interactive filtering', 
 
   const doc = w.document;
   const banner = doc.querySelector('.page-banner.practice-banner');
-  assert.ok(banner, 'Practice banner should be rendered with banner-practice class');
+  assert.equal(banner, null, 'Practice banner should be completely removed from practice view');
 
   const statGrid = doc.querySelector('.stat-grid.practice-stats-grid');
   assert.ok(statGrid, 'Practice stat grid should have practice-stats-grid class');
@@ -308,7 +308,7 @@ test('submissions component renders modern stats grid with filter actions', asyn
 
   const doc = w.document;
   const banner = doc.querySelector('.page-banner.submissions-banner');
-  assert.ok(banner, 'Submissions banner should be rendered with banner-submissions class');
+  assert.equal(banner, null, 'Submissions banner should be completely removed from submissions view');
 
   const statGrid = doc.querySelector('.stat-grid.submissions-stats-grid');
   assert.ok(statGrid, 'Submissions stat grid should have submissions-stats-grid class');

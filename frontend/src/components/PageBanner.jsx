@@ -17,45 +17,45 @@ const themes = {
   editor: ['pen-to-square', 'Soạn đề'],
   workspace: ['terminal', 'Giải bài'],
 };
-export default function PageBanner({ kind = 'practice', title, children, action, highlight }) {
+export default function PageBanner({ kind = 'practice', title, children, action, highlight, className }) {
   const [icon, label] = themes[kind] || themes.practice;
   const rich = ['practice', 'contest', 'submissions'].includes(kind);
   const Feature = highlight?.onClick ? Button : 'div';
   return (
     <section
       className={cn(
-        'heading page-banner rich-banner relative grid items-center gap-5 overflow-hidden rounded-xl border bg-linear-[115deg,var(--action-soft),white_45%,white_70%,var(--success-soft)] p-5 shadow-panel sm:p-6 min-[681px]:grid-cols-[minmax(0,1fr)_auto]',
+        'heading page-banner rich-banner relative flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-5 overflow-hidden rounded-2xl border border-border/80 bg-card p-3.5 sm:px-5 sm:py-3.5 shadow-subtle',
         `banner-${kind} ${kind}-banner`,
-        kind === 'practice' && 'practice-banner',
-        rich &&
-          'bg-linear-[135deg,white_0%,white_45%,#f4fbf6_100%] sm:px-6 sm:py-5 min-[1440px]:px-7 min-[1440px]:py-5.5',
-        kind === 'submissions' && 'bg-linear-[135deg,white_0%,white_45%,#f4f7fb_100%]',
+        kind === 'practice' && 'practice-banner bg-gradient-to-r from-card via-card to-emerald-50/40',
+        rich && 'bg-gradient-to-r from-card via-card to-emerald-50/40',
+        kind === 'submissions' && 'bg-gradient-to-r from-card via-card to-teal-50/40',
+        className,
       )}
       aria-label={t(label)}
     >
-      <div className="banner-copy relative z-10 flex min-w-0 flex-col justify-center">
-        <span
-          className={cn(
-            'eyebrow banner-kicker mb-2.5 inline-flex w-fit items-center gap-1.5 text-xs font-semibold tracking-[.08em] text-muted-foreground',
-            rich &&
-              'mb-2.5 rounded-full border border-success/20 bg-success-soft px-2.5 py-1 font-mono text-[10px] text-success',
-          )}
-        >
-          CODEGRADE <span aria-hidden="true">/</span> {t(label)}
-        </span>
+      <div className="banner-copy relative z-10 flex min-w-0 flex-1 flex-col justify-center">
+        <div className="mb-1 flex items-center gap-2">
+          <span
+            className={cn(
+              'eyebrow banner-kicker inline-flex w-fit items-center gap-1.5 rounded-full border border-success/25 bg-success-soft/90 px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider text-success uppercase',
+            )}
+          >
+            CODEGRADE <span aria-hidden="true" className="opacity-40">/</span> {t(label)}
+          </span>
+        </div>
         <h1
-          className="max-w-[28ch] font-heading text-2xl sm:text-[28px] min-[1440px]:text-[32px] leading-tight font-extrabold tracking-tight break-words"
+          className="font-heading text-xl sm:text-2xl font-black tracking-tight text-foreground leading-tight break-words"
           data-user-content={kind === 'workspace' ? true : undefined}
         >
           {title}
         </h1>
         {children && (
-          <p className="mt-1.5 max-w-[60ch] text-xs sm:text-sm leading-relaxed text-muted-foreground">
+          <p className="mt-0.5 max-w-[65ch] text-xs sm:text-[13px] leading-relaxed text-muted-foreground line-clamp-2 sm:line-clamp-1">
             {children}
           </p>
         )}
         {action && (
-          <div className="banner-actions mt-3.5 flex flex-wrap items-center gap-2.5 [&_.primary]:bg-action [&_.primary]:text-white [&_.primary]:hover:bg-action-hover [&_.secondary]:text-success [&_.banner-text-link]:text-action-text">
+          <div className="banner-actions mt-2 flex flex-wrap items-center gap-2 [&_.primary]:bg-action [&_.primary]:text-white [&_.primary]:hover:bg-action-hover [&_.secondary]:text-foreground [&_.banner-text-link]:text-action-text">
             {action}
           </div>
         )}
@@ -65,50 +65,59 @@ export default function PageBanner({ kind = 'practice', title, children, action,
           ? { type: 'button', variant: 'ghost', onClick: highlight.onClick }
           : {})}
         className={cn(
-          'banner-feature relative z-10 flex h-auto min-h-[110px] w-full min-[681px]:w-[240px] min-[1280px]:w-[260px] min-w-0 flex-col items-start justify-between gap-1 overflow-hidden rounded-xl border border-inverse bg-inverse p-4 sm:p-4.5 text-left whitespace-normal text-white shadow-xs',
+          'banner-feature group relative z-10 flex h-auto shrink-0 items-center justify-start gap-3 rounded-xl border border-border/80 bg-card p-2 px-3 sm:px-3.5 text-left font-normal whitespace-normal transition-all duration-150 shadow-2xs hover:shadow-xs',
           rich &&
-            'bg-linear-[145deg,#184e32_0%,#0d2f1d_100%] shadow-[0_8px_20px_rgb(13_47_29/.2)]',
-          kind === 'submissions' && 'bg-linear-[145deg,#134e4a_0%,#0b3433_100%]',
+            'border-emerald-200/90 bg-gradient-to-br from-emerald-50/80 via-white to-emerald-50/40 text-card-foreground hover:border-emerald-300',
+          kind === 'submissions' &&
+            'border-teal-200/90 bg-gradient-to-br from-teal-50/80 via-white to-teal-50/40 text-card-foreground hover:border-teal-300',
           highlight?.onClick &&
-            'is-clickable transition-transform hover:-translate-y-0.5 hover:bg-inverse hover:text-white focus-visible:ring-ring',
+            'is-clickable cursor-pointer hover:bg-emerald-50/60 active:scale-[0.98] focus-visible:ring-1 focus-visible:ring-ring',
         )}
       >
-        <div className="flex w-full items-center justify-between mb-1">
-          <span
-            className="banner-symbol inline-flex size-8 items-center justify-center rounded-lg border border-white/20 bg-white/15 text-white"
-            aria-hidden="true"
-          >
-            <Icon name={icon} className="size-4" />
-          </span>
-          <div
-            className="banner-decoration flex h-5 items-end gap-[2.5px] opacity-35"
-            aria-hidden="true"
-          >
-            <span className="h-2.5 w-[2.5px] rounded-full bg-[#86efac]" />
-            <span className="h-5 w-[2.5px] rounded-full bg-[#86efac]" />
-            <span className="h-3.5 w-[2.5px] rounded-full bg-[#86efac]" />
-          </div>
-        </div>
+        <span
+          className={cn(
+            'banner-symbol inline-flex size-9 shrink-0 items-center justify-center rounded-lg border text-white shadow-2xs',
+            rich
+              ? 'border-emerald-600 bg-emerald-600'
+              : kind === 'submissions'
+                ? 'border-teal-600 bg-teal-600'
+                : 'border-primary bg-primary',
+          )}
+          aria-hidden="true"
+        >
+          <Icon name={icon} className="size-4" />
+        </span>
         {highlight ? (
-          <div className="flex flex-col gap-0.5 w-full">
-            <span className="banner-feature-label text-[10px] font-bold tracking-[.08em] text-white/75 uppercase">
-              {t(highlight.label)}
-            </span>
+          <div className="flex min-w-0 flex-col justify-center gap-0.5">
+            <div className="flex items-center gap-1.5">
+              <span className="banner-feature-label truncate text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                {t(highlight.label)}
+              </span>
+              {highlight.detail && (
+                <span className="shrink-0 rounded-full border border-emerald-200/80 bg-emerald-100/80 px-1.5 py-0.2 font-mono text-[9px] font-bold text-emerald-800">
+                  {t(highlight.detail)}
+                </span>
+              )}
+            </div>
             <strong
-              className="max-w-full font-heading text-xl sm:text-2xl font-extrabold tracking-tight leading-tight break-words"
+              className="truncate font-heading text-lg sm:text-xl font-black tracking-tight text-foreground leading-none"
               data-user-content={highlight.userContent ? true : undefined}
             >
               {highlight.value ?? '—'}
             </strong>
-            {highlight.detail && (
-              <small className="mt-1.5 w-fit rounded-full bg-[#86efac]/15 px-2 py-0.5 font-mono text-[11px] font-semibold text-[#86efac]">
-                {t(highlight.detail)}
-              </small>
-            )}
           </div>
         ) : (
-          <strong className="font-heading text-base font-bold">{t(label)}</strong>
+          <strong className="font-heading text-sm font-bold text-foreground">{t(label)}</strong>
         )}
+        {highlight?.onClick && (
+          <span
+            className="ml-1 text-muted-foreground/40 transition-transform group-hover:translate-x-0.5 group-hover:text-emerald-700"
+            aria-hidden="true"
+          >
+            <Icon name="arrow-right" className="size-3.5" />
+          </span>
+        )}
+        <div className="banner-decoration hidden" aria-hidden="true" />
       </Feature>
     </section>
   );

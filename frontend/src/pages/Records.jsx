@@ -41,31 +41,6 @@ export function SubmissionsPage({ revision }) {
     rows = ready ? history.items : [];
   return (
     <>
-      <Heading
-        kind="submissions"
-        title={trUI('Lịch sử bài nộp')}
-        highlight={{
-          label: 'Tỷ lệ AC',
-          value: summary.rate === null ? '—' : summary.rate + '%',
-          detail: 'Bài chính thức đã chấm',
-          onClick: () => {
-            F('ac');
-            P(1);
-          },
-        }}
-        action={
-          <ActionLink asChild variant="outline">
-            <a
-              className="button secondary border border-input bg-card text-foreground shadow-xs hover:bg-accent hover:text-accent-foreground"
-              href="#/practice"
-            >
-              <Icon name="fa-solid fa-arrow-left" aria-hidden="true" /> {trUI('Tiếp tục luyện tập')}
-            </a>
-          </ActionLink>
-        }
-      >
-        {trUI('Theo dõi từng lần thử, xem kết quả và tìm bước cải thiện tiếp theo.')}
-      </Heading>
       <ErrorBox error={error || historyError} />
       <StatGrid
         className="submissions-stats-grid grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
