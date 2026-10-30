@@ -1,12 +1,31 @@
 """Package Docker source, evidence and the supplied report without local secrets/cache."""
 import argparse
 import hashlib
+import os
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
 
 ROOT = Path(__file__).resolve().parents[1]
 EXCLUDED_DIRS = {'.git', '.venv', '.tools', 'node_modules', 'target', 'dist', '__pycache__', 'artifacts', 'release', 'report'}
 EXCLUDED_NAMES = {'.env', '.DS_Store', 'Thumbs.db', 'MANIFEST.sha256'}
+
+
+def source_files(root):
+    """Prune generated directories before descending into the source tree."""
+    for directory, directories, files in os.walk(root, followlinks=False):
+        directories[:] = sorted(name for name in directories if name not in EXCLUDED_DIRS)
+        for name in directories:
+            if (Path(directory) / name).is_symlink():
+                raise ValueError('Symlinks are not packaged: ' + str(Path(directory, name).relative_to(root)))
+        for name in sorted(files):
+            if name in EXCLUDED_NAMES or (name.startswith('.env.') and name != '.env.example'):
+                continue
+            path = Path(directory) / name
+            if path.suffix.lower() in {'.zip', '.log', '.pyc', '.partial', '.class', '.jar'}:
+                continue
+            if path.is_symlink():
+                raise ValueError('Symlinks are not packaged: ' + str(path.relative_to(root)))
+            yield path
 
 
 def main():
@@ -29,25 +48,17 @@ def main():
     if args.require_pdf and not pdfs:
         parser.error('Export the final report to PDF in report/ first')
     entries = {}
-    for path in sorted(ROOT.rglob('*')):
+    for path in source_files(ROOT):
         relative = path.relative_to(ROOT)
-        if set(relative.parts) & EXCLUDED_DIRS or path.name in EXCLUDED_NAMES:
-            continue
-        if path.name.startswith('.env.') and path.name != '.env.example':
-            continue
-        if path.suffix.lower() in {'.zip', '.log', '.pyc', '.partial', '.class', '.jar'}:
-            continue
-        if path.is_symlink():
-            raise ValueError('Symlinks are not packaged: ' + str(relative))
-        if path.is_file():
-            entries[relative.as_posix()] = path.read_bytes()
-    for path in reports + pdfs:
+        entries[relative.as_posix()] = path.read_bytes()
+    for path in reports + pdfs + sorted(report_dir.glob('*.md')):
         if path.is_symlink():
             raise ValueError('Report must be a regular file')
         entries['report/' + path.name] = path.read_bytes()
     required = ['README.md', 'Dockerfile', 'compose.yaml', 'compose.test.yaml', '.env.example',
                 'backend/pom.xml', 'frontend/package-lock.json', 'worker/sandbox.py',
-                'scripts/init_env.py', 'scripts/verify_release.py', 'statics/architecture.png']
+                'scripts/init_env.py', 'scripts/verify_release.py',
+                'report/CodeSurvival-v6.md', 'report/UI-Redesign.md']
     for name in required:
         if name not in entries:
             raise ValueError('Missing required file: ' + name)

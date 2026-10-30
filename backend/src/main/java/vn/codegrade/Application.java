@@ -2,7 +2,6 @@ package vn.codegrade;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import vn.codegrade.judge.WorkerMain;
 
 @SpringBootApplication

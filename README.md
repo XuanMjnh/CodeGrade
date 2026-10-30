@@ -70,7 +70,7 @@ DeltaRi = round((K/4) × SUM_j≠i(S(i,j) − E(i,j)))
 K mặc định = 32
 ```
 
-Dùng snapshot rating trước trận của cả năm, chỉ settlement sau FINISHED trong một transaction. Năm rating 1000 với hạng 1,2,3,4,5 cho delta `+16,+8,0,−8,−16`. Thắng đối thủ rating thấp nhận ít hơn thắng đối thủ mạnh. Thứ hạng dựa mốc bị loại; các người cùng nhóm bị loại đồng hạng, không phá hòa bằng thời gian worker.
+Dùng snapshot rating trước trận của cả năm, chỉ settlement sau FINISHED trong một transaction. Năm rating 1000 với hạng 1,2,3,4,5 cho delta Elo cơ bản `+16,+8,0,−8,−16`; sau hỗ trợ Đồng ×3 cho phần điểm tăng, delta thực tế là `+48,+24,0,−8,−16`. Thắng đối thủ rating thấp nhận ít hơn thắng đối thủ mạnh. Thứ hạng dựa mốc bị loại; các người cùng nhóm bị loại đồng hạng, không phá hòa bằng thời gian worker.
 
 Bậc Đồng / Bạc / Vàng / Bạch Kim / Kim Cương / Cao Thủ có ngưỡng 1100 / 1300 / 1500 / 1700 / 1900.
 
@@ -84,7 +84,9 @@ Người đồng hạng nhận EXP theo vị trí thấp nhất của nhóm hòa
 
 ## Editor thi đấu
 
-Contest và cả ba mode Survival không đọc nháp server/localStorage và không autosave. Server xóa nháp legacy tương ứng trong transaction nhận SUBMIT chính thức. Sau ACK, client trả về starter chỉ khi scope (room/round hoặc contest/problem) và revision soạn thảo còn khớp. ACK muộn không xóa code mới/vòng khác. Mất ACK: retry cùng requestId để lấy kết quả đã commit. Submit bị từ chối/chạy thử giữ code. Practice cá nhân vẫn lưu nháp. Bản soạn chưa nộp trong thi đấu cũng không được phục hồi sau reload theo chính sách không lưu nháp này.
+Contest lưu nháp cục bộ riêng theo tài khoản/contest/bài; cả ba mode Survival lưu riêng theo tài khoản/phòng/vòng/bài. Không đọc hoặc ghi nháp luyện tập cá nhân vào editor thi đấu. Submit thành công, bị từ chối và chạy thử đều giữ nguyên code; ACK muộn không cập nhật editor của vòng khác. Có thể tải lại trang để phục hồi nháp trên cùng trình duyệt. Khi Survival đóng vòng để chấm hoặc trả kết quả, editor vẫn hiển thị ở chế độ chỉ đọc để xem/sao chép; vòng mới dùng nháp riêng. Mất ACK: retry cùng requestId và payload để lấy kết quả đã commit. Practice cá nhân tiếp tục lưu nháp cục bộ và server; server không lưu nháp thi đấu và vẫn xóa nháp legacy tương ứng khi nhận SUBMIT chính thức.
+
+Bảng kết quả trực tiếp của Survival lấy từ snapshot server, hiển thị người chơi/khán giả, trạng thái nộp/chấm, số lượt, điểm và thời gian hiệu lực. Thứ hạng còn tạm thời khi vòng chưa chốt; vòng bị hủy không hiển thị hạng như kết quả chính thức. Bảng không trả source của đối thủ hoặc test ẩn.
 
 ## Ngân hàng đề và nâng cấp dữ liệu
 
@@ -104,7 +106,7 @@ Contest và cả ba mode Survival không đọc nháp server/localStorage và kh
 
 Bootstrap, SeedBankUpgrade và SeedBankExpansion nâng cấp theo nội dung khớp bản gốc, giữ UUID/mã CG/bookmark và toàn bộ snapshot/verdict cũ. AUTHOR sửa khác: giữ nguyên, ghi SEED_V6_CONFLICT để người sở hữu rà soát. Đề trong bank đã khóa/contest đang diễn ra: DEFERRED, thử lại sau 60 giây. Trận cũ đang dùng snapshot nhiều test tiếp tục dùng nguyên snapshot đến khi kết thúc. Không sửa V1–V5, reset MySQL hoặc xóa volume. Các phiên bản mới vào queue VALIDATE thật trước khi đủ điều kiện Survival. ADMIN xem xung đột qua AUDIT.
 
-Trạng thái database cũ sau nâng cấp: **315 bài đã có 5 testcase, 5 bài đang thuộc Contest chạy đến 14:05 ngày 31/10/2026 (UTC+7) được giữ nguyên**. Tổng hiện tại trong database cũ là 1.675 testcase; sau Contest, retry tự động chuẩn hóa về 1.600 và đưa phiên bản mới vào queue xác thực. Source và database tạo mới đã có 320 bài / 1.600 testcase. Không kết thúc hoặc sửa Contest để ép nâng cấp. Xem [đối chiếu dữ liệu thật](statics/results/project-upgrade-v6.json).
+Tại lần kiểm chứng nâng cấp database cũ: **315 bài đã có 5 testcase, 5 bài thuộc Contest chạy đến 14:05 ngày 31/10/2026 (UTC+7) được giữ nguyên**. Database tại mốc đó có 1.675 testcase; sau Contest, retry tự động chuẩn hóa về 1.600 và đưa phiên bản mới vào queue xác thực. Source và database tạo mới có 320 bài / 1.600 testcase. Không kết thúc hoặc sửa Contest để ép nâng cấp. Xem [đối chiếu dữ liệu tại mốc kiểm chứng](statics/results/project-upgrade-v6.json).
 
 ## Chạy Docker Compose
 
@@ -146,7 +148,7 @@ mvn test
 cd ..
 # Cần Python 3.11 và g++ đủ c++11/17/20, hoặc image tools-test.
 py -3.11 -X utf8 scripts/verify_dataset.py
-py -3.11 -X utf8 scripts/generate_dataset.py
+py -3.11 -m unittest discover -s scripts/tests -v
 ```
 
 Các script `survival_smoke.py`, `judge_smoke.py`, `restart_smoke.py`, `benchmark_ws.py` dùng cho demo trong project Compose/file env riêng để không thêm trận thử vào lịch sử cá nhân. Xem tham số `--help`. Target tools-test trong Dockerfile có Python 3.11/g++/websockets; bind source vào /workspace và nối network của project kiểm thử. Script UI:

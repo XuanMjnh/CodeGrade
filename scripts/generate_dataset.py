@@ -3,8 +3,6 @@ Run generate_dataset.py, then verify_dataset.py. Does not execute submitted code
 """
 import bisect
 import collections
-import copy
-import itertools
 import json
 import math
 import random

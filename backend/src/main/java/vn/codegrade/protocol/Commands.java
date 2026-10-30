@@ -20,7 +20,7 @@ public class Commands {
     private final Store db; private final Identity identity; private final Catalog catalog;
     private final Survival rooms; private final Submissions submissions; private final Contests contests;
     private final Matchmaking matchmaking;private final Progression progression;
-    private static final Set<String> READ=Set.of("COMMENTS","ANNOUNCEMENTS","ME","CATEGORIES","PROBLEMS","QUESTION_GET","QUESTION_EDIT","LEADERBOARD","PROBLEM_RANKING","SUBMISSIONS","SUBMISSIONS_PAGE","SUBMISSION_GET","ROOM_LIST","ROOM_SNAPSHOT","CONTEST_LIST","CONTEST_GET","USERS","SYNC","DRAFT_GET","AUDIT");
+    private static final Set<String> READ=Set.of("COMMENTS","ANNOUNCEMENTS","ME","CATEGORIES","PROBLEMS","QUESTION_GET","QUESTION_EDIT","LEADERBOARD","PROBLEM_RANKING","SUBMISSIONS","SUBMISSIONS_PAGE","SUBMISSION_GET","ROOM_LIST","ROOM_SNAPSHOT","CONTEST_LIST","CONTEST_GET","USERS","SYNC","DRAFT_GET","AUDIT","MATCH_QUEUE_STATUS","MATCH_SNAPSHOT","PROGRESSION_GET","RANKED_LEADERBOARD","MATCH_HISTORY","REWARD_HISTORY");
     public Commands(Store db,Identity identity,Catalog catalog,Survival rooms,Submissions submissions,Contests contests,Community community,Matchmaking matchmaking,Progression progression) {
         this.matchmaking=matchmaking;this.progression=progression;
         this.community=community;
@@ -31,7 +31,7 @@ public class Commands {
             User u=identity.user(user.id());
             if(type.equals("RECEIPT_GET"))throw new Store.Fault("TYPE","Lệnh biên nhận đã được loại bỏ");
             String fingerprint=Store.hash(type+canonical(p));
-            boolean mutate=!READ.contains(type)&&!Set.of("MATCH_QUEUE_STATUS","MATCH_SNAPSHOT","PROGRESSION_GET","RANKED_LEADERBOARD","MATCH_HISTORY","REWARD_HISTORY").contains(type);
+            boolean mutate=!READ.contains(type);
             if(mutate) {
                 var previous=db.sql.queryForList("SELECT fingerprint,response FROM commands WHERE user_id=? AND request_id=?",u.id(),requestId);
                 if(!previous.isEmpty()) {

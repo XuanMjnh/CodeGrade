@@ -1,5 +1,5 @@
 """Run against the isolated demo project; restart its server after READY_FOR_RESTART."""
-import argparse,asyncio,json,hashlib,time
+import argparse,asyncio,json,hashlib
 from pathlib import Path
 import websockets
 from survival_smoke import Peer

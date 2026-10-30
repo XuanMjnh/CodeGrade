@@ -14,10 +14,11 @@ export function Room({id,user,revision,onNotice}){
  const [mine,mineError]=useResource('SUBMISSIONS',{},revision),[selectedSubmission,selectSubmission]=useState(null);
  const [seconds,Seconds]=useState(120),[finalSeconds,FinalSeconds]=useState(150),[capacity,Capacity]=useState(10),[name,Name]=useState('');
  const [r,setRoom]=useState(null),[error,setError]=useState(null),[busy,setBusy]=useState(false),[levels,setLevels]=useState([1,2,3]);
+ function applyRoom(d){setRoom(d);setLevels(d.selectedDifficulties);Seconds(d.roundSeconds||120);FinalSeconds(d.finalSeconds||150);Capacity(d.capacity||10);Name(d.name||'Code Survival');}
  useEffect(()=>{const touch=()=>{live.call('ROOM_TOUCH',{roomId:id}).catch(()=>{});live.call('MATCH_QUEUE_STATUS').catch(()=>{});};const timer=setInterval(touch,15000),first=setTimeout(touch,1500);return()=>{clearInterval(timer);clearTimeout(first);};},[id]);
- useEffect(()=>{let active=true;live.call('ROOM_JOIN',{roomId:id}).then(d=>{if(active){setRoom(d);setLevels(d.selectedDifficulties);Seconds(d.roundSeconds||120);FinalSeconds(d.finalSeconds||150);Capacity(d.capacity||10);Name(d.name||'Code Survival');}}).catch(setError);return()=>{active=false;};},[id]);
- useEffect(()=>{if(!r)return;let active=true;live.call('ROOM_SNAPSHOT',{roomId:id}).then(d=>{if(active){setRoom(d);setLevels(d.selectedDifficulties);Seconds(d.roundSeconds||120);FinalSeconds(d.finalSeconds||150);Capacity(d.capacity||10);Name(d.name||'Code Survival');}}).catch(setError);return()=>{active=false;};},[revision]);
- async function action(type,p={}){setError(null);setBusy(true);try{const d=await live.call(type,{roomId:r.id,...p});if(d.deleted||type==='ROOM_LEAVE'){go('/survival');return;}setRoom(d);setLevels(d.selectedDifficulties);Seconds(d.roundSeconds||120);FinalSeconds(d.finalSeconds||150);Capacity(d.capacity||10);Name(d.name||'Code Survival');}catch(e){setError(e);}finally{setBusy(false);}}
+ useEffect(()=>{let active=true;live.call('ROOM_JOIN',{roomId:id}).then(d=>{if(active){applyRoom(d);}}).catch(setError);return()=>{active=false;};},[id]);
+ useEffect(()=>{if(!r)return;let active=true;live.call('ROOM_SNAPSHOT',{roomId:id}).then(d=>{if(active){applyRoom(d);}}).catch(setError);return()=>{active=false;};},[revision]);
+ async function action(type,p={}){setError(null);setBusy(true);try{const d=await live.call(type,{roomId:r.id,...p});if(d.deleted||type==='ROOM_LEAVE'){go('/survival');return;}applyRoom(d);}catch(e){setError(e);}finally{setBusy(false);}}
  if(!r)return <><ErrorBox error={error}/><Loading/></>;
  const me=r.players.find(p=>p.id===user.id),host=r.hostId===user.id&&r.mode!=='NORMAL'&&r.mode!=='RANKED',active=r.state==='ROUND_ACTIVE',canPlay=me?.status==='ALIVE'&&(!r.tiePlayers||r.tiePlayers.includes(user.id));
  const winner=r.players.find(p=>p.id===r.winnerId);const practice=!r.mode||r.mode==='PRACTICE';

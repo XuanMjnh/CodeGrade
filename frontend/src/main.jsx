@@ -1,10 +1,8 @@
 import Auth from './components/Auth';
-import {t as trUI} from "./lib/locale";
+import {t as trUI,LanguageButton} from './lib/locale';
 import '@fontsource-variable/inter';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import {installPagination} from './lib/pagination';
-import './lib/locale';
-import {LanguageButton} from './lib/locale';
 import {Profile,Announcements} from './pages/Community';
 import Utilities from './components/Utilities';
 import '@fontsource-variable/jetbrains-mono';

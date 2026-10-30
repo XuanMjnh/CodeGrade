@@ -1,6 +1,5 @@
 import PageBanner from './PageBanner';
-import {t as trUI} from "../lib/locale";
-import {locale} from '../lib/locale';
+import {t as trUI,locale} from '../lib/locale';
 import React,{useState,useEffect,useId} from 'react';
 import {live} from '../lib/live';
 import {formatCountdown} from '../lib/time';

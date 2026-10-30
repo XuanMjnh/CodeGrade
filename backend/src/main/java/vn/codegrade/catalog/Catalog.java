@@ -32,6 +32,7 @@ public class Catalog {
     public Object list(User u,JsonNode p) {
         var result=new ArrayList<Object>();
         Set<String> solved=new HashSet<>(db.sql.queryForList("SELECT problem_id FROM solved WHERE user_id=?",String.class,u.id()));
+        Set<String> bookmarks=new HashSet<>(db.sql.queryForList("SELECT problem_id FROM bookmarks WHERE user_id=?",String.class,u.id()));
         String search=p.path("search").asText().toLowerCase(Locale.ROOT);
         for(var row:db.sql.queryForList("SELECT p.id,p.author_id,p.title,p.difficulty,p.status,p.survival,p.version,p.category_id,c.name AS category,n.number AS public_number FROM problems p JOIN categories c ON c.id=p.category_id JOIN problem_numbers n ON n.problem_id=p.id ORDER BY p.created_at DESC")) {
             if(!row.get("status").equals("ready") && !u.admin() && !row.get("author_id").equals(u.id())) continue;
@@ -39,7 +40,7 @@ public class Catalog {
             if(!row.get("title").toString().toLowerCase(Locale.ROOT).contains(search) && !code.toLowerCase(Locale.ROOT).contains(search)) continue;
             if(p.path("difficulty").asInt()>0 && ((Number)row.get("difficulty")).intValue()!=p.path("difficulty").asInt()) continue;
             if(!p.path("categoryId").asText().isBlank() && !row.get("category_id").equals(p.path("categoryId").asText())) continue;
-            row.put("starred",db.sql.queryForObject("SELECT COUNT(*) FROM bookmarks WHERE user_id=? AND problem_id=?",Integer.class,u.id(),row.get("id"))>0); row.put("solved",solved.contains(row.get("id"))); result.add(row);
+            row.put("starred",bookmarks.contains(row.get("id"))); row.put("solved",solved.contains(row.get("id"))); result.add(row);
         }
         return result;
     }
@@ -77,8 +78,9 @@ public class Catalog {
             require(q.path("version").asInt()==version-1,"Đề đã thay đổi ở tab khác; tải lại trước khi lưu");
             // Running matches keep a stable problem bank.
             for(var room:db.sql.queryForList("SELECT document FROM rooms WHERE state NOT IN ('LOBBY','FINISHED','CLOSED','UNRESOLVED')")) {
-                require(!db.read((String)room.get("document")).path("used").toString().contains(id),"Đề đang dùng trong trận; đợi kết thúc");
-                for(var frozen:db.read((String)room.get("document")).path("bank"))require(!frozen.path("id").asText().equals(id),"Đề nằm trong bank đã khóa; đợi kết thúc trận");
+                var document=db.read((String)room.get("document"));
+                for(var used:document.path("used"))require(!used.asText().equals(id),"Đề đang dùng trong trận; đợi kết thúc");
+                for(var frozen:document.path("bank"))require(!frozen.path("id").asText().equals(id),"Đề nằm trong bank đã khóa; đợi kết thúc trận");
             }
             for(var row:db.sql.queryForList("SELECT document FROM contests")) {
                 var contest=db.read((String)row.get("document"));

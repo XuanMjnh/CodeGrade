@@ -39,14 +39,17 @@ public class Bootstrap implements ApplicationRunner {
                     identity.create(username,"Coder "+i,demoPassword,"CODER");
             }
             String author=(String)db.one("SELECT id FROM users WHERE username='author'").get("id");
+            var owner=identity.user(author);
+            Set<String> categories=new HashSet<>(db.sql.queryForList("SELECT id FROM categories",String.class));
+            Set<String> existing=new HashSet<>();
+            for(var row:db.sql.queryForList("SELECT document FROM problems"))
+                existing.add(db.read((String)row.get("document")).path("general").path("idNumber").asText());
             for(var item:dataset) {
-                String category=item.path("general").path("categoryId").asText();if(db.sql.queryForObject("SELECT COUNT(*) FROM categories WHERE id=?",Integer.class,category)==0)db.sql.update("INSERT INTO categories VALUES(?,?,?)",category,category,category);
+                String category=item.path("general").path("categoryId").asText();
+                if(categories.add(category))db.sql.update("INSERT INTO categories VALUES(?,?,?)",category,category,category);
                 String key=item.path("general").path("idNumber").asText();
-                boolean exists=false;
-                for(var row:db.sql.queryForList("SELECT document FROM problems"))
-                    if(db.read((String)row.get("document")).path("general").path("idNumber").asText().equals(key)) exists=true;
-                if(exists) continue;
-                ObjectNode saved=(ObjectNode)catalog.save(identity.user(author),item);
+                if(!existing.add(key)) continue;
+                ObjectNode saved=(ObjectNode)catalog.save(owner,item);
                 // Reference solutions are verified by the real worker, never marked AC by seed logic.
                 String id=db.id();
                 db.sql.update("INSERT INTO submissions(id,user_id,problem_id,request_id,source_code,language,mode,received_at,status,snapshot) VALUES(?,?,?,?,?,?,?,?,?,?)",

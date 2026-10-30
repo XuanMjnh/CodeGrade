@@ -1,11 +1,11 @@
 import {t as trUI} from '../lib/locale';
 import React,{useState} from 'react';
-import {Heading,ErrorBox,Loading,useResource,Badge,Check} from '../components/ui';
+import {Heading,ErrorBox,Loading,useResource,Check} from '../components/ui';
 import {StatGrid,InsightPanel,ProgressRows} from '../components/Insights';
 import {submissionInsights} from '../lib/insights';
 import {live} from '../lib/live';
 import {languageNames} from '../lib/coderunner';
-import {Result} from './Workspace';
+import Result from '../components/SubmissionResult';
 import SubmissionStatus from '../components/SubmissionStatus';
 export function SubmissionsPage({revision}){
  const [data,error]=useResource('SUBMISSIONS',{},revision),[selected,setSelected]=useState(null),[filter,F]=useState('all'),[page,P]=useState(1),[pageSize,S]=useState(20);const summary=submissionInsights(data||[]);

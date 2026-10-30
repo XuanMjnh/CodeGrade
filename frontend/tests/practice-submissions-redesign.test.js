@@ -222,7 +222,7 @@ test('submissions component renders modern stats grid with filter actions', asyn
           b.onResolve({ filter: /lib\/locale$/ }, () => ({ path: 'locale', namespace: 'stub' }));
           b.onResolve({ filter: /components\/ui$/ }, () => ({ path: 'ui', namespace: 'stub' }));
           b.onResolve({ filter: /components\/SubmissionStatus$/ }, () => ({ path: 'status', namespace: 'stub' }));
-          b.onResolve({ filter: /\.\/Workspace$/ }, () => ({ path: 'workspace', namespace: 'stub' }));
+          b.onResolve({ filter: /components\/SubmissionResult$/ }, () => ({ path: 'result', namespace: 'stub' }));
           b.onLoad({ filter: /.*/, namespace: 'stub' }, (a) => {
             if (a.path === 'live') {
               return {
@@ -245,11 +245,11 @@ test('submissions component renders modern stats grid with filter actions', asyn
                 contents: `import React from 'react'; export default function SubmissionStatus({ submission }) { return <span>{submission.status}</span>; }`,
               };
             }
-            if (a.path === 'workspace') {
+            if (a.path === 'result') {
               return {
                 loader: 'jsx',
                 resolveDir: frontendDir,
-                contents: `export const Result = () => null;`,
+                contents: `export default () => null;`,
               };
             }
             if (a.path === 'ui') {

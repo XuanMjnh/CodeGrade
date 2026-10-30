@@ -91,6 +91,32 @@ class SystemIntegrationTest {
   assertFalse(accepted.has("source"));assertFalse(accepted.has("source_code"));assertFalse(accepted.has("cases"));
   assertEquals("ROUND_ACTIVE",rooms.load(id).path("state").asText());
  }
+ @Test void problemListKeepsBookmarksPrivateAndPreservesFilters() {
+  var first=createProblem(1,false);var second=createProblem(2,false);
+  String firstId=first.path("id").asText(),secondId=second.path("id").asText();
+  call(coders.getFirst(),"BOOKMARK_SET",data("problemId",firstId,"starred",true));
+  call(coders.get(1),"BOOKMARK_SET",data("problemId",secondId,"starred",true));
+  var mine=call(coders.getFirst(),"PROBLEMS",data("difficulty",1,"categoryId","algorithms"));
+  assertEquals(1,mine.size());assertEquals(firstId,mine.get(0).path("id").asText());assertTrue(mine.get(0).path("starred").asBoolean());
+  var other=call(coders.get(1),"PROBLEMS",data("search",first.path("publicId").asText()));
+  assertEquals(1,other.size());assertFalse(other.get(0).path("starred").asBoolean());
+ }
+ @Test void demoBootstrapIsRepeatableAndPreservesExistingProblemContentAndBookmarks() throws Exception {
+  var existing=createProblem(1,false);String pid=existing.path("id").asText();
+  call(coders.getFirst(),"BOOKMARK_SET",data("problemId",pid,"starred",true));
+  var bootstrap=new vn.codegrade.db.Bootstrap(db,identity,catalog);
+  org.springframework.test.util.ReflectionTestUtils.setField(bootstrap,"adminPassword","test-password-123");
+  org.springframework.test.util.ReflectionTestUtils.setField(bootstrap,"workerToken","test-worker-token-long-enough-1234567890");
+  org.springframework.test.util.ReflectionTestUtils.setField(bootstrap,"demoPassword","test-password-123");
+  org.springframework.test.util.ReflectionTestUtils.setField(bootstrap,"demo",true);
+  bootstrap.run(null);
+  int problems=db.sql.queryForObject("SELECT COUNT(*) FROM problems",Integer.class),jobs=db.sql.queryForObject("SELECT COUNT(*) FROM submissions",Integer.class);
+  assertEquals(320,problems);
+  bootstrap.run(null);
+  assertEquals(problems,db.sql.queryForObject("SELECT COUNT(*) FROM problems",Integer.class));assertEquals(jobs,db.sql.queryForObject("SELECT COUNT(*) FROM submissions",Integer.class));
+  assertEquals(existing.path("general"),catalog.document(pid).path("general"));assertEquals(existing.path("publicId"),catalog.document(pid).path("publicId"));
+  assertEquals(1,db.sql.queryForObject("SELECT COUNT(*) FROM bookmarks WHERE user_id=? AND problem_id=?",Integer.class,coders.getFirst().id(),pid));
+ }
  @Test void everyoneSubmittingClosesEarlyAndWaitsForAllJudgments() {
   ObjectNode r=start(lobby(5,List.of(1),4));String id=r.path("id").asText();
   for(int i=0;i<4;i++)call(coders.get(i),"SUBMIT",submitPayload(r));

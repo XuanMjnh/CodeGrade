@@ -1,7 +1,4 @@
 """200 distinct exercises for bank v6. Trusted reference sources, never user code."""
-import math
-import itertools
-import collections
 SPECS=[]
 HEADER='import sys, math, itertools, collections, functools, heapq, bisect\n'
 def add(cat,title,level,desc,contract,code,cases,method,complexity='O(n²)',helpers=''):

@@ -6,7 +6,6 @@ has g++12 and Python3.11). Includes independent exhaustive checks on new algorit
 import argparse
 import collections
 import hashlib
-import itertools
 import json
 import math
 import os

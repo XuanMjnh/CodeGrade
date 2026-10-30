@@ -8,10 +8,9 @@ import React,{useEffect,useState,useRef} from 'react';
 import {live} from '../lib/live';
 import {competitionScope} from '../lib/competition';
 import {languageNames} from '../lib/coderunner';
-import {Heading,Badge,ErrorBox,Loading,useResource,TimeLeft,go} from '../components/ui';
+import {Heading,Badge,ErrorBox,Loading,useResource,go} from '../components/ui';
 const cpp='#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    \n    return 0;\n}\n';
 
-export {default as Result} from '../components/SubmissionResult';
 export default function Workspace({id,user,revision,problem:provided,room,contestId,onNotice,onSubmissionSelected,readOnly=false}){
  const [q,setQ]=useState(provided||null),[source,setSource]=useState(''),[language,setLanguage]=useState('PY311'),[error,setError]=useState(null),[busy,setBusy]=useState(false),[hydrated,setHydrated]=useState(false);
  const scope=competitionScope(room,contestId,id);
