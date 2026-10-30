@@ -557,50 +557,21 @@ class SystemIntegrationTest {
   ObjectNode r=start(lobby(5,List.of(1),4));String id=r.path("id").asText();for(int i=0;i<5;i++){call(coders.get(i),"SUBMIT",submitPayload(r));gradeNext(i==0);}closeRound(r);r=rooms.load(id);assertEquals("FINISHED",r.path("state").asText());assertEquals(coders.getFirst().id(),r.path("winnerId").asText());
  }
 
- @Test void localizesOnlyUnmodifiedSeedProblems() throws Exception {
-  var entry=db.json.readTree(getClass().getResourceAsStream("/dataset-localization.json")).get(0);
-  ObjectNode original=fixture.deepCopy();((ObjectNode)original.path("general")).put("questionName",entry.path("oldTitle").asText()).put("questionText",entry.path("oldText").asText());
-  var saved=call(author,"QUESTION_SAVE",original);String id=saved.path("id").asText();
-  ObjectNode edited=fixture.deepCopy();((ObjectNode)edited.path("general")).put("questionName","Authored title").put("questionText","Authored statement");var other=call(author,"QUESTION_SAVE",edited);
-  var migration=new vn.codegrade.db.SeedLocalization(db);migration.apply();migration.apply();
-  assertEquals(entry.path("title").asText(),db.one("SELECT title FROM problems WHERE id=?",id).get("title"));
-  assertEquals("Authored title",db.one("SELECT title FROM problems WHERE id=?",other.path("id").asText()).get("title"));
- }
- @Test void auditedBankUpgradePreservesIdsUserDataAndOldSubmissionSnapshots() throws Exception {
-  var baseline=db.json.readTree(getClass().getResourceAsStream("/dataset-upgrade-5.5.json")).get(17);
-  ObjectNode old=(ObjectNode)baseline.path("baseline").deepCopy();
-  db.sql.update("INSERT INTO categories VALUES('arithmetic','Số học','Số học')");
-  var saved=db.tree(catalog.save(author,old));String id=saved.path("id").asText(),code=saved.path("publicId").asText();
-  call(coders.getFirst(),"BOOKMARK_SET",data("problemId",id,"starred",true));
+ @Test void singleDatasetBootstrapAddsMissingProblemsAndPreservesExistingWork() throws Exception {
+  ObjectNode edited=fixture.deepCopy();((ObjectNode)edited.path("general")).put("questionName","Author's edited problem");
+  var saved=call(author,"QUESTION_SAVE",edited);String id=saved.path("id").asText();
   var receipt=call(coders.getFirst(),"SUBMIT",data("problemId",id,"language","PY311","source","print(10)"));
   String snapshot=(String)db.one("SELECT snapshot FROM submissions WHERE id=?",receipt.path("id").asText()).get("snapshot");
-  var upgrade=new vn.codegrade.db.SeedBankUpgrade(db);upgrade.apply();upgrade.apply();
-  var updated=catalog.document(id);assertEquals(code,updated.path("publicId").asText());assertEquals(2,updated.path("version").asInt());
-  assertEquals("CPP11",updated.path("answer").path("language").asText());assertTrue(updated.path("general").path("questionText").asText().contains("C(a+b, a)"));
-  assertEquals(1,db.sql.queryForObject("SELECT COUNT(*) FROM bookmarks WHERE problem_id=?",Integer.class,id));
+  var bootstrap=new vn.codegrade.db.Bootstrap(db,identity,catalog);
+  org.springframework.test.util.ReflectionTestUtils.setField(bootstrap,"adminPassword","test-password-123");
+  org.springframework.test.util.ReflectionTestUtils.setField(bootstrap,"workerToken","test-worker-token-01234567890123456789");
+  org.springframework.test.util.ReflectionTestUtils.setField(bootstrap,"demo",true);
+  org.springframework.test.util.ReflectionTestUtils.setField(bootstrap,"demoPassword","test-password-123");
+  var args=new org.springframework.boot.DefaultApplicationArguments(new String[0]);bootstrap.run(args);bootstrap.run(args);
+  assertEquals(320,db.sql.queryForObject("SELECT COUNT(*) FROM problems",Integer.class));
+  assertEquals(319,db.sql.queryForObject("SELECT COUNT(*) FROM submissions WHERE request_id LIKE 'seed:%'",Integer.class));
+  assertEquals(saved,catalog.document(id));
   assertEquals(snapshot,db.one("SELECT snapshot FROM submissions WHERE id=?",receipt.path("id").asText()).get("snapshot"));
-  assertEquals(1,db.sql.queryForObject("SELECT COUNT(*) FROM submissions WHERE request_id=?",Integer.class,"seed-v55:"+baseline.path("key").asText()));
-  assertFalse(updated.has("validatedVersion"));
- }
- @Test void auditedBankUpgradeDoesNotOverwriteAuthorEditsOrLaterVersions() throws Exception {
-  var baseline=db.json.readTree(getClass().getResourceAsStream("/dataset-upgrade-5.5.json")).get(0).path("baseline");
-  db.sql.update("INSERT INTO categories VALUES('arithmetic','Số học','Số học')");
-  ObjectNode changed=baseline.deepCopy();((ObjectNode)changed.path("answer")).put("sampleAnswer","custom reference");
-  var saved=db.tree(catalog.save(author,changed));
-  ObjectNode later=(ObjectNode)db.tree(catalog.save(author,baseline));later=(ObjectNode)db.tree(catalog.save(author,later));
-  new vn.codegrade.db.SeedBankUpgrade(db).apply();
-  assertEquals("custom reference",catalog.document(saved.path("id").asText()).path("answer").path("sampleAnswer").asText());
-  assertEquals(baseline.path("answer"),catalog.document(later.path("id").asText()).path("answer"));
-  assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM submissions",Integer.class));
- }
- @Test void auditedBankDefersActiveRoomAndAcceptsExactEnglishBaseline() throws Exception {
-  var baseline=db.json.readTree(getClass().getResourceAsStream("/dataset-upgrade-5.5.json")).get(0);
-  db.sql.update("INSERT INTO categories VALUES('arithmetic','Số học','Số học')");
-  ObjectNode old=(ObjectNode)baseline.path("baseline").deepCopy();((ObjectNode)old.path("general")).put("questionName",baseline.path("englishTitle").asText()).put("questionText",baseline.path("englishText").asText());
-  String id=db.tree(catalog.save(author,old)).path("id").asText(),roomId=db.id();
-  db.sql.update("INSERT INTO rooms(id,invite_code,state,version,document,updated_at) VALUES(?,?,?,?,?,?)",roomId,"PINNED","ROUND_ACTIVE",1,db.write(data("used",List.of(id))),db.now());
-  var upgrade=new vn.codegrade.db.SeedBankUpgrade(db);upgrade.apply();assertEquals(1,catalog.document(id).path("version").asInt());
-  db.sql.update("DELETE FROM rooms WHERE id=?",roomId);upgrade.apply();assertEquals(2,catalog.document(id).path("version").asInt());
  }
  @Test void problemCodesStayStableAndAreSearchable() {
   ObjectNode first=(ObjectNode)createProblem(1,false);String code=first.path("publicId").asText();
@@ -742,18 +713,6 @@ class SystemIntegrationTest {
   assertThrows(Store.Fault.class,()->call(coders.getFirst(),"DRAFT_SAVE",data("roomId",r.path("id").asText(),"problemId",pid,"language","PY311","source","late code")));
   assertEquals("print(sum(map(int,input().split())))",db.one("SELECT source_code FROM submissions WHERE id=?",ack.path("id").asText()).get("source_code"));
  }
- @Test void bankExpansionIsIdempotentAndPreservesAuthorConflictsAndSnapshots() throws Exception {
-  var baseline=(ObjectNode)db.json.readTree(getClass().getResourceAsStream("/dataset-upgrade-6.json")).get(0).deepCopy();
-  db.sql.update("INSERT INTO categories VALUES('arithmetic','Số học','Số học')");
-  var saved=(ObjectNode)createProblem(1,false);String id=saved.path("id").asText(),code=saved.path("publicId").asText();
-  baseline.put("id",id).put("version",7);db.sql.update("UPDATE problems SET version=7,document=? WHERE id=?",db.write(baseline),id);
-  var expansion=new vn.codegrade.db.SeedBankExpansion(db,catalog,identity);expansion.apply();expansion.apply();
-  assertEquals(201,db.sql.queryForObject("SELECT COUNT(*) FROM problems",Integer.class));
-  assertEquals(8,catalog.document(id).path("version").asInt());assertEquals(5,catalog.document(id).path("testcases").size());assertEquals(code,catalog.document(id).path("publicId").asText());
-  var changed=(ObjectNode)catalog.document(id);((ObjectNode)changed.path("general")).put("questionName","AUTHOR changed title");call(author,"QUESTION_SAVE",changed);expansion.apply();
-  assertEquals("AUTHOR changed title",catalog.document(id).path("general").path("questionName").asText());
-  assertEquals(1,db.sql.queryForObject("SELECT COUNT(*) FROM audit WHERE action='SEED_V6_CONFLICT' AND entity_id=?",Integer.class,id));
- }
  @Test void rankedWindowsIncludeTheirBoundaryAndExcludeTheNextPoint() {
   for(int[] c:List.of(new int[]{0,150,1},new int[]{0,151,0},new int[]{10,250,1},new int[]{10,251,0},new int[]{20,350,1},new int[]{20,351,0},new int[]{30,400,1},new int[]{30,401,0})) {
    db.sql.update("DELETE FROM match_queue");db.sql.update("DELETE FROM rooms");
@@ -825,14 +784,14 @@ class SystemIntegrationTest {
   for(int i=0;i<3;i++) {judge.complete("test-worker",data("id",first.path("id").asText(),"leaseToken",first.path("leaseToken").asText(),"systemError",true));if(i<2)first=db.tree(judge.claim("test-worker"));}
   var current=rooms.load(r.path("id").asText());assertEquals("RESCUE",current.path("nextKind").asText());assertFalse(current.has("winnerId"));assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM reward_events",Integer.class));
  }
- @Test void existingFrozenRoomKeepsItsLegacyTestsUntilTheMatchEnds() throws Exception {
-  ObjectNode r=start(lobby(2,List.of(1),3));var original=db.json.readTree(getClass().getResourceAsStream("/dataset-upgrade-6.json")).get(0);
+ @Test void frozenRoomKeepsItsTestsUntilTheMatchEnds() throws Exception {
+  ObjectNode r=start(lobby(2,List.of(1),3));ObjectNode original=fixture.deepCopy();((ArrayNode)original.path("testcases")).add(original.path("testcases").get(0).deepCopy());
   ((ObjectNode)r.path("frozenProblem")).set("testcases",original.path("testcases"));writeRoom(r);
   var ack=call(coders.getFirst(),"SUBMIT",submitPayload(r));var frozen=db.read((String)db.one("SELECT snapshot FROM submissions WHERE id=?",ack.path("id").asText()).get("snapshot"));
   assertEquals(original.path("testcases").size(),frozen.path("testcases").size());assertTrue(frozen.path("testcases").size()>5);
  }
- @Test void deferredContestProblemStillWorksInIndependentPractice() throws Exception {
-  ObjectNode q=(ObjectNode)createProblem(1,false);String pid=q.path("id").asText();var baseline=db.json.readTree(getClass().getResourceAsStream("/dataset-upgrade-6.json")).get(0);
+ @Test void contestProblemStillWorksInIndependentPractice() throws Exception {
+  ObjectNode q=(ObjectNode)createProblem(1,false);String pid=q.path("id").asText();ObjectNode baseline=fixture.deepCopy();((ArrayNode)baseline.path("testcases")).add(baseline.path("testcases").get(0).deepCopy());
   q.set("testcases",baseline.path("testcases"));db.sql.update("UPDATE problems SET document=? WHERE id=?",db.write(q),pid);
   var c=data("startsAt",db.now()-1000,"endsAt",db.now()+60000,"problemIds",List.of(pid));db.sql.update("INSERT INTO contests VALUES(?,?,?)",db.id(),author.id(),db.write(c));
   var ack=call(coders.getFirst(),"SUBMIT",data("problemId",pid,"source","pass","language","PY311"));

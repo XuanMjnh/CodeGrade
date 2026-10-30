@@ -88,9 +88,9 @@ Contest lưu nháp cục bộ riêng theo tài khoản/contest/bài; cả ba mod
 
 Bảng kết quả trực tiếp của Survival lấy từ snapshot server, hiển thị người chơi/khán giả, trạng thái nộp/chấm, số lượt, điểm và thời gian hiệu lực. Thứ hạng còn tạm thời khi vòng chưa chốt; vòng bị hủy không hiển thị hạng như kết quả chính thức. Bảng không trả source của đối thủ hoặc test ẩn.
 
-## Ngân hàng đề và nâng cấp dữ liệu
+## Ngân hàng đề của phiên bản 6.0.0
 
-| Chủ đề | Cũ | Mới | Tổng |
+| Chủ đề | Tham chiếu C++11 | Tham chiếu Python 3.11 | Tổng |
 |---|---:|---:|---:|
 | Arithmetic | 20 | 34 | 54 |
 | Arrays | 20 | 34 | 54 |
@@ -100,13 +100,13 @@ Bảng kết quả trực tiếp của Survival lấy từ snapshot server, hi�
 | Graphs | 20 | 33 | 53 |
 | **Tổng** | **120** | **200** | **320** |
 
-[dataset.json](backend/src/main/resources/dataset.json): đúng 5 test/bài, tổng 1.600; một ví dụ công khai và bốn test ẩn. Bài cũ giữ mã v5, đề/đáp án; chọn lại test theo biên, trường hợp đặc biệt và độ đa dạng, không lấy năm test đầu. `dataset-upgrade-6.json` là bản gốc để so sánh nâng cấp, không phải test inactive của đề công bố.
+[dataset.json](backend/src/main/resources/dataset.json) là nguồn dữ liệu duy nhất của phiên bản 6.0.0: 320 bài, mỗi bài 5 testcase, tổng 1.600 testcase; một ví dụ công khai và bốn test ẩn. Mã bài được giữ ổn định để bảo toàn liên kết lời giải và dữ liệu người dùng.
 
-200 bài v6 có phát biểu/contract/ví dụ tiếng Việt, độ khó 1–6, CPU/RAM và lời giải Python 3.11. [solutions/README.md](solutions/README.md) liệt kê đủ 120 lời giải C++11 cũ và 200 lời giải Python mới cùng phương pháp/độ phức tạp. C++11/17/20 và Python 3.11 đều tiếp tục là ngôn ngữ nộp bài. Một số bài khó có giới hạn nhỏ để dùng vét cạn tham chiếu.
+200 bài có phát biểu/contract/ví dụ tiếng Việt, độ khó 1–6, CPU/RAM và lời giải Python 3.11. [solutions/README.md](solutions/README.md) liệt kê đủ 120 lời giải C++11 và 200 lời giải Python cùng phương pháp/độ phức tạp. C++11/17/20 và Python 3.11 đều tiếp tục là ngôn ngữ nộp bài. Một số bài khó có giới hạn nhỏ để dùng vét cạn tham chiếu.
 
-Bootstrap, SeedBankUpgrade và SeedBankExpansion nâng cấp theo nội dung khớp bản gốc, giữ UUID/mã CG/bookmark và toàn bộ snapshot/verdict cũ. AUTHOR sửa khác: giữ nguyên, ghi SEED_V6_CONFLICT để người sở hữu rà soát. Đề trong bank đã khóa/contest đang diễn ra: DEFERRED, thử lại sau 60 giây. Trận cũ đang dùng snapshot nhiều test tiếp tục dùng nguyên snapshot đến khi kết thúc. Không sửa V1–V5, reset MySQL hoặc xóa volume. Các phiên bản mới vào queue VALIDATE thật trước khi đủ điều kiện Survival. ADMIN xem xung đột qua AUDIT.
+Bootstrap chỉ đọc dataset.json, thêm bài chưa có khi bật DEMO_DATA và đưa đáp án tham chiếu vào queue VALIDATE. Bài đã tồn tại, dữ liệu người dùng và snapshot được giữ nguyên. Schema được tạo bằng một migration duy nhất: `V1__initial_schema.sql`, dùng cho database mới. Database đã áp dụng bộ V1–V6 cũ cần đối chiếu schema và chuyển tiếp lịch sử Flyway riêng trước khi chạy bản này; source không tự reset database, sửa lịch sử hoặc xóa volume.
 
-Tại lần kiểm chứng nâng cấp database cũ: **315 bài đã có 5 testcase, 5 bài thuộc Contest chạy đến 14:05 ngày 31/10/2026 (UTC+7) được giữ nguyên**. Database tại mốc đó có 1.675 testcase; sau Contest, retry tự động chuẩn hóa về 1.600 và đưa phiên bản mới vào queue xác thực. Source và database tạo mới có 320 bài / 1.600 testcase. Không kết thúc hoặc sửa Contest để ép nâng cấp. Xem [đối chiếu dữ liệu tại mốc kiểm chứng](statics/results/project-upgrade-v6.json).
+Database tạo mới dùng toàn bộ 320 bài / 1.600 testcase. Database đã có dữ liệu giữ nguyên nội dung đang lưu; thay đổi source không tự chuyển đổi các bài cũ. Tạo lại dữ liệu từ đầu chỉ áp dụng với database mới, tách biệt dữ liệu đang sử dụng.
 
 ## Chạy Docker Compose
 
@@ -159,7 +159,9 @@ $env:CG_UI_URL='http://localhost:18080'
 node frontend/tests/survival-ui.cjs
 ```
 
-Kết quả thực chạy ngày 29/10/2026:
+Kiểm tra sau khi hợp nhất phiên bản ngày 30/10/2026: backend 96/96 test; frontend 122/122 test và Vite build đạt; 3/3 test đóng gói đạt. Script tạo dữ liệu chạy trong thư mục tạm tái tạo đúng nguyên dataset 320 bài / 1.600 testcase. Verifier chạy 1.000 testcase Python, 125 kiểm tra độc lập và đối chiếu 600 testcase C++ bằng Python oracle. Chưa chạy lại binary C++ hoặc smoke test Docker trong lần này vì máy chưa có g++ và Docker Engine chưa hoạt động.
+
+Kết quả lịch sử ngày 29/10/2026, trước lần hợp nhất phiên bản:
 
 | Kiểm tra | Kết quả | Bằng chứng |
 |---|---|---|
@@ -170,7 +172,6 @@ Kết quả thực chạy ngày 29/10/2026:
 | Ba mode thật | Practice 2 không EXP; Normal/Ranked: 100 + 4×20 EXP | [exp-policy-smoke.json](statics/results/exp-policy-smoke.json) |
 | Docker judge | AC bốn ngôn ngữ; WA/CE/TLE | [judge-v6-smoke.json](statics/results/judge-v6-smoke.json) |
 | Restart thật | Queue/session/joinedAt và UUID/mã/version giữ nguyên | [restart-v6.json](statics/results/restart-v6.json) |
-| Database cũ | Đối chiếu snapshot, verdict, UUID/mã và command sau nâng cấp | [project-upgrade-v6.json](statics/results/project-upgrade-v6.json) |
 | Fairness | 10.000 mô phỏng: baseline sai cutoff 6.151, proposed 0 | [fairness-v6.json](statics/results/fairness-v6.json) |
 | PING RTT | 1/10/30 client, tổng 820 ACK | [network-v6.json](statics/results/network-v6.json) |
 

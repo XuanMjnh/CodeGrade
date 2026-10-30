@@ -37,7 +37,7 @@ TCP/WebSocket cung cấp kênh hai chiều lâu dài; requestId và event log gi
 | Survival / RoundRanking | Engine vòng chung, bank snapshot, admission, cutoff, tie/rescue/final |
 | Progression | EXP/Level/Rank, Elo, reward ledger, match history/leaderboard |
 | Submissions / WorkerMain | Admission và snapshot, job/lease/progress, judge/settlement |
-| SeedBankExpansion | Nâng cấp theo nội dung, bảo toàn ID, defer/conflict và validation |
+| Bootstrap | Khởi tạo từ dataset duy nhất, giữ bài đã có và xác thực qua worker |
 | SurvivalLobby / Room | Ba mode, queue, nhận trận, thời gian, roster và kết quả |
 | Workspace / competition.js | Scope thi đấu, bảo vệ ACK muộn, không khôi phục nháp thi đấu |
 
@@ -73,17 +73,15 @@ Luyện tập cá nhân và giao lưu (Survival Practice) không cộng EXP, k�
 
 Workspace dùng scope room+round+problem hoặc contest+problem. Không đọc/lưu nháp trong scope thi đấu. SUBMIT được ACK mới về starter, và chỉ khi revision chưa đổi. Chạy thử, lỗi server hoặc ACK đến sau khi người dùng đã gõ code mới không xóa code. Nếu ACK thất lạc, retry dùng cùng requestId; không suy đoán trạng thái để xóa. Practice cá nhân vẫn autosave. Đây là lựa chọn không lưu nháp thi đấu: phần đang gõ chưa submit cũng mất sau reload.
 
-## Dataset và database migration
+## Dataset và schema hiện tại
 
-Giữ 120 mã v5 và thêm 200 mã v6 theo tỷ lệ 34 Arithmetic,34 Arrays,33 Strings,33 Number Theory,33 Sequences,33 Graphs. Mỗi bản đề công bố mới có năm test có nội dung, một ví dụ và bốn test ẩn. Bộ test cũ được chọn theo biên/độ đa dạng từ bản gốc 2.394 test; không sửa đề/đáp án gốc. Reference cũ là C++11; reference mới là Python 3.11; vẫn chấm được cả bốn ngôn ngữ.
+Project thống nhất ở phiên bản 6.0.0, chỉ đóng gói dataset.json: 320 bài / 1.600 testcase, gồm 120 lời giải C++11 và 200 lời giải Python 3.11. Mã bài giữ ổn định; cả bốn ngôn ngữ vẫn được hỗ trợ khi nộp bài.
 
-Migration schema chỉ thêm V6. Chuyển dữ liệu giữ UUID, CG, bookmark và submission snapshot/verdict. Chỉ cập nhật đề khớp baseline chính xác sau khi bỏ metadata do server tạo. Khác nội dung thì CONFLICT; bank đã khóa/contest đang thi thì DEFERRED, thử lại sau trận. Không thu gọn snapshot lịch sử hoặc snapshot của trận đang diễn ra. Xác thực đáp án qua worker thật; không tự ghi AC/validatedVersion từ seed.
+Bootstrap thêm bài chưa có khi bật DEMO_DATA và tạo yêu cầu VALIDATE qua worker. Không còn baseline dataset, bộ dịch hoặc luồng nâng cấp nội dung tự động. Database mới dùng V1__initial_schema.sql và dataset hiện tại. Database đã áp dụng V1–V6 cần đối chiếu schema và chuyển tiếp lịch sử Flyway riêng; source không tự sửa lịch sử hoặc reset dữ liệu.
 
-Trước khi cập nhật database dự án đã sao lưu riêng trong thư mục Temp của người dùng. Báo cáo [project-upgrade-v6.json](../statics/results/project-upgrade-v6.json) đối chiếu 120 UUID/mã, 314 snapshot/source/received_at, 314 verdict đã hoàn tất và 1.113 command response cũ. Những con số trước nâng cấp là số đọc từ database thật, không phải dữ liệu mô phỏng.
+## Experimental setup và kết quả lịch sử
 
-Database cũ còn một Contest chạy đến **14:05 ngày 31/10/2026 (UTC+7)**. Vì vậy 5 bài được giữ nguyên bộ test cũ: 315 bài đã chuẩn hóa, tổng database hiện tại 1.675 testcase. Source và database kiểm thử mới đều đạt 320 bài / 1.600 testcase. Timer tự thử nâng cấp sau khi Contest kết thúc; không tự hủy Contest để đạt số đếm. Trong thời gian này, các bài bị hoãn vẫn chấm được trong Contest và Practice bằng phiên bản legacy đang dùng.
-
-## Experimental setup và kết quả
+Các số liệu bên dưới được đo trước khi hợp nhất dataset; chúng không thay thế kết quả kiểm thử của source hiện tại.
 
 Windows host, Docker Linux VM 12 CPU / 8 GiB; Java 21, MySQL 8.4, Python 3.11, g++ hỗ trợ 11/17/20. H2 MySQL mode cho unit/integration backend, MySQL thật cho Compose. JSDOM chạy bundle React thực và mở WebSocket thật; không dùng nó để đánh giá CSS hay kích thước hiển thị native.
 
@@ -109,7 +107,7 @@ Các file nằm ở [statics/results](../statics/results). PING p95 tương ứn
 | Cutoff tách khỏi worker completion | RoundRanking/Survival, fairness và test final worker đảo thứ tự |
 | Engine ba mode với queue durable năm người | Matchmaking/Survival, test 2–10 Practice, 4/5/6/15 queue, accept/cancel race và smoke thật |
 | Settlement Elo/EXP đúng một lần | Progression, unique keys, tests tie/forfeit/first AC/replay |
-| Nâng cấp ngân hàng không reset lịch sử | SeedBankExpansion, fingerprint database trước/sau và restart |
+| Khởi tạo ngân hàng | Bootstrap, dataset.json và validation qua worker |
 | Editor bảo vệ ACK muộn | Workspace DOM tests cho submit lỗi, trial, scope mới và code mới |
 
 Elo, gamification, WebSocket, Docker và các thuật toán đề đều là kiến thức có sẵn. Đóng góp là thiết kế tích hợp và kiểm chứng trong phạm vi ứng dụng; không tuyên bố nhóm phát minh các thuật toán đó.
@@ -122,6 +120,6 @@ Hướng tiếp theo: benchmark matcher/judge có kiểm soát tải; lease ph�
 
 ## Files và tài liệu tái lập
 
-[changes-v6.json](../statics/results/changes-v6.json) liệt kê toàn bộ file thêm/sửa/xóa, gồm 320 source lời giải; không tính hai file architecture.png/svg đã bị xóa trước phiên làm việc. Các entry chính là Matchmaking.java, Progression.java, SeedBankExpansion.java, V6 migration, Survival/Commands/Submissions/QuestionRules/Catalog, SurvivalLobby/Survival/Workspace/Community/QuestionEditor, script generate/verify/smoke và tests.
+[changes-v6.json](../statics/results/changes-v6.json) liệt kê toàn bộ file thêm/sửa/xóa, gồm 320 source lời giải; không tính hai file architecture.png/svg đã bị xóa trước phiên làm việc. Các entry chính là Matchmaking.java, Progression.java, Bootstrap.java, V1__initial_schema.sql, Survival/Commands/Submissions/QuestionRules/Catalog, SurvivalLobby/Survival/Workspace/Community/QuestionEditor, script generate/verify/smoke và tests.
 
 [README](../README.md) có lệnh chạy Compose, biến cấu hình, demo và cách tái lập. [solutions/index.json](../solutions/index.json) là mục lục thuật toán. Việc nộp/kiểm tra học thuật và cập nhật Word chính thức do nhóm xác nhận theo [INSTRUCTION](../INSTRUCTION.md).
