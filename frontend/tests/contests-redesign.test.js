@@ -113,7 +113,15 @@ test('contest component toggles between list view and dedicated arena space', as
                 contents: `
                   import React from 'react';
                   export const useNow = () => 1500;
-                  export const StatGrid = () => <div className="stat-grid-mock" />;
+                  export const StatGrid = ({ items, className }) => (
+                    <div className={'stat-grid-mock ' + (className || '')}>
+                      {items?.map((it, idx) => (
+                        <button key={idx} className={'stat-card-mock ' + (it.tone || '')} onClick={it.onClick}>
+                          {it.label}
+                        </button>
+                      ))}
+                    </div>
+                  );
                   export const InsightPanel = ({ title, children }) => <section><h3>{title}</h3>{children}</section>;
                   export const contestState = (c, now) => { if (c.settled) return 'finished'; if (now < c.startsAt) return 'upcoming'; if (now < c.endsAt) return 'live'; return 'grading'; };
                   export const contestInsights = (contests, now, uid) => ({ live: 1, upcoming: 1, joined: 1, pending: 0, next: contests[0] });
@@ -197,6 +205,19 @@ test('contest component toggles between list view and dedicated arena space', as
   assert.equal(w.document.querySelectorAll('.contest-card').length, 2, 'Should display 2 contest cards');
   assert.equal(w.document.querySelector('#contest-space'), null, 'Dedicated arena should NOT be rendered in list view');
 
+  // Verify interactive stat cards filtering
+  const liveStatCard = w.document.querySelector('.stat-card-mock.live');
+  assert.ok(liveStatCard, 'Live stat card should be rendered');
+  await act(async () => {
+    liveStatCard.click();
+  });
+  assert.equal(w.document.querySelectorAll('.contest-card').length, 1, 'Should filter to 1 live contest');
+  assert.ok(w.document.body.textContent.includes('Contest 1 Alpha'), 'Should show Contest 1 Alpha');
+  await act(async () => {
+    liveStatCard.click();
+  });
+  assert.equal(w.document.querySelectorAll('.contest-card').length, 2, 'Clicking active stat card again should reset filter to all 2 contests');
+
   // 2. Click the first contest card
   const firstCard = w.document.querySelectorAll('.contest-card')[0];
   await act(async () => {
@@ -278,7 +299,15 @@ test('contest problems that are AC are styled with green color, check badge, and
                 contents: `
                   import React from 'react';
                   export const useNow = () => 1500;
-                  export const StatGrid = () => <div className="stat-grid-mock" />;
+                  export const StatGrid = ({ items, className }) => (
+                    <div className={'stat-grid-mock ' + (className || '')}>
+                      {items?.map((it, idx) => (
+                        <button key={idx} className={'stat-card-mock ' + (it.tone || '')} onClick={it.onClick}>
+                          {it.label}
+                        </button>
+                      ))}
+                    </div>
+                  );
                   export const InsightPanel = ({ title, children }) => <section><h3>{title}</h3>{children}</section>;
                   export const contestState = (c, now) => { if (c.settled) return 'finished'; if (now < c.startsAt) return 'upcoming'; if (now < c.endsAt) return 'live'; return 'grading'; };
                   export const contestInsights = (contests, now, uid) => ({ live: 1, upcoming: 1, joined: 1, pending: 0, next: contests[0] });

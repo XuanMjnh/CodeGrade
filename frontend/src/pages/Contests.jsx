@@ -825,6 +825,7 @@ export default function Contests({ user, revision, onNotice, contestId }) {
           value: overview.next?.title || trUI('Chưa có lịch thi mới'),
           userContent: true,
           detail: overview.next ? formatDate(overview.next.startsAt) : undefined,
+          onClick: overview.next ? () => openContest(overview.next.id) : undefined,
         }}
         action={
           user.role !== 'CODER' ? (
@@ -850,12 +851,51 @@ export default function Contests({ user, revision, onNotice, contestId }) {
       </Heading>
 
       <StatGrid
+        className="contest-stats-grid"
         label={trUI('Tổng quan contest')}
         items={[
-          { label: trUI('Đang diễn ra'), value: data ? overview.live : null, tone: 'positive' },
-          { label: trUI('Sắp diễn ra'), value: data ? overview.upcoming : null },
-          { label: trUI('Đã tham gia'), value: data ? overview.joined : null },
-          { label: trUI('Chờ duyệt'), value: data ? overview.pending : null },
+          {
+            label: trUI('Đang diễn ra'),
+            value: data ? overview.live : null,
+            tone: 'live',
+            icon: <i className="fa-solid fa-bolt" aria-hidden="true" />,
+            badge:
+              overview.live > 0 ? (
+                <span className="stat-pill-live">
+                  <span className="pulse-dot" /> LIVE
+                </span>
+              ) : null,
+            note: trUI(overview.live > 0 ? 'Đang mở làm bài' : 'Chưa có cuộc thi'),
+            active: filter === 'live',
+            onClick: () => setFilter(filter === 'live' ? 'all' : 'live'),
+          },
+          {
+            label: trUI('Sắp diễn ra'),
+            value: data ? overview.upcoming : null,
+            tone: 'upcoming',
+            icon: <i className="fa-regular fa-calendar-check" aria-hidden="true" />,
+            note: trUI('Lịch thi sắp tới'),
+            active: filter === 'upcoming',
+            onClick: () => setFilter(filter === 'upcoming' ? 'all' : 'upcoming'),
+          },
+          {
+            label: trUI('Đã tham gia'),
+            value: data ? overview.joined : null,
+            tone: 'joined',
+            icon: <i className="fa-solid fa-trophy" aria-hidden="true" />,
+            note: trUI('Cuộc thi của bạn'),
+            active: filter === 'mine',
+            onClick: () => setFilter(filter === 'mine' ? 'all' : 'mine'),
+          },
+          {
+            label: trUI('Chờ duyệt'),
+            value: data ? overview.pending : null,
+            tone: 'pending',
+            icon: <i className="fa-regular fa-hourglass-half" aria-hidden="true" />,
+            note: trUI('Đang chờ xét duyệt'),
+            active: filter === 'mine' && overview.pending > 0,
+            onClick: () => setFilter(filter === 'mine' ? 'all' : 'mine'),
+          },
         ]}
       />
 

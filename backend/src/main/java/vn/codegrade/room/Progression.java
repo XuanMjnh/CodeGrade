@@ -14,15 +14,19 @@ public class Progression {
     private final Store db;
     @Value("${app.survival.k-factor:32}") double k=32;
     @Value("${app.survival.rank-thresholds:1100,1300,1500,1700,1900}") int[] thresholds={1100,1300,1500,1700,1900};
+    @Value("${app.survival.rank-gain-multipliers:3,2,1.5,1,1,1}") double[] gainMultipliers={3,2,1.5,1,1,1};
     private static final String[] TIERS={"Đồng","Bạc","Vàng","Bạch Kim","Kim Cương","Cao Thủ"};
     public Progression(Store db) { this.db=db; }
     @jakarta.annotation.PostConstruct public void validateConfiguration() {
         require(k>0&&k<=128&&Double.isFinite(k),"K-factor phải trong (0,128]");
         require(thresholds.length==5,"Cần 5 ngưỡng cho 6 bậc Rank");
         for(int i=1;i<5;i++)require(thresholds[i]>thresholds[i-1],"Ngưỡng Rank phải tăng nghiêm ngặt");
+        require(gainMultipliers.length==6,"Cần 6 hệ số tăng rating cho 6 bậc Rank");
+        for(int i=0;i<6;i++)require(Double.isFinite(gainMultipliers[i])&&gainMultipliers[i]>=1&&gainMultipliers[i]<=4&&(i==0||gainMultipliers[i]<=gainMultipliers[i-1]),"Hệ số tăng rating từ 1 đến 4 và giảm dần theo Rank");
     }
     public static int level(long exp) { return 1+(int)Math.sqrt(Math.max(0,exp)/100.0); }
-    public String tier(int rating) { int n=0; for(int t:thresholds) if(rating>=t)n++; return TIERS[Math.min(n,5)]; }
+    private int tierIndex(int rating) { int n=0; for(int t:thresholds) if(rating>=t)n++; return Math.min(n,5); }
+    public String tier(int rating) { return TIERS[tierIndex(rating)]; }
     public ObjectNode get(String uid) {
         if(db.sql.queryForObject("SELECT COUNT(*) FROM progression WHERE user_id=?",Integer.class,uid)==0)
             db.sql.update("INSERT INTO progression(user_id) VALUES(?)",uid);
@@ -30,6 +34,18 @@ public class Progression {
         long exp=((Number)row.get("exp")).longValue(); int rating=((Number)row.get("rating")).intValue(),l=level(exp);
         var p=db.obj().put("exp",exp).put("level",l).put("rating",rating).put("rank",tier(rating))
             .put("rankedGames",((Number)row.get("ranked_games")).intValue()).put("nextLevelExp",100L*l*l);
+        int index=tierIndex(rating);
+        if(index==0)p.putNull("rankMinRating");else p.put("rankMinRating",thresholds[index-1]);
+        p.put("ratingGainMultiplier",gainMultipliers[index]);
+        if(index<thresholds.length) p.put("nextRank",TIERS[index+1]).put("nextRankRating",thresholds[index]).put("ratingToNextRank",thresholds[index]-(long)rating);
+        else {p.putNull("nextRank");p.putNull("nextRankRating");p.put("ratingToNextRank",0);}
+        var rankTiers=p.putArray("rankTiers");
+        for(int i=0;i<TIERS.length;i++) {
+            var info=db.obj().put("name",TIERS[i]).put("gainMultiplier",gainMultipliers[i]);
+            if(i==0)info.putNull("minRating");else info.put("minRating",thresholds[i-1]);
+            if(i==thresholds.length)info.putNull("maxRating");else info.put("maxRating",thresholds[i]-1);
+            rankTiers.add(info);
+        }
         var badges=p.putArray("badges"); if(l>=2)badges.add("Người học chăm chỉ");if(l>=5)badges.add("Bền bỉ");if(l>=10)badges.add("Chinh phục");
         p.put("avatarFrame",l>=10?"gold":l>=5?"silver":"basic"); return p;
     }
@@ -45,6 +61,12 @@ public class Progression {
             }
             deltas.put(a,(int)Math.round(k/4*sum));
         }
+        return deltas;
+    }
+    public Map<String,Integer> rankedDeltas(Map<String,Integer> ratings,Map<String,Integer> ranks) {
+        var deltas=elo(ratings,ranks,k);
+        // Support early progression on gains only, using each player's rating at match start.
+        deltas.replaceAll((uid,delta)->delta>0?(int)Math.round(delta*gainMultipliers[tierIndex(ratings.get(uid))]):delta);
         return deltas;
     }
     private void reward(String uid,String key,String kind,int exp,int before,int after) {
@@ -75,7 +97,7 @@ public class Progression {
         }
         String winner=room.path("winnerId").asText();stage.put(winner,Integer.MAX_VALUE);
         for(String id:ids)ranks.put(id,1+(int)ids.stream().filter(other->stage.get(other)>stage.get(id)).count());
-        if(mode.equals("RANKED"))deltas=elo(ratings,ranks,k);
+        if(mode.equals("RANKED"))deltas=rankedDeltas(ratings,ranks);
         var results=room.putArray("results");
         for(String uid:ids) {
             int exp=0;

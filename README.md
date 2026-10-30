@@ -126,8 +126,11 @@ Mở `http://localhost:8080`. `admin` dùng ADMIN_PASSWORD; `author`, `coder01`�
 SURVIVAL_RATING_RANGES=150,250,350,400
 SURVIVAL_RANK_THRESHOLDS=1100,1300,1500,1700,1900
 SURVIVAL_K_FACTOR=32
+SURVIVAL_RANK_GAIN_MULTIPLIERS=3,2,1.5,1,1,1
 SURVIVAL_ACCEPT_SECONDS=20
 ```
+
+Rank Survival mặc định: Đồng dưới 1100; Bạc 1100–1299; Vàng 1300–1499; Bạch Kim 1500–1699; Kim Cương 1700–1899; Cao Thủ từ 1900. Điểm tăng Elo cơ bản được nhân theo rank đầu trận: Đồng ×3, Bạc ×2, Vàng ×1,5, các rank còn lại ×1. Điểm trừ giữ nguyên, thay đổi bằng 0 vẫn bằng 0; chỉ Ranked thay đổi rating. Ví dụ với K=32, người thắng một trận 5 người cùng rating được +48 ở Đồng, +32 ở Bạc, +24 ở Vàng, +16 từ Bạch Kim. Đây là mức hỗ trợ thăng hạng nên tổng thay đổi rating của trận không bắt buộc bằng 0. API `PROGRESSION_GET` trả về các mốc cấu hình, hệ số và số rating còn thiếu; giao diện không tự định nghĩa lại ngưỡng rank. Thay đổi áp dụng cho các trận chưa chốt kết quả; lịch sử đã thưởng không được tính lại.
 
 Ngoài Docker: Java 21, Maven 3.9, Node ≥22.12; cấu hình DB_URL/DB_USER/DB_PASSWORD trong environment, `mvn spring-boot:run` tại backend, `npx vite` tại frontend. Proxy Vite nằm trong frontend/vite.config.js. Worker cần Docker và `WORKER_URL`, `WORKER_TOKEN`, `SANDBOX_IMAGE=codegrade-sandbox:5`; không có fallback chạy source người dùng trên host.
 

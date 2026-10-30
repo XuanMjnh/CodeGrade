@@ -33,11 +33,12 @@ async function mount(extra={}){
  const finish=async(ok=true)=>act(async()=>{ok?pending.resolve({id:'s',receivedAt:Date.now()}):pending.reject(Object.assign(Error('rejected'),{code:'VALIDATION'}));});
  return {w,calls,props,act,edit,click,finish,source:()=>w.document.querySelector('[aria-label=code]').value,close:async()=>{await act(async()=>w.harness.unmount());w.close();}};
 }
-test('competition never hydrates or autosaves old code; confirmed submit clears only its editor',async()=>{
+test('room submit retains code and saves a separate round draft',async()=>{
  const h=await mount();try{
   assert.equal(h.source().includes('old code'),false);assert.equal(h.calls.some(c=>c.type==='DRAFT_GET'),false);
-  await h.edit('print(123)');await h.click('Nộp bài');assert.equal(h.source(),'print(123)');await h.finish();assert.equal(h.source().includes('print(123)'),false);
-  assert.equal(h.w.localStorage.getItem('cg-code-u-p'),null);assert.equal(h.calls.some(c=>c.type==='DRAFT_SAVE'),false);
+  await h.edit('print(123)');await h.click('Nộp bài');assert.equal(h.source(),'print(123)');await h.finish();assert.equal(h.source(),'print(123)');
+  assert.equal(JSON.parse(h.w.localStorage.getItem('cg-code-room:room1:r1:p-u')).source,'print(123)');
+  assert.equal(JSON.parse(h.w.localStorage.getItem('cg-code-u-p')).source,'local old code');assert.equal(h.calls.some(c=>c.type==='DRAFT_SAVE'),false);
  }finally{await h.close();}
 });
 test('rejected submissions and examples preserve the current code',async()=>{
@@ -49,8 +50,19 @@ test('late ACK never deletes newer edits or code in a new round',async()=>{
   await h.click('Nộp bài');await h.act(async()=>h.w.harness.render({...h.props,room:{id:'room2',current:{id:'r2'}}}));await h.edit('new room code');await h.finish();assert.equal(h.source(),'new room code');
  }finally{await h.close();}
 });
-test('contest is isolated from practice drafts; precheck keeps code',async()=>{
- const h=await mount({room:null,contestId:'contest1'});try{assert.equal(h.source().includes('old code'),false);await h.edit('contest code');await h.click('Precheck');await h.finish();assert.equal(h.source(),'contest code');await h.click('Nộp bài');await h.finish();assert.equal(h.source().includes('contest code'),false);}finally{await h.close();}
+test('contest precheck and submit retain code and its saved draft',async()=>{
+ const h=await mount({room:null,contestId:'contest1'});try{assert.equal(h.source().includes('old code'),false);await h.edit('contest code');await h.click('Precheck');await h.finish();assert.equal(h.source(),'contest code');await h.click('Nộp bài');await h.finish();assert.equal(h.source(),'contest code');assert.equal(JSON.parse(h.w.localStorage.getItem('cg-code-contest-contest1-u-p')).source,'contest code');}finally{await h.close();}
+});
+
+test('room drafts restore only in the same match and round',async()=>{
+ const h=await mount();try{
+  await h.edit('round one code');await h.click('Nộp bài');await h.finish();
+  await h.act(async()=>h.w.harness.render({...h.props,room:{id:'room1',current:{id:'r2'}}}));
+  assert.equal(h.source().includes('round one code'),false);await h.edit('round two code');
+  await h.act(async()=>h.w.harness.render(h.props));assert.equal(h.source(),'round one code');
+  await h.act(async()=>h.w.harness.render({...h.props,readOnly:true}));assert.equal(h.source(),'round one code');
+  assert.ok([...h.w.document.querySelectorAll('button')].find(b=>b.textContent.includes('Nộp bài')).disabled);
+ }finally{await h.close();}
 });
 test('independent practice still restores and retains its draft after submit',async()=>{
  const h=await mount({room:null});try{assert.equal(h.source(),'local old code');assert.equal(h.calls.some(c=>c.type==='DRAFT_GET'),true);await h.edit('practice code');await h.click('Nộp bài');await h.finish();assert.equal(h.source(),'practice code');assert.equal(JSON.parse(h.w.localStorage.getItem('cg-code-u-p')).source,'practice code');}finally{await h.close();}

@@ -24,14 +24,42 @@ public class Survival {
         r.put("version",r.path("version").asLong()+1);
         db.sql.update("UPDATE rooms SET state=?,version=?,document=?,updated_at=? WHERE id=?",r.path("state").asText(),r.path("version").asLong(),db.write(r),db.now(),r.path("id").asText());
         // Store a private event per member; no source code or hidden tests in snapshots.
-        for(var p:r.path("players")) db.event(p.path("id").asText(),event,publicState(r));
+        var snapshot=publicState(r);
+        for(var p:r.path("players")) db.event(p.path("id").asText(),event,snapshot);
         db.audit("server",event,r.path("id").asText(),r);
     }
     public ObjectNode publicState(ObjectNode r) {
         ObjectNode out=r.deepCopy();
         out.remove(List.of("bank","used","frozenProblem","baseRanks","certificate","initialRatings"));
-        if(r.has("current") && r.path("current").has("problemId"))
+        if(r.has("current") && r.path("current").has("problemId")) {
             out.set("problem",catalog.publicQuestion(r.path("frozenProblem")));
+            out.set("liveStandings",liveStandings(r));
+        }
+        return out;
+    }
+    private ArrayNode liveStandings(ObjectNode r) {
+        var current=r.path("current");
+        var submissions=db.sql.queryForList("SELECT user_id,status,score,received_at FROM submissions WHERE round_id=? AND mode='OFFICIAL' ORDER BY received_at,admission_order",current.path("id").asText());
+        var players=new ArrayList<String>();
+        for(var uid:current.path("players")) players.add(uid.asText());
+        var completed=new ArrayList<RoundRanking.Attempt>();
+        for(var s:submissions) if(!Set.of("QUEUED","RUNNING","SE").contains((String)s.get("status")))
+            completed.add(new RoundRanking.Attempt((String)s.get("user_id"),(String)s.get("status"),((Number)s.get("score")).doubleValue(),((Number)s.get("received_at")).longValue()));
+        var ranks=RoundRanking.rank(players,completed,current.path("startedAt").asLong());
+        ArrayNode out=db.json.createArrayNode();
+        int place=0;RoundRanking.Rank previous=null;
+        for(int i=0;i<ranks.size();i++) {
+            var rank=ranks.get(i);
+            if(previous==null || !RoundRanking.tied(previous,rank))place=i+1;
+            ObjectNode entry=(ObjectNode)db.tree(rank);
+            if(rank.attempts()>0)entry.put("rank",place);else entry.putNull("rank");
+            if(!rank.ac())entry.putNull("effectiveMs");
+            var attempts=submissions.stream().filter(s->rank.userId().equals(s.get("user_id"))).toList();
+            entry.put("attempts",attempts.stream().filter(s->!"SE".equals(s.get("status"))).count());
+            entry.put("pending",attempts.stream().filter(s->Set.of("QUEUED","RUNNING").contains(s.get("status"))).count());
+            entry.put("status",rank.ac()?"AC":attempts.isEmpty()?"NOT_SUBMITTED":(String)attempts.getLast().get("status"));
+            out.add(entry);previous=rank;
+        }
         return out;
     }
     private ObjectNode member(ObjectNode r,String uid) {

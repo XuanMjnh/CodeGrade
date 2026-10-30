@@ -170,6 +170,7 @@ public class Submissions {
             for(var t:q.path("testcases")) tests.add(db.obj().put("testcode",t.path("testcode").asText()).put("stdin",t.path("stdin").asText()));
             job.set("runner",runner);
             db.event((String)s.get("user_id"),"submission_running",Map.of("id",s.get("id")));
+            if(s.get("room_id")!=null && "OFFICIAL".equals(s.get("mode"))) survival.submissionEvent((String)s.get("room_id"),"room_submission_running",Map.of("id",s.get("id"),"userId",s.get("user_id")));
             return job;
         });
     }
@@ -281,6 +282,7 @@ public class Submissions {
                 else {
                     db.sql.update("UPDATE submissions SET status='QUEUED',current_test=0,completed_tests=0,lease_token=NULL,lease_until=NULL WHERE id=?",s.get("id"));
                     db.event((String)s.get("user_id"),"submission_retried",Map.of("id",s.get("id")));
+                    if(s.get("room_id")!=null && "OFFICIAL".equals(s.get("mode"))) survival.submissionEvent((String)s.get("room_id"),"room_submission_retried",Map.of("id",s.get("id"),"userId",s.get("user_id")));
                 }
             }
             return null;

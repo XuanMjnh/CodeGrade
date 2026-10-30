@@ -1,4 +1,45 @@
 import React from 'react';
 import {t} from '../lib/locale';
 const themes={room:['fa-bolt','Phòng thi đấu'],practice:['fa-code','Luyện tập'],survival:['fa-bolt','Code Survival'],contest:['fa-flag-checkered','Contest'],leaderboard:['fa-trophy','Xếp hạng'],submissions:['fa-chart-simple','Bài nộp'],profile:['fa-user','Tài khoản'],announcements:['fa-bullhorn','Thông báo'],categories:['fa-layer-group','Danh mục'],admin:['fa-shield-halved','Quản trị'],editor:['fa-pen-to-square','Soạn đề'],workspace:['fa-terminal','Giải bài']};
-export default function PageBanner({kind='practice',title,children,action,highlight}){const [icon,label]=themes[kind]||themes.practice;return <section className={'heading page-banner rich-banner banner-'+kind+(kind==='practice'?' practice-banner':'')} aria-label={t(label)}><div className="banner-copy"><span className="eyebrow banner-kicker">CODEGRADE <span aria-hidden="true">/</span> {t(label)}</span><h1 data-user-content={kind==='workspace'?true:undefined}>{title}</h1>{children&&<p>{children}</p>}{action&&<div className="banner-actions">{action}</div>}</div><div className="banner-feature"><span className="banner-symbol" aria-hidden="true"><i className={'fa-solid '+icon}/></span>{highlight?<><span className="banner-feature-label">{t(highlight.label)}</span><strong data-user-content={highlight.userContent?true:undefined}>{highlight.value??'—'}</strong>{highlight.detail&&<small>{t(highlight.detail)}</small>}</>:<strong>{t(label)}</strong>}<div className="banner-decoration" aria-hidden="true"><span/><span/><span/></div></div></section>;}
+export default function PageBanner({kind='practice',title,children,action,highlight}){
+  const [icon,label]=themes[kind]||themes.practice;
+  return (
+    <section className={'heading page-banner rich-banner banner-'+kind+(kind==='practice'?' practice-banner':'')} aria-label={t(label)}>
+      <div className="banner-copy">
+        <span className="eyebrow banner-kicker">CODEGRADE <span aria-hidden="true">/</span> {t(label)}</span>
+        <h1 data-user-content={kind==='workspace'?true:undefined}>{title}</h1>
+        {children&&<p>{children}</p>}
+        {action&&<div className="banner-actions">{action}</div>}
+      </div>
+      <div
+        className={'banner-feature' + (highlight?.onClick ? ' is-clickable' : '')}
+        onClick={highlight?.onClick}
+        role={highlight?.onClick ? 'button' : undefined}
+        tabIndex={highlight?.onClick ? 0 : undefined}
+        aria-label={highlight?.onClick && highlight?.value ? t(highlight.label) + ': ' + highlight.value : undefined}
+        onKeyDown={
+          highlight?.onClick
+            ? (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  highlight.onClick();
+                }
+              }
+            : undefined
+        }
+      >
+        <span className="banner-symbol" aria-hidden="true"><i className={'fa-solid '+icon}/></span>
+        {highlight ? (
+          <>
+            <span className="banner-feature-label">{t(highlight.label)}</span>
+            <strong data-user-content={highlight.userContent?true:undefined}>{highlight.value??'—'}</strong>
+            {highlight.detail&&<small>{t(highlight.detail)}</small>}
+          </>
+        ) : (
+          <strong>{t(label)}</strong>
+        )}
+        <div className="banner-decoration" aria-hidden="true"><span/><span/><span/></div>
+      </div>
+    </section>
+  );
+}

@@ -121,6 +121,7 @@ button.mode-card:disabled { opacity:.55; transform:none; cursor:not-allowed; }
 .arena-player-banner .progression-rank>.rank-emblem { width:88px; height:96px; }
 .arena-player-banner .progression-rank strong { margin:8px 0; font:850 30px/1.15 var(--font-family-heading); color:var(--rank-color); }
 .arena-player-banner .progression-rank-copy>small { font:9px var(--font-family-code); letter-spacing:.12em; }
+.arena-player-banner .progression-rank-copy>.rank-gain-support { font:11px/1.6 var(--font-family-primary); letter-spacing:0; }
 .arena-player-banner .progression-rank-copy>span { font-size:13px; }
 .arena-player-banner .progression-badges { max-width:none; grid-column:1/-1; }
 .arena-player-banner .progression-badges:not(:has(.badge)) { display:none; }
@@ -301,4 +302,13 @@ button.mode-card:disabled { opacity:.55; transform:none; cursor:not-allowed; }
  .arena-match-history { padding:22px; }.arena-match-history .arena-section-heading>span { display:none; }.arena-history-empty { align-items:flex-start; padding:20px 12px; gap:12px; }.arena-history-empty h3 { font-size:14px; }.arena-history-empty p { font-size:11px; }
  .arena-room-browser,.arena-results-grid { margin-top:36px; }
 }
+.arena-live-standings { padding:24px; }
+.arena-live-standings .arena-section-heading { margin-bottom:12px; }
+.arena-live-standings .standings-note { font-size:12px; margin-bottom:16px; }
+.arena-live-standings .table-wrap { position:relative; }
+.arena-live-standings table { min-width:680px; }
+.arena-live-standings th,.arena-live-standings td { font-size:12px; }
+.arena-live-standings td:first-child { font-variant-numeric:tabular-nums; }
+.standings-self,.standings-pending { display:block; margin-top:4px; font-size:11px; }
+@media(max-width:559px) { .arena-live-standings { padding:16px; }.arena-live-standings .arena-section-heading { flex-wrap:wrap; } }
 @media(prefers-reduced-motion:reduce) { .arena-page *, .arena-page *::before, .arena-page *::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; } }

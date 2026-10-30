@@ -67,6 +67,30 @@ class SystemIntegrationTest {
  }
  void writeRoom(ObjectNode r){db.sql.update("UPDATE rooms SET state=?,document=? WHERE id=?",r.path("state").asText(),db.write(r),r.path("id").asText());}
  ObjectNode submitPayload(ObjectNode r){return data("roomId",r.path("id").asText(),"roundId",r.path("current").path("id").asText(),"problemId",r.path("current").path("problemId").asText(),"source","print(sum(map(int,input().split())))","language","PY311");}
+ @Test void liveStandingsTrackOfficialSubmissionsWithoutExposingSourceOrCountingExamples() {
+  ObjectNode r=start(lobby(5,List.of(1),4));String id=r.path("id").asText(),uid=coders.getFirst().id();
+  var initial=rooms.publicState(r).path("liveStandings");
+  assertEquals(5,initial.size());assertTrue(initial.get(0).path("rank").isNull());
+  for(var row:initial){assertEquals("NOT_SUBMITTED",row.path("status").asText());assertEquals(0,row.path("attempts").asInt());}
+  call(coders.getFirst(),"RUN_EXAMPLES",submitPayload(r));gradeNext(true);
+  assertEquals(0,rooms.publicState(rooms.load(id)).path("liveStandings").get(0).path("attempts").asInt());
+  call(coders.getFirst(),"SUBMIT",submitPayload(r));
+  var queued=rooms.publicState(rooms.load(id)).path("liveStandings");
+  JsonNode mine=null;for(var row:queued)if(row.path("userId").asText().equals(uid))mine=row;
+  assertNotNull(mine);assertEquals("QUEUED",mine.path("status").asText());assertEquals(1,mine.path("attempts").asInt());assertEquals(1,mine.path("pending").asInt());assertTrue(mine.path("rank").isNull());
+  var job=db.tree(judge.claim("test-worker"));
+  assertEquals(1,db.sql.queryForObject("SELECT COUNT(*) FROM events WHERE user_id=? AND type='room_submission_running'",Integer.class,coders.get(1).id()));
+  var running=rooms.publicState(rooms.load(id)).path("liveStandings");
+  for(var row:running)if(row.path("userId").asText().equals(uid))assertEquals("RUNNING",row.path("status").asText());
+  grade(job,false);
+  call(coders.getFirst(),"SUBMIT",submitPayload(r));gradeNext(true);
+  var accepted=rooms.publicState(rooms.load(id)).path("liveStandings").get(0);
+  assertEquals(uid,accepted.path("userId").asText());assertEquals("AC",accepted.path("status").asText());assertEquals(1,accepted.path("rank").asInt());
+  assertEquals(100,accepted.path("score").asInt());assertEquals(2,accepted.path("attempts").asInt());assertEquals(0,accepted.path("pending").asInt());
+  assertTrue(accepted.path("effectiveMs").asLong()>=10_000);
+  assertFalse(accepted.has("source"));assertFalse(accepted.has("source_code"));assertFalse(accepted.has("cases"));
+  assertEquals("ROUND_ACTIVE",rooms.load(id).path("state").asText());
+ }
  @Test void everyoneSubmittingClosesEarlyAndWaitsForAllJudgments() {
   ObjectNode r=start(lobby(5,List.of(1),4));String id=r.path("id").asText();
   for(int i=0;i<4;i++)call(coders.get(i),"SUBMIT",submitPayload(r));
@@ -649,8 +673,28 @@ class SystemIntegrationTest {
    db.atomic(()->{progression.settle(rooms.load(rid));return null;});
    assertEquals(5,db.sql.queryForObject("SELECT COUNT(*) FROM reward_events WHERE event_key=?",Integer.class,"match:"+rid));
    assertEquals(1200,identity.user(coders.getFirst().id()).elo());
-   int rating=progression.get(coders.getFirst().id()).path("rating").asInt();assertEquals(mode.equals("RANKED")?1016:1000,rating);
+   int rating=progression.get(coders.getFirst().id()).path("rating").asInt();assertEquals(mode.equals("RANKED")?1048:1000,rating);
   }
+ }
+ @Test void rankMetadataUsesConfiguredThresholdsAndHandlesEveryPromotionBoundary() {
+  String uid=coders.getFirst().id();
+  var initial=call(coders.getFirst(),"PROGRESSION_GET",data());
+  assertEquals(6,initial.path("rankTiers").size());assertEquals(100,initial.path("ratingToNextRank").asInt());assertEquals(3,initial.path("ratingGainMultiplier").asDouble());
+  assertTrue(initial.path("rankTiers").get(0).path("minRating").isNull());assertEquals(1099,initial.path("rankTiers").get(0).path("maxRating").asInt());
+  assertEquals(1900,initial.path("rankTiers").get(5).path("minRating").asInt());assertTrue(initial.path("rankTiers").get(5).path("maxRating").isNull());
+  int[] starts={1100,1300,1500,1700,1900};
+  for(int i=0;i<starts.length;i++) {
+   db.sql.update("UPDATE progression SET rating=? WHERE user_id=?",starts[i]-1,uid);
+   var before=progression.get(uid);assertEquals(1,before.path("ratingToNextRank").asInt());assertEquals(starts[i],before.path("nextRankRating").asInt());
+   db.sql.update("UPDATE progression SET rating=? WHERE user_id=?",starts[i],uid);
+   var after=progression.get(uid);assertEquals(before.path("nextRank").asText(),after.path("rank").asText());assertEquals(starts[i],after.path("rankMinRating").asInt());
+   if(i==4){assertTrue(after.path("nextRank").isNull());assertTrue(after.path("nextRankRating").isNull());assertEquals(0,after.path("ratingToNextRank").asInt());}
+   else assertEquals(starts[i+1]-starts[i],after.path("ratingToNextRank").asInt());
+  }
+  db.sql.update("UPDATE progression SET rating=1000 WHERE user_id=?",uid);
+  var custom=new vn.codegrade.room.Progression(db);
+  org.springframework.test.util.ReflectionTestUtils.setField(custom,"thresholds",new int[]{1050,1200,1400,1700,2000});custom.validateConfiguration();
+  var configured=custom.get(uid);assertEquals(50,configured.path("ratingToNextRank").asInt());assertEquals(1050,configured.path("nextRankRating").asInt());assertEquals(1049,configured.path("rankTiers").get(0).path("maxRating").asInt());
  }
  @Test void independentPracticeNeverAwardsExpIncludingFirstAcAndReplay() {
   progression.get(coders.getFirst().id());db.sql.update("UPDATE progression SET exp=123,rating=1750 WHERE user_id=?",coders.getFirst().id());
