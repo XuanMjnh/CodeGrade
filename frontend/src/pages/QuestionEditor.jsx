@@ -560,7 +560,7 @@ export default function QuestionEditor({ id, revision, onNotice }) {
                 aria-selected={step === i}
                 tabIndex={step === i ? 0 : -1}
                 key={title}
-                className={`studio-tab-item relative my-1 w-full rounded-[10px] border-transparent bg-transparent text-muted-foreground shadow-none [&>svg]:ml-auto [&>svg]:size-3.5 aria-selected:[&_.studio-step-number]:border-success aria-selected:[&_.studio-step-number]:bg-success aria-selected:[&_.studio-step-number]:text-white ${step === i ? 'is-active border-primary/40 bg-accent text-accent-foreground ring-1 ring-primary/15' : ''}`}
+                className={`studio-tab-item relative my-1 w-full rounded-[10px] border-transparent bg-transparent text-muted-foreground shadow-none hover:bg-muted/60 hover:text-foreground [&>svg]:ml-auto [&>svg]:size-3.5 aria-selected:[&_.studio-step-number]:border-success aria-selected:[&_.studio-step-number]:bg-success aria-selected:[&_.studio-step-number]:text-white ${step === i ? 'is-active border-primary/40 bg-accent text-accent-foreground ring-1 ring-primary/15' : ''}`}
                 onClick={() => changeStep(i)}
                 onKeyDown={(e) => {
                   const n = ['ArrowDown', 'ArrowRight'].includes(e.key)
@@ -577,7 +577,7 @@ export default function QuestionEditor({ id, revision, onNotice }) {
                     changeStep(n);
                   }
                 }}
-                variant="outline"
+                variant="ghost"
               >
                 <span className="studio-step-number grid size-7 shrink-0 place-items-center rounded-full border bg-muted font-mono text-[11px] font-semibold">
                   {i + 1}

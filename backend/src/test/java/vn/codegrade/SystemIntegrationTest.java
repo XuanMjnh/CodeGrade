@@ -161,6 +161,43 @@ class SystemIntegrationTest {
   }
 
   @Test
+  void openRoomListHidesTerminalRoomsAndPreservesTheirSnapshots() {
+    var room = call(coders.getFirst(), "ROOM_CREATE", data("capacity", 3));
+    String rid = room.path("id").asText();
+    assertEquals(rid, call(coders.get(2), "ROOM_LIST", data()).path(0).path("id").asText());
+    for (String state : List.of("FINISHED", "CLOSED", "UNRESOLVED")) {
+      var saved = rooms.load(rid);
+      saved.put("state", state);
+      roomRepository.updateRoom(state, saved.path("version").asLong(), db.write(saved), db.now(), rid);
+      assertTrue(call(coders.get(2), "ROOM_LIST", data()).isEmpty(), state);
+      assertEquals(
+          state,
+          call(coders.getFirst(), "ROOM_SNAPSHOT", data("roomId", rid)).path("state").asText());
+    }
+  }
+
+  @Test
+  void openRoomListTracksRemainingPlayersAndHidesEmptyRooms() {
+    var room = call(coders.getFirst(), "ROOM_CREATE", data("capacity", 3));
+    String rid = room.path("id").asText();
+    call(coders.get(1), "ROOM_JOIN", data("roomId", rid));
+    assertEquals(2, call(coders.get(2), "ROOM_LIST", data()).path(0).path("count").asInt());
+    call(coders.getFirst(), "ROOM_LEAVE", data("roomId", rid));
+    var listed = call(coders.get(2), "ROOM_LIST", data());
+    assertEquals(1, listed.size());
+    assertEquals(1, listed.path(0).path("count").asInt());
+
+    // A stale nonterminal room with no remaining players must also be hidden.
+    for (String status : List.of("LEFT", "FORFEIT", "ELIMINATED", "SPECTATOR")) {
+      var saved = rooms.load(rid);
+      ((ObjectNode) saved.path("players").get(1)).put("status", status);
+      roomRepository.updateRoom("LOBBY", saved.path("version").asLong(), db.write(saved), db.now(), rid);
+      assertTrue(call(coders.get(2), "ROOM_LIST", data()).isEmpty(), status);
+      assertEquals("LOBBY", rooms.load(rid).path("state").asText());
+    }
+  }
+
+  @Test
   void contestRelationsTrackPendingAndApprovedParticipants() {
     String pid = createProblem(1, false).path("id").asText();
     var contest =

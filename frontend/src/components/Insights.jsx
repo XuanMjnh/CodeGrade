@@ -9,10 +9,10 @@ const metricTones = {
   star: 'border-amber-500/20 [&_.stat-card-icon]:bg-amber-500/10 [&_.stat-card-icon]:text-amber-700 [&_.stat-card-value]:text-amber-700 hover:border-amber-400/40 hover:bg-amber-50/20 aria-pressed:border-amber-500 aria-pressed:bg-amber-50/50 aria-pressed:ring-2 aria-pressed:ring-amber-500/20',
   category:
     'border-border/80 [&_.stat-card-icon]:bg-muted [&_.stat-card-icon]:text-muted-foreground hover:border-border hover:bg-muted/30 aria-pressed:border-foreground/30 aria-pressed:ring-2 aria-pressed:ring-muted-foreground/20',
-  live: 'border-emerald-500/20 [&_.stat-card-icon]:bg-emerald-500/10 [&_.stat-card-icon]:text-emerald-700 [&_.stat-card-value]:text-emerald-700 aria-pressed:border-emerald-600 aria-pressed:ring-2 aria-pressed:ring-emerald-500/20',
+  live: 'border-emerald-500/20 [&_.stat-card-icon]:bg-emerald-500/10 [&_.stat-card-icon]:text-emerald-700 [&_.stat-card-value]:text-emerald-700 hover:border-emerald-400/40 hover:bg-emerald-50/20 aria-pressed:border-emerald-600 aria-pressed:bg-emerald-50/50 aria-pressed:ring-2 aria-pressed:ring-emerald-500/20',
   upcoming:
-    'border-orange-500/20 [&_.stat-card-icon]:bg-orange-500/10 [&_.stat-card-icon]:text-orange-600 aria-pressed:border-orange-500 aria-pressed:ring-2 aria-pressed:ring-orange-500/20',
-  joined: 'border-amber-500/20 [&_.stat-card-icon]:bg-amber-500/10 [&_.stat-card-icon]:text-amber-700 aria-pressed:border-amber-500 aria-pressed:ring-2 aria-pressed:ring-amber-500/20',
+    'border-orange-500/20 [&_.stat-card-icon]:bg-orange-500/10 [&_.stat-card-icon]:text-orange-600 [&_.stat-card-value]:text-orange-600 hover:border-orange-400/40 hover:bg-orange-50/20 aria-pressed:border-orange-500 aria-pressed:bg-orange-50/40 aria-pressed:ring-2 aria-pressed:ring-orange-500/20',
+  joined: 'border-amber-500/20 [&_.stat-card-icon]:bg-amber-500/10 [&_.stat-card-icon]:text-amber-700 [&_.stat-card-value]:text-amber-700 hover:border-amber-400/40 hover:bg-amber-50/20 aria-pressed:border-amber-500 aria-pressed:bg-amber-50/50 aria-pressed:ring-2 aria-pressed:ring-amber-500/20',
   pending:
     'border-orange-500/20 [&_.stat-card-icon]:bg-orange-500/10 [&_.stat-card-icon]:text-orange-600 [&_.stat-card-value]:text-orange-600 hover:border-orange-400/40 hover:bg-orange-50/20 aria-pressed:border-orange-500 aria-pressed:bg-orange-50/40 aria-pressed:ring-2 aria-pressed:ring-orange-500/20',
   score:

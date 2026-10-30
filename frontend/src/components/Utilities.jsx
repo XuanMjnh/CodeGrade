@@ -204,20 +204,22 @@ export default function Utilities({ side, revision }) {
             {!categories || !problems ? (
               <Loading />
             ) : (
-              <div className="category-chips flex flex-wrap gap-2 [&_button]:h-auto [&_button]:min-h-9 [&_button]:rounded-lg [&_button]:border-border [&_button]:bg-muted [&_button]:px-2 [&_button]:py-1.5 [&_button]:text-[11px] [&_button]:font-normal [&_button]:text-muted-foreground [&_b]:rounded-full [&_b]:bg-action-soft [&_b]:px-1.5 [&_b]:py-0.5 [&_b]:text-action-text">
+              <div className="category-chips flex flex-wrap gap-2">
                 {categories
                   .filter((c) =>
                     c.name.toLocaleLowerCase('vi').includes(search.trim().toLocaleLowerCase('vi')),
                   )
                   .map((c) => (
                     <UiButton
-                      className="category-chip flex items-center justify-between gap-3 rounded-lg border bg-card px-3 py-2 text-left text-sm"
+                      className="category-chip flex items-center justify-between gap-3 rounded-lg border border-border/70 bg-card px-3 py-2 text-left text-xs font-medium text-foreground transition-colors hover:bg-muted/70 hover:text-foreground shadow-2xs h-auto min-h-9"
                       key={c.id}
                       onClick={() => go('/practice?category=' + encodeURIComponent(c.id))}
-                      variant="default"
+                      variant="ghost"
                     >
                       <span data-user-content>{c.name}</span>
-                      <b>{problems.filter((p) => p.category_id === c.id).length}</b>
+                      <b className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-bold text-muted-foreground">
+                        {problems.filter((p) => p.category_id === c.id).length}
+                      </b>
                     </UiButton>
                   ))}
               </div>

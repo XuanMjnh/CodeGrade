@@ -157,7 +157,7 @@ public class SurvivalService {
   public Object command(User u, String type, JsonNode p) {
     if (type.equals("ROOM_LIST")) {
       var result = new ArrayList<Object>();
-      for (var row : roomRepository.listRecentRooms()) {
+      for (var row : roomRepository.listOpenRooms()) {
         var r = (ObjectNode) db.read((String) row.get("document"));
         if (!r.path("mode").asText("PRACTICE").equals("PRACTICE")) continue;
         ObjectNode entry =

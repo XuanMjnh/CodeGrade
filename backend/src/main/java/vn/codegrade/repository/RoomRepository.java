@@ -18,8 +18,11 @@ public class RoomRepository extends JdbcRepository {
         "SELECT document FROM rooms WHERE state NOT IN ('LOBBY','FINISHED','CLOSED','UNRESOLVED')");
   }
 
-  public List<Map<String, Object>> listRecentRooms() {
-    return jdbc.queryForList("SELECT document FROM rooms ORDER BY updated_at DESC LIMIT 100");
+  public List<Map<String, Object>> listOpenRooms() {
+    return jdbc.queryForList(
+        "SELECT r.document FROM rooms r WHERE r.state NOT IN ('FINISHED','CLOSED','UNRESOLVED')"
+            + " AND EXISTS (SELECT 1 FROM room_members m WHERE m.room_id=r.id AND m.status='ALIVE')"
+            + " ORDER BY r.updated_at DESC LIMIT 100");
   }
 
   public List<Map<String, Object>> listActiveRooms() {

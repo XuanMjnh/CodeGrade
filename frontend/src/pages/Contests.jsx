@@ -1213,7 +1213,7 @@ export default function Contests({ user, revision, onNotice, contestId }) {
       </div>
 
       <div
-        className="tabs flex w-fit max-w-full flex-wrap gap-1 rounded-[14px] border bg-muted p-1.5 [&_button]:border [&_button]:border-transparent [&_button]:bg-transparent [&_button]:text-muted-foreground [&_button[aria-pressed=true]]:border-action-text [&_button[aria-pressed=true]]:bg-action-soft [&_button[aria-pressed=true]]:text-action-text [&_button[aria-pressed=true]]:ring-0"
+        className="tabs flex w-fit max-w-full flex-wrap gap-1 rounded-xl bg-muted/60 p-1 border border-border/50"
         aria-label={trUI('Lọc contest')}
       >
         {[
@@ -1222,21 +1222,25 @@ export default function Contests({ user, revision, onNotice, contestId }) {
           ['upcoming', 'Sắp diễn ra'],
           ['mine', 'Của bạn'],
           ['finished', 'Đã kết thúc'],
-        ].map(([k, label]) => (
-          <UiButton
-            key={k}
-            className={
-              filter === k
-                ? 'active border-primary/40 bg-accent text-accent-foreground ring-1 ring-primary/15'
-                : ''
-            }
-            aria-pressed={filter === k}
-            onClick={() => setFilter(k)}
-            variant="default"
-          >
-            {trUI(label)}
-          </UiButton>
-        ))}
+        ].map(([k, label]) => {
+          const isActive = filter === k;
+          return (
+            <UiButton
+              key={k}
+              className={cn(
+                'h-8 px-3 text-xs font-semibold rounded-lg transition-all border-0 shadow-none',
+                isActive
+                  ? 'active bg-card text-foreground shadow-2xs border border-border/60 font-bold'
+                  : 'bg-transparent text-muted-foreground hover:bg-card/50 hover:text-foreground',
+              )}
+              aria-pressed={isActive}
+              onClick={() => setFilter(k)}
+              variant="ghost"
+            >
+              {trUI(label)}
+            </UiButton>
+          );
+        })}
       </div>
 
       {!data ? (
