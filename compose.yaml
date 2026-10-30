@@ -10,7 +10,7 @@ services:
     command: ["--character-set-server=utf8mb4","--collation-server=utf8mb4_bin"]
     volumes: [mysql_data:/var/lib/mysql]
     healthcheck:
-      test: ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysqladmin ping -h localhost -uroot --silent"]
+      test: ["CMD-SHELL", "MYSQL_PWD=\"$$MYSQL_PASSWORD\" mysql --host=127.0.0.1 --user=\"$$MYSQL_USER\" --database=\"$$MYSQL_DATABASE\" --batch --skip-column-names --execute='SELECT 1'"]
       interval: 5s
       timeout: 3s
       retries: 40

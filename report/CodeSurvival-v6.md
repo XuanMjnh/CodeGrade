@@ -1,5 +1,7 @@
 # Phụ lục kỹ thuật: Code Survival và CodeGrade Network 6.0.0
 
+> Phụ lục này lưu lại thiết kế và số liệu của các lần kiểm chứng trước khi refactor backend. Kiến trúc hiện hành là Layered Architecture; xem [backend/README.md](../backend/README.md) để biết các lớp, schema database mới và luồng truy vấn hiện tại.
+
 Ngày kiểm chứng: 29/10/2026. Đây là phần bổ sung cho báo cáo Word gốc, không tự xác nhận phân công, đóng góp cá nhân hay các thủ tục nộp bài của học phần.
 
 ## Abstract

@@ -20,19 +20,21 @@ Host Practice cấu hình tên, sức chứa 2–10, độ khó, thời gian vò
 
 ## Kiến trúc mạng
 
+Backend được tổ chức theo **Layered Architecture**: controller → service → repository → database; model độc lập với Spring/JDBC. Xem [kiến trúc và database backend](backend/README.md) để biết trách nhiệm từng lớp, luồng transaction và các truy vấn đã tối ưu. Bản này dùng database mới với một migration tạo schema hoàn chỉnh.
+
 ```mermaid
 flowchart LR
-    C[React / CodeMirror] <-->|JSON WebSocket /ws| S[Spring Boot / Commands]
-    S --> M[Matchmaking / Survival / Progression]
-    S --> D[(MySQL / Flyway)]
-    M --> D
-    W[Java workers] <-->|WebSocket /worker-ws| S
+    C[React / CodeMirror] <-->|JSON WebSocket /ws| T[Controller]
+    T --> S[Service / CommandService]
+    S --> R[Repository]
+    R --> D[(MySQL / Flyway)]
+    W[Java workers] <-->|WebSocket /worker-ws| T
     W --> B[Docker sandbox riêng từng testcase]
 ```
 
-Client gửi `{v:1,type,requestId,payload}`; server trả ACK sau commit và ghi EVENT bền vững để phát lại khi reconnect. `commands(user_id,request_id)` gắn requestId với fingerprint/phản hồi. Retry giữ nguyên requestId và payload. Khóa SQL `system_lock FOR UPDATE` tuần tự hóa admission, matchmaking, cutoff và settlement trên các tiến trình dùng chung database. Worker không giữ khóa trong lúc chạy code.
+Client gửi `{v:1,type,requestId,payload}`; server trả ACK sau commit và ghi EVENT bền vững để phát lại khi reconnect. `commands(user_id,request_id)` gắn requestId với fingerprint/phản hồi. Retry giữ nguyên requestId và payload. UnitOfWork dùng hàng khóa `competition` trong `transaction_locks` để tuần tự hóa admission, matchmaking, cutoff và settlement; các command đọc không giữ khóa ghi này. Đăng ký dùng hàng khóa `identity` riêng. Worker không giữ khóa trong lúc chạy code.
 
-Giữ `received_at`, `admission_order`, snapshot đề/source, lease và lịch sử submission. Không tạo Receipt/Certificate mới, không trả chúng trong ACK/EVENT/snapshot. Replay cũ được lọc proof; `RECEIPT_GET` bị từ chối kể cả khi có command response cũ. Bảng legacy vẫn còn để bảo toàn dữ liệu.
+Giữ `received_at`, `admission_order`, snapshot đề/source, lease và lịch sử submission. Không trả Receipt/Certificate trong ACK/EVENT/snapshot; `RECEIPT_GET` bị từ chối. Schema mới đã bỏ các bảng signing_keys/receipts không còn phục vụ chức năng hiện tại.
 
 ### Survival engine
 
@@ -104,7 +106,7 @@ Bảng kết quả trực tiếp của Survival lấy từ snapshot server, hi�
 
 200 bài có phát biểu/contract/ví dụ tiếng Việt, độ khó 1–6, CPU/RAM và lời giải Python 3.11. [solutions/README.md](solutions/README.md) liệt kê đủ 120 lời giải C++11 và 200 lời giải Python cùng phương pháp/độ phức tạp. C++11/17/20 và Python 3.11 đều tiếp tục là ngôn ngữ nộp bài. Một số bài khó có giới hạn nhỏ để dùng vét cạn tham chiếu.
 
-Bootstrap chỉ đọc dataset.json, thêm bài chưa có khi bật DEMO_DATA và đưa đáp án tham chiếu vào queue VALIDATE. Bài đã tồn tại, dữ liệu người dùng và snapshot được giữ nguyên. Schema được tạo bằng một migration duy nhất: `V1__initial_schema.sql`, dùng cho database mới. Database đã áp dụng bộ V1–V6 cũ cần đối chiếu schema và chuyển tiếp lịch sử Flyway riêng trước khi chạy bản này; source không tự reset database, sửa lịch sử hoặc xóa volume.
+Bootstrap gọi SeedService để đọc dataset.json, thêm bài chưa có khi bật DEMO_DATA và đưa đáp án tham chiếu vào queue VALIDATE. Schema mới được tạo bằng một migration duy nhất: `V1__initial_schema.sql`. Cấu hình kết nối tới database rỗng rồi khởi động ứng dụng; lần refactor này không chuyển dữ liệu từ cấu trúc cũ.
 
 Database tạo mới dùng toàn bộ 320 bài / 1.600 testcase. Database đã có dữ liệu giữ nguyên nội dung đang lưu; thay đổi source không tự chuyển đổi các bài cũ. Tạo lại dữ liệu từ đầu chỉ áp dụng với database mới, tách biệt dữ liệu đang sử dụng.
 
@@ -120,7 +122,7 @@ docker compose ps
 docker compose logs --tail 50 server worker
 ```
 
-Mở `http://localhost:8080`. `admin` dùng ADMIN_PASSWORD; `author`, `coder01`…`coder10` dùng DEMO_PASSWORD khi DEMO_DATA=true. Chờ worker xác thực bank lần đầu. Dừng giữ dữ liệu bằng `docker compose stop`; chạy lại `docker compose up -d`. Không chạy `down -v` hoặc tự đổi mật khẩu của volume cũ trong .env.
+Mở `http://localhost:8080`. `admin` dùng ADMIN_PASSWORD; `author`, `coder01`…`coder10` dùng DEMO_PASSWORD khi DEMO_DATA=true. Chờ worker xác thực bank lần đầu. Bản refactor cần database rỗng; nếu đang dùng volume của cấu trúc cũ, xem [hướng dẫn khởi tạo database mới](backend/README.md). Sau khi khởi tạo, dừng giữ dữ liệu bằng `docker compose stop`; chạy lại bằng `docker compose up -d`.
 
 [.env.example](.env.example) liệt kê DB_PASSWORD, MYSQL_ROOT_PASSWORD, ADMIN_PASSWORD (10–72 ký tự), WORKER_TOKEN (≥32 ký tự), PORT, APP_ORIGINS và cấu hình:
 
@@ -159,7 +161,9 @@ $env:CG_UI_URL='http://localhost:18080'
 node frontend/tests/survival-ui.cjs
 ```
 
-Kiểm tra sau khi hợp nhất phiên bản ngày 30/10/2026: backend 96/96 test; frontend 122/122 test và Vite build đạt; 3/3 test đóng gói đạt. Script tạo dữ liệu chạy trong thư mục tạm tái tạo đúng nguyên dataset 320 bài / 1.600 testcase. Verifier chạy 1.000 testcase Python, 125 kiểm tra độc lập và đối chiếu 600 testcase C++ bằng Python oracle. Chưa chạy lại binary C++ hoặc smoke test Docker trong lần này vì máy chưa có g++ và Docker Engine chưa hoạt động.
+Kiểm tra backend sau refactor Layered Architecture ngày 30/10/2026: `mvn clean verify` đạt **105/105 test** và đóng gói JAR; bộ backend trên MySQL 8.0.46 riêng đạt **104/104 test**, cùng các kiểm tra bổ sung HTTP/WebSocket, lịch sử và leaderboard. Schema cuối tạo đủ 27 bảng trên MySQL. Compose với MySQL 8.4.13 đã khởi tạo thành công, MySQL/server healthy và hai worker kết nối; chấm Docker thật đạt **7/7 kiểm tra** (AC bốn ngôn ngữ, WA/CE/TLE). Xem [chi tiết xác minh backend](backend/README.md). Chưa benchmark tải.
+
+Các kiểm tra trước bước refactor backend trong ngày 30/10/2026: frontend 122/122 test và Vite build đạt; 3/3 test đóng gói đạt. Script tạo dữ liệu tái tạo đúng nguyên dataset 320 bài / 1.600 testcase. Verifier chạy 1.000 testcase Python, 125 kiểm tra độc lập và đối chiếu 600 testcase C++ bằng Python oracle; chưa chạy lại binary C++.
 
 Kết quả lịch sử ngày 29/10/2026, trước lần hợp nhất phiên bản:
 

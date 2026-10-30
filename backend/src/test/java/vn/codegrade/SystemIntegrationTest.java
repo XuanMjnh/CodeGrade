@@ -1,811 +1,2393 @@
 package vn.codegrade;
 
-import org.junit.jupiter.api.*;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.node.*;
-import vn.codegrade.db.Store;
-import vn.codegrade.auth.Identity;
-import vn.codegrade.auth.Identity.User;
-import vn.codegrade.catalog.*;
-import vn.codegrade.room.Survival;
-import vn.codegrade.judge.Submissions;
-import vn.codegrade.protocol.Commands;
-import vn.codegrade.protocol.ClientSocket;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import java.util.*;
-import java.util.concurrent.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.node.*;
+import java.util.*;
+import java.util.concurrent.*;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.ActiveProfiles;
+import vn.codegrade.controller.*;
+import vn.codegrade.controller.ClientSocketController;
+import vn.codegrade.model.*;
+import vn.codegrade.model.DomainException;
+import vn.codegrade.model.User;
+import vn.codegrade.service.*;
+import vn.codegrade.service.CommandService;
+import vn.codegrade.service.IdentityService;
+import vn.codegrade.service.SubmissionService;
+import vn.codegrade.service.SurvivalService;
+import vn.codegrade.support.ServiceContext;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+@org.springframework.context.annotation.Import(SystemIntegrationTest.FixtureConfiguration.class)
 class SystemIntegrationTest {
- @Autowired Store db; @Autowired Identity identity; @Autowired Catalog catalog; @Autowired Commands commands;
- @Autowired Submissions judge; @Autowired Survival rooms; @Autowired Contests contests;
- @Autowired ClientSocket clients; @LocalServerPort int port;
- @Autowired vn.codegrade.room.Matchmaking matchmaking; @Autowired vn.codegrade.room.Progression progression;
- User admin,author;List<User> coders;ObjectNode fixture;
- @BeforeEach void setup() throws Exception {
-  db.atomic(()->{
-   for(String t:List.of("reward_events","match_results","match_queue","progression","room_presence","submissions","rooms","contests","solved","commands","drafts","events","audit","problems","sessions","users","categories"))db.sql.update("DELETE FROM "+t);
-   db.sql.update("INSERT INTO categories VALUES('algorithms','Algorithms','Tests')");
-   admin=identity.user(identity.create("admin","Admin","test-password-123","ADMIN"));
-   author=identity.user(identity.create("author","Author","test-password-123","AUTHOR"));
-   coders=new ArrayList<>();for(int i=0;i<6;i++)coders.add(identity.user(identity.create("coder"+i,"Coder "+i,"test-password-123","CODER")));
-   return null;
-  });
-  fixture=(ObjectNode)db.json.readTree(getClass().getResourceAsStream("/dataset.json")).get(0).deepCopy();
-  ((ObjectNode)fixture.path("answer")).put("validateOnSave",false);((ObjectNode)fixture.path("general")).put("categoryId","algorithms");
- }
- JsonNode call(User u,String type,JsonNode payload){return db.tree(commands.execute(u,type,payload,db.id()));}
- ObjectNode data(Object... a){ObjectNode p=db.obj();for(int i=0;i<a.length;i+=2)p.set(a[i].toString(),db.tree(a[i+1]));return p;}
- JsonNode createProblem(int difficulty,boolean validate) {
-  ObjectNode q=fixture.deepCopy();q.put("difficulty",difficulty);((ObjectNode)q.path("general")).put("questionName","Problem "+db.id());
-  JsonNode saved=call(author,"QUESTION_SAVE",q);
-  if(validate){call(author,"QUESTION_VALIDATE",data("id",saved.path("id").asText()));gradeNext(true);}
-  return saved;
- }
- JsonNode gradeNext(boolean pass){JsonNode job=db.tree(judge.claim("test-worker"));assertTrue(job.path("job").asBoolean());grade(job,pass);return job;}
- void grade(JsonNode job,boolean pass) {
-  JsonNode q=db.read((String)db.one("SELECT snapshot FROM submissions WHERE id=?",job.path("id").asText()).get("snapshot"));
-  ObjectNode result=data("id",job.path("id").asText(),"leaseToken",job.path("leaseToken").asText());
-  ArrayNode cases=result.putArray("cases");for(var t:q.path("testcases"))cases.add(data("verdict","OK","stdout",pass?t.path("expected").asText():"WRONG\n","timeMs",1,"compileMs",1));
-  assertTrue(db.tree(judge.complete("test-worker",result)).path("accepted").asBoolean());
- }
- ObjectNode lobby(int count,List<Integer> selected,int bankSize) {
-  for(int i=0;i<bankSize;i++)createProblem(selected.getFirst(),true);
-  var r=(ObjectNode)call(coders.getFirst(),"ROOM_CREATE",data("selectedDifficulties",selected));
-  for(int i=1;i<count;i++)r=(ObjectNode)call(coders.get(i),"ROOM_JOIN",data("roomId",r.path("id").asText()));
-  return r;
- }
- ObjectNode start(ObjectNode r) {
-  call(coders.getFirst(),"ROOM_START",data("roomId",r.path("id").asText()));
-  ObjectNode loaded=rooms.load(r.path("id").asText());loaded.put("nextAt",db.now()-1);writeRoom(loaded);
-  db.atomic(()->{rooms.advance(loaded);return null;});return rooms.load(r.path("id").asText());
- }
- void writeRoom(ObjectNode r){db.sql.update("UPDATE rooms SET state=?,document=? WHERE id=?",r.path("state").asText(),db.write(r),r.path("id").asText());}
- ObjectNode submitPayload(ObjectNode r){return data("roomId",r.path("id").asText(),"roundId",r.path("current").path("id").asText(),"problemId",r.path("current").path("problemId").asText(),"source","print(sum(map(int,input().split())))","language","PY311");}
- @Test void liveStandingsTrackOfficialSubmissionsWithoutExposingSourceOrCountingExamples() {
-  ObjectNode r=start(lobby(5,List.of(1),4));String id=r.path("id").asText(),uid=coders.getFirst().id();
-  var initial=rooms.publicState(r).path("liveStandings");
-  assertEquals(5,initial.size());assertTrue(initial.get(0).path("rank").isNull());
-  for(var row:initial){assertEquals("NOT_SUBMITTED",row.path("status").asText());assertEquals(0,row.path("attempts").asInt());}
-  call(coders.getFirst(),"RUN_EXAMPLES",submitPayload(r));gradeNext(true);
-  assertEquals(0,rooms.publicState(rooms.load(id)).path("liveStandings").get(0).path("attempts").asInt());
-  call(coders.getFirst(),"SUBMIT",submitPayload(r));
-  var queued=rooms.publicState(rooms.load(id)).path("liveStandings");
-  JsonNode mine=null;for(var row:queued)if(row.path("userId").asText().equals(uid))mine=row;
-  assertNotNull(mine);assertEquals("QUEUED",mine.path("status").asText());assertEquals(1,mine.path("attempts").asInt());assertEquals(1,mine.path("pending").asInt());assertTrue(mine.path("rank").isNull());
-  var job=db.tree(judge.claim("test-worker"));
-  assertEquals(1,db.sql.queryForObject("SELECT COUNT(*) FROM events WHERE user_id=? AND type='room_submission_running'",Integer.class,coders.get(1).id()));
-  var running=rooms.publicState(rooms.load(id)).path("liveStandings");
-  for(var row:running)if(row.path("userId").asText().equals(uid))assertEquals("RUNNING",row.path("status").asText());
-  grade(job,false);
-  call(coders.getFirst(),"SUBMIT",submitPayload(r));gradeNext(true);
-  var accepted=rooms.publicState(rooms.load(id)).path("liveStandings").get(0);
-  assertEquals(uid,accepted.path("userId").asText());assertEquals("AC",accepted.path("status").asText());assertEquals(1,accepted.path("rank").asInt());
-  assertEquals(100,accepted.path("score").asInt());assertEquals(2,accepted.path("attempts").asInt());assertEquals(0,accepted.path("pending").asInt());
-  assertTrue(accepted.path("effectiveMs").asLong()>=10_000);
-  assertFalse(accepted.has("source"));assertFalse(accepted.has("source_code"));assertFalse(accepted.has("cases"));
-  assertEquals("ROUND_ACTIVE",rooms.load(id).path("state").asText());
- }
- @Test void problemListKeepsBookmarksPrivateAndPreservesFilters() {
-  var first=createProblem(1,false);var second=createProblem(2,false);
-  String firstId=first.path("id").asText(),secondId=second.path("id").asText();
-  call(coders.getFirst(),"BOOKMARK_SET",data("problemId",firstId,"starred",true));
-  call(coders.get(1),"BOOKMARK_SET",data("problemId",secondId,"starred",true));
-  var mine=call(coders.getFirst(),"PROBLEMS",data("difficulty",1,"categoryId","algorithms"));
-  assertEquals(1,mine.size());assertEquals(firstId,mine.get(0).path("id").asText());assertTrue(mine.get(0).path("starred").asBoolean());
-  var other=call(coders.get(1),"PROBLEMS",data("search",first.path("publicId").asText()));
-  assertEquals(1,other.size());assertFalse(other.get(0).path("starred").asBoolean());
- }
- @Test void demoBootstrapIsRepeatableAndPreservesExistingProblemContentAndBookmarks() throws Exception {
-  var existing=createProblem(1,false);String pid=existing.path("id").asText();
-  call(coders.getFirst(),"BOOKMARK_SET",data("problemId",pid,"starred",true));
-  var bootstrap=new vn.codegrade.db.Bootstrap(db,identity,catalog);
-  org.springframework.test.util.ReflectionTestUtils.setField(bootstrap,"adminPassword","test-password-123");
-  org.springframework.test.util.ReflectionTestUtils.setField(bootstrap,"workerToken","test-worker-token-long-enough-1234567890");
-  org.springframework.test.util.ReflectionTestUtils.setField(bootstrap,"demoPassword","test-password-123");
-  org.springframework.test.util.ReflectionTestUtils.setField(bootstrap,"demo",true);
-  bootstrap.run(null);
-  int problems=db.sql.queryForObject("SELECT COUNT(*) FROM problems",Integer.class),jobs=db.sql.queryForObject("SELECT COUNT(*) FROM submissions",Integer.class);
-  assertEquals(320,problems);
-  bootstrap.run(null);
-  assertEquals(problems,db.sql.queryForObject("SELECT COUNT(*) FROM problems",Integer.class));assertEquals(jobs,db.sql.queryForObject("SELECT COUNT(*) FROM submissions",Integer.class));
-  assertEquals(existing.path("general"),catalog.document(pid).path("general"));assertEquals(existing.path("publicId"),catalog.document(pid).path("publicId"));
-  assertEquals(1,db.sql.queryForObject("SELECT COUNT(*) FROM bookmarks WHERE user_id=? AND problem_id=?",Integer.class,coders.getFirst().id(),pid));
- }
- @Test void everyoneSubmittingClosesEarlyAndWaitsForAllJudgments() {
-  ObjectNode r=start(lobby(5,List.of(1),4));String id=r.path("id").asText();
-  for(int i=0;i<4;i++)call(coders.get(i),"SUBMIT",submitPayload(r));
-  assertEquals("ROUND_ACTIVE",rooms.load(id).path("state").asText());
-  call(coders.get(4),"SUBMIT",submitPayload(r));
-  assertEquals("ROUND_GRADING",rooms.load(id).path("state").asText());
-  assertThrows(Store.Fault.class,()->call(coders.getFirst(),"SUBMIT",submitPayload(r)));
-  for(int i=0;i<4;i++)gradeNext(true);
-  assertEquals("ROUND_GRADING",rooms.load(id).path("state").asText());
-  gradeNext(true);var settled=rooms.load(id);
-  assertEquals("ROUND_RESULT",settled.path("state").asText());
-  assertEquals(1,settled.path("history").size());
-  assertTrue(settled.path("current").path("deadline").asLong()>db.now());
- }
- @Test void examplesDoNotCloseRoundAndPlayersCanRetryBeforeEveryoneSubmits() {
-  ObjectNode r=start(lobby(5,List.of(1),4));String id=r.path("id").asText();
-  for(int i=0;i<5;i++)call(coders.get(i),"RUN_EXAMPLES",submitPayload(r));
-  assertEquals("ROUND_ACTIVE",rooms.load(id).path("state").asText());
-  for(int i=0;i<5;i++)gradeNext(true);
-  call(coders.getFirst(),"SUBMIT",submitPayload(r));gradeNext(false);
-  assertEquals("ROUND_ACTIVE",rooms.load(id).path("state").asText());
-  assertDoesNotThrow(()->call(coders.getFirst(),"SUBMIT",submitPayload(r)));
- }
- @Test void forfeitedPlayerDoesNotBlockEarlyClose() {
-  ObjectNode r=start(lobby(5,List.of(1),4));String id=r.path("id").asText();
-  call(coders.get(4),"ROOM_LEAVE",data("roomId",id));
-  for(int i=0;i<4;i++)call(coders.get(i),"SUBMIT",submitPayload(r));
-  assertEquals("ROUND_GRADING",rooms.load(id).path("state").asText());
- }
- @Test void finalWaitsForEarlierPendingAdmissionAndWorkerOrderCannotChooseWinner() {
-  ObjectNode r=start(lobby(5,List.of(1),4));String id=r.path("id").asText();
-  for(int i=0;i<2;i++){everyoneAc(r);r=nextRound(rooms.load(id));}
-  assertEquals("FINAL",r.path("current").path("kind").asText());
-  var payload=submitPayload(r);
-  call(coders.getFirst(),"SUBMIT",payload);
-  JsonNode first=db.tree(judge.claim("test-worker"));
-  call(coders.get(1),"SUBMIT",payload);
-  JsonNode second=db.tree(judge.claim("test-worker"));
-  grade(second,true);
-  assertEquals("ROUND_GRADING",rooms.load(id).path("state").asText());
-  grade(first,true);ObjectNode finished=rooms.load(id);
-  assertEquals("FINISHED",finished.path("state").asText());
-  assertEquals(coders.getFirst().id(),finished.path("winnerId").asText());
-  assertEquals(1,identity.user(coders.getFirst().id()).wins());
-  assertThrows(Store.Fault.class,()->call(coders.getFirst(),"SUBMIT",payload));
-  assertFalse(db.tree(judge.complete("test-worker",data("id",first.path("id").asText(),"leaseToken",first.path("leaseToken").asText()))).path("accepted").asBoolean());
-  assertEquals(finished,rooms.load(id));
-  assertEquals(0,identity.user(coders.get(1).id()).wins());
-  assertEquals(1,identity.user(coders.getFirst().id()).wins());
- }
- @Test void finalAcDoesNotWaitForOpponentToSubmit() {
-  ObjectNode r=start(lobby(5,List.of(1),4));String id=r.path("id").asText();
-  for(int i=0;i<2;i++){everyoneAc(r);r=nextRound(rooms.load(id));}
-  call(coders.getFirst(),"SUBMIT",submitPayload(r));gradeNext(true);
-  assertEquals("FINISHED",rooms.load(id).path("state").asText());
-  assertEquals(coders.getFirst().id(),rooms.load(id).path("winnerId").asText());
- }
- @Test void queuedSubmissionStillFinishesAndEmptyRoomHistoryIsPreserved() {
-  ObjectNode r=start(lobby(5,List.of(1),4));String rid=r.path("id").asText();
-  JsonNode receipt=call(coders.getFirst(),"SUBMIT",submitPayload(r));
-  for(int i=0;i<5;i++)call(coders.get(i),"ROOM_LEAVE",data("roomId",rid));
-  assertEquals(1,db.sql.queryForObject("SELECT COUNT(*) FROM rooms WHERE id=?",Integer.class,rid));
-  assertEquals("UNRESOLVED",rooms.load(rid).path("state").asText());
-  gradeNext(true);
-  assertEquals("AC",db.one("SELECT status FROM submissions WHERE id=?",receipt.path("id").asText()).get("status"));
- }
- @Test void activeContestPreventsEditingItsProblemsAndRejectsDuplicates() {
-  JsonNode q=createProblem(1,false);String pid=q.path("id").asText();
-  var p=data("title","Stable contest","startsAt",db.now()-100,"endsAt",db.now()+120000,"problemIds",List.of(pid,pid));
-  assertThrows(Store.Fault.class,()->call(author,"CONTEST_CREATE",p));
-  p.set("problemIds",db.tree(List.of(pid)));call(author,"CONTEST_CREATE",p);
-  assertThrows(Store.Fault.class,()->call(author,"QUESTION_SAVE",q));
- }
- @Test void disabledContestMemberDoesNotBlockSettlementAndFinalStandingsStayFrozen() {
-  String pid=createProblem(1,false).path("id").asText();
-  JsonNode c=call(author,"CONTEST_CREATE",data("title","Archive","startsAt",db.now()-100,"endsAt",db.now()+120000,"rated",true,"problemIds",List.of(pid)));
-  String cid=c.path("id").asText();
-  for(int i=0;i<2;i++)call(coders.get(i),"CONTEST_JOIN",data("contestId",cid));
-  call(admin,"USER_SET",data("id",coders.get(1).id(),"enabled",false));
-  ObjectNode ended=(ObjectNode)db.read((String)db.one("SELECT document FROM contests WHERE id=?",cid).get("document"));
-  ended.put("endsAt",db.now()-1);db.sql.update("UPDATE contests SET document=? WHERE id=?",db.write(ended),cid);contests.settle();
-  JsonNode first=call(author,"CONTEST_GET",data("contestId",cid));assertTrue(first.path("contest").path("settled").asBoolean());assertEquals(2,first.path("standings").size());
-  call(admin,"USER_SET",data("id",coders.getFirst().id(),"role","AUTHOR"));
-  assertEquals(first.path("standings"),call(author,"CONTEST_GET",data("contestId",cid)).path("standings"));
- }
- ObjectNode tiedCutoff() {
-  ObjectNode r=start(lobby(6,List.of(1),5));long started=r.path("current").path("startedAt").asLong();
-  for(int i=0;i<6;i++) {
-   JsonNode ack=call(coders.get(i),"SUBMIT",submitPayload(r));
-   db.sql.update("UPDATE submissions SET received_at=? WHERE id=?",started+(i==0?100:200),ack.path("id").asText());
-  }
-  while(true){JsonNode job=db.tree(judge.claim("test-worker"));if(!job.path("job").asBoolean())break;grade(job,true);}
-  closeRound(r);return rooms.load(r.path("id").asText());
- }
- @Test void tieBreakRetainsOriginalRemainingSlots() {
-  ObjectNode r=tiedCutoff();assertEquals(3,r.path("tieSlots").asInt());assertEquals(5,r.path("tiePlayers").size());
-  r=nextRound(r);int i=0;
-  for(var uid:r.path("current").path("players")) {
-   JsonNode ack=call(identity.user(uid.asText()),"SUBMIT",submitPayload(r));
-   db.sql.update("UPDATE submissions SET received_at=? WHERE id=?",r.path("current").path("startedAt").asLong()+100+(i++)*100,ack.path("id").asText());
-  }
-  while(true){JsonNode job=db.tree(judge.claim("test-worker"));if(!job.path("job").asBoolean())break;grade(job,true);}
-  closeRound(r);r=rooms.load(r.path("id").asText());
-  int alive=0;for(var player:r.path("players"))if(player.path("status").asText().equals("ALIVE"))alive++;
-  assertEquals(4,alive);
- }
- @Test void submissionCannotBelongToBothRoomAndContestOrOrphanRound() {
-  String pid=createProblem(1,false).path("id").asText();
-  var p=data("problemId",pid,"source","print(5)","language","PY311","roomId","room","contestId","contest");
-  assertThrows(Store.Fault.class,()->call(coders.getFirst(),"SUBMIT",p));
-  p.remove(List.of("roomId","contestId"));p.put("roundId","orphan");
-  assertThrows(Store.Fault.class,()->call(coders.getFirst(),"SUBMIT",p));
- }
- @Test void safeQualifierStillWinsWhenAllTiedPlayersFailTheTieBreak() {
-  ObjectNode r=nextRound(tiedCutoff());String rid=r.path("id").asText();
-  closeRound(r);r=rooms.load(rid);
-  assertEquals("FINISHED",r.path("state").asText());assertEquals(coders.getFirst().id(),r.path("winnerId").asText());
- }
- @Test void forfeitedQualifierCannotReturnAsWinnerAfterTheTieBreak() {
-  ObjectNode r=tiedCutoff();String rid=r.path("id").asText();
-  call(coders.getFirst(),"ROOM_LEAVE",data("roomId",rid));r=nextRound(rooms.load(rid));
-  closeRound(r);r=rooms.load(rid);assertEquals("UNRESOLVED",r.path("state").asText());assertFalse(r.has("winnerId"));
- }
- @Test void failedReauthenticationClearsOldSocketIdentity() throws Exception {
-  try(Peer peer=new Peer()) {
-   JsonNode login=peer.send("LOGIN",data("username","coder0","password","test-password-123"));
-   assertTrue(peer.send("AUTH",data("token",login.path("data").path("token").asText())).path("ok").asBoolean());
-   assertFalse(peer.send("AUTH",data("token","invalid")).path("ok").asBoolean());
-   assertFalse(peer.send("ME",data()).path("ok").asBoolean());
-  }
- }
- @Test void revokedSocketStopsReceivingPrivateEvents() throws Exception {
-  try(Peer peer=new Peer()) {
-   JsonNode login=peer.send("LOGIN",data("username","coder0","password","test-password-123"));
-   assertTrue(peer.send("AUTH",data("token",login.path("data").path("token").asText())).path("ok").asBoolean());
-   db.sql.update("DELETE FROM sessions WHERE user_id=?",coders.getFirst().id());
-   db.event(coders.getFirst().id(),"private_after_revoke",Map.of("secret",true));clients.events();
-   JsonNode event=peer.inbox.poll(5,TimeUnit.SECONDS);assertNotNull(event);assertEquals("session_revoked",event.path("event").asText());
-   assertFalse(peer.send("ME",data()).path("ok").asBoolean());
-  }
- }
- @Test void serverRejectsRoleEscalationAndForgedValidation() {
-  assertThrows(Store.Fault.class,()->call(coders.getFirst(),"QUESTION_SAVE",fixture));
-  assertThrows(Store.Fault.class,()->call(author,"USER_SET",data("id",coders.getFirst().id(),"role","ADMIN")));
-  fixture.put("validatedVersion",1);JsonNode q=call(author,"QUESTION_SAVE",fixture);assertFalse(q.has("validatedVersion"));
- }
- @Test void mutationIdempotenceBindsPayload() {
-  JsonNode q=createProblem(1,false);var p=data("problemId",q.path("id").asText(),"source","print(5)","language","PY311");String key=db.id();
-  Object first=commands.execute(coders.getFirst(),"SUBMIT",p,key),again=commands.execute(coders.getFirst(),"SUBMIT",p,key);
-  assertEquals(db.write(first),db.write(again));assertEquals(1,db.sql.queryForObject("SELECT COUNT(*) FROM submissions",Integer.class));
-  p.put("source","print(6)");assertThrows(Store.Fault.class,()->commands.execute(coders.getFirst(),"SUBMIT",p,key));
- }
- @Test void leaderboardsSeparateContestEloRankExpAndCompletedMatchCounts() {
-  for(User u:List.of(coders.get(0),coders.get(1),coders.get(3),admin))progression.get(u.id());
-  db.sql.update("UPDATE users SET elo=1800 WHERE id=?",coders.get(0).id());
-  db.sql.update("UPDATE progression SET exp=900,rating=1050 WHERE user_id=?",coders.get(0).id());
-  db.sql.update("UPDATE progression SET exp=300,rating=1750 WHERE user_id=?",coders.get(1).id());
-  db.sql.update("UPDATE progression SET exp=9999,rating=2500 WHERE user_id IN (?,?)",coders.get(3).id(),admin.id());
-  db.sql.update("UPDATE users SET enabled=FALSE WHERE id=?",coders.get(3).id());
-  var completed=List.of(List.of("NORMAL","NORMAL","RANKED"),List.of("NORMAL","RANKED","RANKED"),List.of("PRACTICE","PRACTICE","PRACTICE"));
-  for(int i=0;i<completed.size();i++)for(String mode:completed.get(i))
-   db.sql.update("INSERT INTO match_results VALUES(?,?,?,?,?,?,?,?)",db.id(),coders.get(i).id(),mode,1,0,1000,1000,db.now());
-  for(int i=0;i<2;i++) {
-   JsonNode q=createProblem(1,false);
-   db.sql.update("INSERT INTO solved(user_id,problem_id) VALUES(?,?)",coders.get(0).id(),q.path("id").asText());
-  }
-  for(String metric:List.of("elo","ac","exp","rank","normal_games","ranked_games")) {
-   JsonNode board=db.tree(catalog.leaderboard(metric));
-   assertEquals(5,board.size());
-   String expected=List.of("rank","ranked_games").contains(metric)?coders.get(1).id():coders.get(0).id();
-   assertEquals(expected,board.get(0).path("id").asText(),metric);
-   for(JsonNode row:board) {
-    assertNotEquals(admin.id(),row.path("id").asText());
-    assertNotEquals(coders.get(3).id(),row.path("id").asText());
-    if(row.path("id").asText().equals(coders.get(0).id())) {
-     assertEquals(2,row.path("ac").asInt());assertEquals(2,row.path("normal_games").asInt());assertEquals(1,row.path("ranked_games").asInt());
-     assertEquals(1800,row.path("elo").asInt());assertEquals(900,row.path("exp").asInt());assertEquals(1050,row.path("rating").asInt());
+  @org.springframework.boot.test.context.TestConfiguration
+  static class FixtureConfiguration {
+    @org.springframework.context.annotation.Bean
+    @org.springframework.context.annotation.Primary
+    TestDatabase testDatabase(
+        com.fasterxml.jackson.databind.ObjectMapper json,
+        vn.codegrade.support.UnitOfWork tx,
+        vn.codegrade.repository.ActivityRepository activity,
+        org.springframework.jdbc.core.JdbcTemplate jdbc) {
+      return new TestDatabase(json, tx, activity, jdbc);
     }
-    if(row.path("id").asText().equals(coders.get(2).id())) {
-     assertEquals(0,row.path("normal_games").asInt());assertEquals(0,row.path("ranked_games").asInt());
-     assertEquals(0,row.path("exp").asInt());assertEquals(1000,row.path("rating").asInt());
+  }
+
+  @Autowired TestDatabase db;
+  @Autowired IdentityService identity;
+  @Autowired ProblemService catalog;
+  @Autowired CommandService commands;
+  @Autowired SubmissionService judge;
+  @Autowired SurvivalService rooms;
+  @Autowired ContestService contests;
+  @Autowired ClientSocketController clients;
+  @LocalServerPort int port;
+  @Autowired vn.codegrade.service.MatchmakingService matchmaking;
+  @Autowired vn.codegrade.service.ProgressionService progression;
+  @Autowired vn.codegrade.repository.ProblemRepository problemRepository;
+  @Autowired vn.codegrade.repository.SubmissionRepository submissionRepository;
+  @Autowired vn.codegrade.repository.UserRepository userRepository;
+  @Autowired vn.codegrade.repository.MatchQueueRepository matchQueueRepository;
+  @Autowired vn.codegrade.repository.RoomRepository roomRepository;
+  @Autowired vn.codegrade.repository.ProgressionRepository progressionRepository;
+  @Autowired vn.codegrade.repository.ContestRepository contestRepository;
+  @Autowired vn.codegrade.repository.ActivityRepository activityRepository;
+  User admin, author;
+  List<User> coders;
+  ObjectNode fixture;
+
+  @Test
+  void httpHealthAndMetadataRemainAvailableAfterControllerSeparation() throws Exception {
+    var http = java.net.http.HttpClient.newHttpClient();
+    for (String endpoint : List.of("health", "meta")) {
+      var request =
+          java.net.http.HttpRequest.newBuilder(
+                  java.net.URI.create("http://127.0.0.1:" + port + "/api/" + endpoint))
+              .GET()
+              .build();
+      var response = http.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+      assertEquals(200, response.statusCode());
+      var body = db.read(response.body());
+      if (endpoint.equals("health")) assertEquals("UP", body.path("status").asText());
+      else {
+        assertEquals(1, body.path("protocolVersion").asInt());
+        assertEquals(4, body.path("languages").size());
+        assertEquals(4, body.path("questionTypes").size());
+      }
     }
-    assertEquals(progression.tier(row.path("rating").asInt()),row.path("rank").asText());
-   }
   }
- }
- @Test void adminAcNeverEntersAnyLeaderboard() {
-  JsonNode q=createProblem(1,false);
-  call(admin,"SUBMIT",data("problemId",q.path("id").asText(),"source","pass","language","PY311"));gradeNext(true);
-  assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM solved WHERE user_id=?",Integer.class,admin.id()));
-  for(String metric:List.of("elo","ac","wins")) assertFalse(db.write(catalog.leaderboard(metric)).contains(admin.id()));
-  assertEquals(1200,identity.user(admin.id()).elo());
-  for(int i=0;i<2;i++) {
-   call(coders.getFirst(),"SUBMIT",data("problemId",q.path("id").asText(),"source","pass","language","PY311"));gradeNext(true);
-  }
-  assertEquals(1,db.sql.queryForObject("SELECT COUNT(*) FROM solved WHERE user_id=?",Integer.class,coders.getFirst().id()));
-  JsonNode board=db.tree(catalog.leaderboard("ac"));
-  assertEquals(coders.getFirst().id(),board.get(0).path("id").asText());assertEquals(1,board.get(0).path("ac").asInt());
- }
- @Test void changingAdminToCoderWhileGradingDoesNotRetroactivelyCountAdminSubmission() {
-  JsonNode q=createProblem(1,false);
-  call(admin,"SUBMIT",data("problemId",q.path("id").asText(),"source","pass","language","PY311"));
-  db.sql.update("UPDATE users SET role='CODER' WHERE id=?",admin.id());gradeNext(true);
-  assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM solved WHERE user_id=?",Integer.class,admin.id()));
- }
- @Test void frozenSnapshotAndVisibilityAreEnforced() {
-  JsonNode q=createProblem(1,false);
-  String publicDoc=db.write(catalog.get(coders.getFirst(),q.path("id").asText(),false));
-  assertFalse(publicDoc.contains("sampleAnswer"));assertFalse(publicDoc.contains("-4 9"));
-  JsonNode receipt=call(coders.getFirst(),"SUBMIT",data("problemId",q.path("id").asText(),"source","pass","language","PY311"));
-  gradeNext(true);
-  JsonNode detail=call(coders.getFirst(),"SUBMISSION_GET",data("id",receipt.path("id").asText()));
-  assertTrue(detail.path("result").path("cases").get(1).path("hidden").asBoolean());assertFalse(detail.has("snapshot"));
-  assertThrows(Store.Fault.class,()->call(coders.get(1),"SUBMISSION_GET",data("id",receipt.path("id").asText())));
- }
- @Test void defaultLevelsAndServerLockCannotBeBypassed() {
-  ObjectNode r=lobby(5,List.of(1,3),4);String id=r.path("id").asText();
-  assertThrows(Store.Fault.class,()->call(coders.get(1),"ROOM_CONFIG",data("roomId",id,"selectedDifficulties",List.of(2))));
-  assertThrows(Store.Fault.class,()->call(coders.getFirst(),"ROOM_CONFIG",data("roomId",id,"selectedDifficulties",List.of())));
-  r=start(r);assertTrue(List.of(1,3).contains(r.path("current").path("difficulty").asInt()));
-  assertThrows(Store.Fault.class,()->call(coders.getFirst(),"ROOM_CONFIG",data("roomId",id,"selectedDifficulties",List.of(2))));
-  assertEquals(4,r.path("bank").size());assertFalse(rooms.publicState(r).has("bank"));
- }
- @Test void shortageIsReportedWithoutExpandingLevels() {
-  ObjectNode r=lobby(5,List.of(5),1);
-  for(int i=0;i<5;i++)createProblem(1,true);
-  assertThrows(Store.Fault.class,()->call(coders.getFirst(),"ROOM_START",data("roomId",r.path("id").asText())));
-  assertEquals("LOBBY",rooms.load(r.path("id").asText()).path("state").asText());
- }
- @Test void concurrentAdmissionNeverConsumesMoreThanTwoAttempts() throws Exception {
-  ObjectNode r=start(lobby(5,List.of(1),4));ObjectNode payload=submitPayload(r);
-  ExecutorService pool=Executors.newFixedThreadPool(8);var futures=new ArrayList<Future<Boolean>>();
-  try{
-   for(int i=0;i<8;i++)futures.add(pool.submit(()->{try{call(coders.getFirst(),"SUBMIT",payload);return true;}catch(Store.Fault ex){return false;}}));
-   int accepted=0;for(var f:futures)if(f.get(10,TimeUnit.SECONDS))accepted++;
-   assertEquals(2,accepted);
-  }finally{pool.shutdownNow();}
- }
- @Test void lateWorkerCompletionWaitsAndDoesNotDetermineElimination() {
-  ObjectNode r=start(lobby(5,List.of(1),4));String id=r.path("id").asText();long started=r.path("current").path("startedAt").asLong();
-  for(int i=0;i<5;i++){var receipt=call(coders.get(i),"SUBMIT",submitPayload(r));db.sql.update("UPDATE submissions SET received_at=? WHERE id=?",started+100+i*20,receipt.path("id").asText());}
-  var jobs=new ArrayList<JsonNode>();for(int i=0;i<5;i++)jobs.add(db.tree(judge.claim("test-worker")));
-  ((ObjectNode)r.path("current")).put("deadline",db.now()-1);writeRoom(r);
-  rooms.advance(r);r=rooms.load(id);rooms.advance(r);assertEquals("ROUND_GRADING",rooms.load(id).path("state").asText());
-  Collections.reverse(jobs);for(var job:jobs)grade(job,true);
-  rooms.advance(rooms.load(id));r=rooms.load(id);
-  assertEquals("ROUND_RESULT",r.path("state").asText());assertEquals(coders.getFirst().id(),r.path("standings").get(0).path("userId").asText());
-  assertEquals(3,java.util.stream.StreamSupport.stream(r.path("players").spliterator(),false).filter(p->p.path("status").asText().equals("ALIVE")).count());
- }
- @Test void expiredLeaseCannotOverwriteNewWorkerResult() {
-  JsonNode q=createProblem(1,false);call(coders.getFirst(),"SUBMIT",data("problemId",q.path("id").asText(),"source","pass","language","PY311"));
-  JsonNode old=db.tree(judge.claim("test-worker"));db.sql.update("UPDATE submissions SET lease_until=0 WHERE id=?",old.path("id").asText());judge.recover();
-  JsonNode fresh=db.tree(judge.claim("test-worker"));assertNotEquals(old.path("leaseToken"),fresh.path("leaseToken"));
-  assertFalse(db.tree(judge.complete("test-worker",data("id",old.path("id").asText(),"leaseToken",old.path("leaseToken").asText(),"systemError",true))).path("accepted").asBoolean());
-  grade(fresh,true);assertEquals("AC",db.one("SELECT status FROM submissions WHERE id=?",fresh.path("id").asText()).get("status"));
- }
- @Test void allZeroEndsWithoutWinner() {
-  ObjectNode r=start(lobby(5,List.of(3),4));String id=r.path("id").asText();r.put("state","ROUND_GRADING");writeRoom(r);rooms.advance(r);assertEquals("UNRESOLVED",rooms.load(id).path("state").asText());
- }
- @Test void lateJoinerBecomesSpectatorAndCannotSubmit() {
-  ObjectNode r=start(lobby(5,List.of(1),4));
-  JsonNode joined=call(coders.get(5),"ROOM_JOIN",data("roomId",r.path("id").asText()));
-  assertEquals("SPECTATOR",joined.path("players").get(5).path("status").asText());
-  assertThrows(Store.Fault.class,()->call(coders.get(5),"SUBMIT",submitPayload(r)));
- }
- @Test void draftsAndMultilineSurviveRoundTrip() {
-  JsonNode q=createProblem(1,false);String source="a = '\\t'\nprint(a)\n\n";
-  call(coders.getFirst(),"DRAFT_SAVE",data("problemId",q.path("id").asText(),"source",source,"language","PY311"));
-  assertEquals(source,call(coders.getFirst(),"DRAFT_GET",data("problemId",q.path("id").asText())).get(0).path("source_code").asText());
- }
- @Test void disabledAccountCanBeReenabled() {
-  call(admin,"USER_SET",data("id",coders.getFirst().id(),"role","CODER","enabled",false));
-  assertThrows(Store.Fault.class,()->identity.user(coders.getFirst().id()));
-  call(admin,"USER_SET",data("id",coders.getFirst().id(),"role","CODER","enabled",true));
-  assertTrue(identity.user(coders.getFirst().id()).coder());
- }
- void closeRound(ObjectNode r) {
-  r=rooms.load(r.path("id").asText());
-  if(!List.of("ROUND_ACTIVE","ROUND_GRADING").contains(r.path("state").asText()))return;
-  ((ObjectNode)r.path("current")).put("deadline",0);writeRoom(r);rooms.advance(r);rooms.advance(rooms.load(r.path("id").asText()));
- }
- ObjectNode nextRound(ObjectNode r) {
-  r.put("nextAt",0);writeRoom(r);rooms.advance(r);return rooms.load(r.path("id").asText());
- }
- void everyoneAc(ObjectNode r) {
-  int index=0;
-  for(var player:r.path("players"))if(player.path("status").asText().equals("ALIVE")) {
-   User u=identity.user(player.path("id").asText());var receipt=call(u,"SUBMIT",submitPayload(r));
-   db.sql.update("UPDATE submissions SET received_at=? WHERE id=?",r.path("current").path("startedAt").asLong()+1000+(index++)*50,receipt.path("id").asText());
-  }
-  while(true){var job=db.tree(judge.claim("test-worker"));if(!job.path("job").asBoolean())break;grade(job,true);}
- }
- @Test void completeMatchUpdatesWinsOnceWithoutChangingAnyElo() {
-  ObjectNode r=start(lobby(5,List.of(1),4));String id=r.path("id").asText();
-  Map<String,Integer> ratings=new HashMap<>();for(int i=0;i<6;i++){int elo=950+i*137;db.sql.update("UPDATE users SET elo=? WHERE id=?",elo,coders.get(i).id());ratings.put(coders.get(i).id(),elo);}
-  call(coders.get(5),"ROOM_JOIN",data("roomId",id));
-  for(int round=0;round<3;round++){everyoneAc(r);closeRound(r);r=rooms.load(id);if(!r.path("state").asText().equals("FINISHED"))r=nextRound(r);}
-  assertEquals("FINISHED",r.path("state").asText());assertEquals(coders.getFirst().id(),r.path("winnerId").asText());
-  assertEquals(1,identity.user(coders.getFirst().id()).wins());
-  for(User coder:coders)assertEquals(ratings.get(coder.id()).intValue(),identity.user(coder.id()).elo());
-  rooms.advance(r);assertEquals(1,identity.user(coders.getFirst().id()).wins());
- }
- @Test void passwordChangeChecksCurrentPasswordAndRevokesAllSessions() {
-  User u=coders.getFirst();String old=(String)identity.login(data("username",u.username(),"password","test-password-123")).get("token");
-  String other=(String)identity.login(data("username",u.username(),"password","test-password-123")).get("token");
-  assertThrows(Store.Fault.class,()->call(u,"PASSWORD_CHANGE",data("currentPassword","wrong","newPassword","new-password-123")));
-  assertEquals(u.id(),identity.authenticate(old).id());
-  assertThrows(Store.Fault.class,()->call(u,"PASSWORD_CHANGE",data("currentPassword","test-password-123","newPassword","short")));
-  assertThrows(Store.Fault.class,()->call(u,"PASSWORD_CHANGE",data("currentPassword","test-password-123","newPassword","ậ".repeat(25))));
-  assertThrows(Store.Fault.class,()->call(u,"PASSWORD_CHANGE",data("currentPassword","test-password-123","newPassword","test-password-123")));
-  assertTrue(call(u,"PASSWORD_CHANGE",data("currentPassword","test-password-123","newPassword","new-password-123")).path("changed").asBoolean());
-  assertThrows(Store.Fault.class,()->identity.authenticate(old));assertThrows(Store.Fault.class,()->identity.authenticate(other));
-  assertThrows(Store.Fault.class,()->identity.login(data("username",u.username(),"password","test-password-123")));
-  assertNotNull(identity.login(data("username",u.username(),"password","new-password-123")).get("token"));
-  assertNotNull(identity.login(data("username",coders.get(1).username(),"password","test-password-123")).get("token"));
- }
- @Test void progressIsBoundedMonotonicPrivateAndRestrictedToActiveLease() {
-  String pid=createProblem(1,false).path("id").asText();User u=coders.getFirst();
-  String id=call(u,"SUBMIT",data("problemId",pid,"source","pass","language","PY311")).path("id").asText();
-  JsonNode job=db.tree(judge.claim("test-worker"));String lease=job.path("leaseToken").asText();int total=job.path("runner").path("tests").size();
-  assertFalse(db.tree(judge.progress("other-worker",data("id",id,"leaseToken",lease,"currentTest",1,"completedTests",0))).path("accepted").asBoolean());
-  assertTrue(db.tree(judge.progress("test-worker",data("id",id,"leaseToken",lease,"currentTest",2,"completedTests",1))).path("accepted").asBoolean());
-  judge.progress("test-worker",data("id",id,"leaseToken",lease,"currentTest",1,"completedTests",0));
-  var detail=call(u,"SUBMISSION_GET",data("id",id));assertEquals(2,detail.path("current_test").asInt());assertEquals(1,detail.path("completed_tests").asInt());assertEquals(total,detail.path("total_tests").asInt());assertFalse(detail.has("lease_token"));
-  assertThrows(Store.Fault.class,()->call(coders.get(1),"SUBMISSION_GET",data("id",id)));
-  assertThrows(Store.Fault.class,()->judge.progress("test-worker",data("id",id,"leaseToken",lease,"currentTest",total+1,"completedTests",total)));
-  grade(job,true);assertEquals(total,call(u,"SUBMISSION_GET",data("id",id)).path("completed_tests").asInt());
-  assertFalse(db.tree(judge.progress("test-worker",data("id",id,"leaseToken",lease,"currentTest",2,"completedTests",1))).path("accepted").asBoolean());
-  assertEquals(1,db.sql.queryForObject("SELECT COUNT(*) FROM events WHERE user_id=? AND type='submission_progress'",Integer.class,u.id()));
- }
- @Test void historyPaginationIncludesOldRowsAndKeepsAccountAndFilterBoundaries() {
-  String pid=createProblem(1,false).path("id").asText();User u=coders.getFirst();
-  for(int i=0;i<107;i++)db.sql.update("INSERT INTO submissions(id,user_id,problem_id,request_id,source_code,language,mode,received_at,status,snapshot) VALUES(?,?,?,?,?,?,?,?,?,?)",db.id(),i<105?u.id():coders.get(1).id(),pid,db.id(),"pass","PY311","OFFICIAL",i,i%2==0?"AC":"WA","{}");
-  var first=call(u,"SUBMISSIONS_PAGE",data("page",1,"pageSize",20));assertEquals(105,first.path("total").asInt());assertEquals(6,first.path("totalPages").asInt());assertEquals(20,first.path("items").size());
-  var last=call(u,"SUBMISSIONS_PAGE",data("page",99,"pageSize",20));assertEquals(6,last.path("page").asInt());assertEquals(5,last.path("items").size());assertEquals(0,last.path("items").get(4).path("received_at").asInt());
-  var ac=call(u,"SUBMISSIONS_PAGE",data("page",1,"pageSize",50,"filter","ac"));assertEquals(53,ac.path("total").asInt());for(var s:ac.path("items"))assertEquals("AC",s.path("status").asText());
-  assertEquals(100,call(u,"SUBMISSIONS",data()).size());
-  assertThrows(Store.Fault.class,()->call(u,"SUBMISSIONS_PAGE",data("pageSize",500)));
- }
- @Test void perProblemRankingUsesBestAcPerCoderWithoutRevealingSources() {
-  String pid=createProblem(1,false).path("id").asText();
-  int index=0;String bestId="";
-  for(User u:List.of(coders.getFirst(),coders.getFirst(),coders.get(1),admin,author)) {
-   String id=call(u,"SUBMIT",data("problemId",pid,"source","pass","language","PY311")).path("id").asText();gradeNext(true);
-   var result=(ObjectNode)db.read((String)db.one("SELECT result FROM submissions WHERE id=?",id).get("result"));
-   for(var c:result.path("cases"))((ObjectNode)c).put("timeMs",index==0?50:index==1?0.5:1);
-   db.sql.update("UPDATE submissions SET result=? WHERE id=?",db.write(result),id);if(index++==1)bestId=id;
-  }
-  var ranked=call(coders.get(2),"PROBLEM_RANKING",data("problemId",pid));assertEquals(2,ranked.size());
-  assertEquals(coders.getFirst().id(),ranked.get(0).path("userId").asText());assertEquals(1,ranked.get(0).path("rank").asInt());
-  assertEquals(bestId,ranked.get(0).path("submissionId").asText());
-  assertFalse(ranked.toString().contains("source_code"));assertFalse(ranked.toString().contains("expected"));assertFalse(ranked.toString().contains("stdout"));
-  db.sql.update("UPDATE users SET enabled=FALSE WHERE id=?",coders.getFirst().id());assertEquals(1,call(coders.get(2),"PROBLEM_RANKING",data("problemId",pid)).size());
-  ObjectNode q=fixture.deepCopy();((ObjectNode)q.path("general")).put("status","draft");String draft=call(author,"QUESTION_SAVE",q).path("id").asText();
-  assertThrows(Store.Fault.class,()->call(coders.get(2),"PROBLEM_RANKING",data("problemId",draft)));
- }
- @Test void finalWithoutAcHasNoWinner() {
-  ObjectNode r=start(lobby(5,List.of(1),4));String id=r.path("id").asText();for(int i=0;i<2;i++){everyoneAc(r);closeRound(r);r=nextRound(rooms.load(id));}closeRound(r);assertEquals("UNRESOLVED",rooms.load(id).path("state").asText());
- }
- @Test void emptySourcesAndOutOfRangeLanguageCannotEnterQueue() {
-  JsonNode q=createProblem(1,false);
-  assertThrows(Store.Fault.class,()->call(coders.getFirst(),"SUBMIT",data("problemId",q.path("id").asText(),"source"," ","language","PY311")));
-  assertThrows(Store.Fault.class,()->call(coders.getFirst(),"SUBMIT",data("problemId",q.path("id").asText(),"source","x","language","CPP23")));
-  assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM submissions",Integer.class));
- }
- class Peer implements java.net.http.WebSocket.Listener,AutoCloseable {
-  java.net.http.WebSocket ws;BlockingQueue<JsonNode> inbox=new LinkedBlockingQueue<>();StringBuilder text=new StringBuilder();
-  Peer() throws Exception{this("/ws");}
-  Peer(String path) throws Exception{ws=java.net.http.HttpClient.newHttpClient().newWebSocketBuilder().buildAsync(java.net.URI.create("ws://127.0.0.1:"+port+path),this).get(5,TimeUnit.SECONDS);}
-  public void onOpen(java.net.http.WebSocket w){w.request(1);}
-  public CompletionStage<?> onText(java.net.http.WebSocket w,CharSequence data,boolean last){text.append(data);if(last){inbox.add(db.read(text.toString()));text.setLength(0);}w.request(1);return CompletableFuture.completedFuture(null);}
-  JsonNode send(String type,JsonNode p)throws Exception{String id=db.id();ws.sendText(db.write(Map.of("v",1,"type",type,"requestId",id,"payload",p)),true).join();for(int i=0;i<20;i++){var m=inbox.poll(5,TimeUnit.SECONDS);assertNotNull(m);if(m.path("requestId").asText().equals(id))return m;}throw new AssertionError("No ACK");}
-  public void close(){ws.abort();}
- }
- @Test void realWebSocketAuthAuthorizationReplayAndSnapshot() throws Exception {
-  String token;
-  try(Peer peer=new Peer()){
-   assertFalse(peer.send("PROBLEMS",data()).path("ok").asBoolean());
-   var login=peer.send("LOGIN",data("username","coder0","password","test-password-123"));assertTrue(login.path("ok").asBoolean());token=login.path("data").path("token").asText();
-   assertTrue(peer.send("AUTH",data("token",token)).path("ok").asBoolean());
-   assertFalse(peer.send("CATEGORY_SAVE",data("name","Escalation","description","")).path("ok").asBoolean());
-  }
-  call(author,"CATEGORY_SAVE",data("name","Replay category","description","while disconnected"));
-  try(Peer peer=new Peer()){
-   assertTrue(peer.send("AUTH",data("token",token,"lastSeq",0)).path("ok").asBoolean());
-   clients.events();JsonNode event=peer.inbox.poll(5,TimeUnit.SECONDS);assertNotNull(event);assertEquals("catalog_changed",event.path("event").asText());
-   var snapshot=peer.send("SYNC",data());assertTrue(snapshot.path("ok").asBoolean());assertEquals(coders.getFirst().id(),snapshot.path("data").path("user").path("id").asText());
-  }
- }
- @Test void workerSocketReportsRealProgressUsingItsLease() throws Exception {
-  String pid=createProblem(1,false).path("id").asText();
-  String id=call(coders.getFirst(),"SUBMIT",data("problemId",pid,"source","pass","language","PY311")).path("id").asText();
-  try(Peer peer=new Peer("/worker-ws")) {
-   assertFalse(peer.send("CLAIM",data()).path("ok").asBoolean());
-   assertTrue(peer.send("WORKER_AUTH",data("token","test-worker-token-long-enough-1234567890","workerId","test-worker")).path("ok").asBoolean());
-   var job=peer.send("CLAIM",data()).path("data");assertEquals(id,job.path("id").asText());
-   var response=peer.send("PROGRESS",data("id",id,"leaseToken",job.path("leaseToken").asText(),"currentTest",1,"completedTests",0));
-   assertTrue(response.path("data").path("accepted").asBoolean());
-   var mine=call(coders.getFirst(),"SUBMISSIONS",data()).get(0);assertEquals(1,mine.path("current_test").asInt());assertEquals(job.path("runner").path("tests").size(),mine.path("total_tests").asInt());
-   grade(job,true);
-  }
- }
- @Test void passwordChangeOverSocketRequiresReauthenticationAndLimitsAttempts() throws Exception {
-  try(Peer peer=new Peer()) {
-   String token=peer.send("LOGIN",data("username","coder0","password","test-password-123")).path("data").path("token").asText();
-   assertTrue(peer.send("AUTH",data("token",token)).path("ok").asBoolean());
-   assertTrue(peer.send("PASSWORD_CHANGE",data("currentPassword","test-password-123","newPassword","changed-password-123")).path("ok").asBoolean());
-   assertFalse(peer.send("ME",data()).path("ok").asBoolean());
-   String fresh=peer.send("LOGIN",data("username","coder0","password","changed-password-123")).path("data").path("token").asText();
-   assertTrue(peer.send("AUTH",data("token",fresh)).path("ok").asBoolean());
-   for(int i=0;i<4;i++)assertFalse(peer.send("PASSWORD_CHANGE",data("currentPassword","wrong-password","newPassword","another-password-123")).path("ok").asBoolean());
-   var blocked=peer.send("PASSWORD_CHANGE",data("currentPassword","changed-password-123","newPassword","another-password-123"));
-   assertFalse(blocked.path("ok").asBoolean());assertTrue(blocked.path("error").path("message").asText().contains("5"));
-   assertDoesNotThrow(()->identity.authenticate(fresh));
-  }
- }
- @Test void contestRegistrationFinalizationAndEloExcludeAdmin() {
-  JsonNode q=createProblem(1,false);
-  JsonNode c=call(author,"CONTEST_CREATE",data("title","Rated test","startsAt",db.now()-100,"endsAt",db.now()+120000,"rated",true,"problemIds",List.of(q.path("id").asText())));
-  String cid=c.path("id").asText();call(coders.get(0),"CONTEST_JOIN",data("contestId",cid));call(coders.get(1),"CONTEST_JOIN",data("contestId",cid));
-  for(User u:List.of(coders.get(0),coders.get(1),admin)) {
-   call(u,"SUBMIT",data("contestId",cid,"problemId",q.path("id").asText(),"language","PY311","source","pass"));gradeNext(!u.id().equals(coders.get(1).id()));
-  }
-  ObjectNode ended=(ObjectNode)c.deepCopy();ended.set("participants",db.tree(List.of(coders.get(0).id(),coders.get(1).id())));ended.put("endsAt",db.now()-1);
-  db.sql.update("UPDATE contests SET document=? WHERE id=?",db.write(ended),cid);contests.settle();
-  assertTrue(identity.user(coders.get(0).id()).elo()>1200);assertTrue(identity.user(coders.get(1).id()).elo()<1200);assertEquals(1200,identity.user(admin.id()).elo());
-  int rating=identity.user(coders.get(0).id()).elo();contests.settle();assertEquals(rating,identity.user(coders.get(0).id()).elo());
-  assertThrows(Store.Fault.class,()->call(coders.get(0),"SUBMIT",data("contestId",cid,"problemId",q.path("id").asText(),"language","PY311","source","pass")));
- }
- @Test void approvalGatesPrivateContestProblems() {
-  ObjectNode q=fixture.deepCopy();((ObjectNode)q.path("general")).put("status","draft");JsonNode saved=call(author,"QUESTION_SAVE",q);String pid=saved.path("id").asText();
-  JsonNode c=call(author,"CONTEST_CREATE",data("title","Private","startsAt",db.now()-100,"endsAt",db.now()+120000,"approvalRequired",true,"problemIds",List.of(pid)));String cid=c.path("id").asText();
-  call(coders.getFirst(),"CONTEST_JOIN",data("contestId",cid));assertThrows(Store.Fault.class,()->call(coders.getFirst(),"QUESTION_GET",data("id",pid)));
-  assertThrows(Store.Fault.class,()->call(coders.getFirst(),"CONTEST_APPROVE",data("contestId",cid,"userId",coders.getFirst().id(),"approve",true)));
-  call(author,"CONTEST_APPROVE",data("contestId",cid,"userId",coders.getFirst().id(),"approve",true));assertTrue(call(coders.getFirst(),"QUESTION_GET",data("id",pid)).has("general"));
- }
- @Test void onlyAcSurvivesEvenWhenOthersEarnPartialPoints() {
-  ObjectNode r=start(lobby(5,List.of(1),4));String id=r.path("id").asText();for(int i=0;i<5;i++){call(coders.get(i),"SUBMIT",submitPayload(r));gradeNext(i==0);}closeRound(r);r=rooms.load(id);assertEquals("FINISHED",r.path("state").asText());assertEquals(coders.getFirst().id(),r.path("winnerId").asText());
- }
 
- @Test void singleDatasetBootstrapAddsMissingProblemsAndPreservesExistingWork() throws Exception {
-  ObjectNode edited=fixture.deepCopy();((ObjectNode)edited.path("general")).put("questionName","Author's edited problem");
-  var saved=call(author,"QUESTION_SAVE",edited);String id=saved.path("id").asText();
-  var receipt=call(coders.getFirst(),"SUBMIT",data("problemId",id,"language","PY311","source","print(10)"));
-  String snapshot=(String)db.one("SELECT snapshot FROM submissions WHERE id=?",receipt.path("id").asText()).get("snapshot");
-  var bootstrap=new vn.codegrade.db.Bootstrap(db,identity,catalog);
-  org.springframework.test.util.ReflectionTestUtils.setField(bootstrap,"adminPassword","test-password-123");
-  org.springframework.test.util.ReflectionTestUtils.setField(bootstrap,"workerToken","test-worker-token-01234567890123456789");
-  org.springframework.test.util.ReflectionTestUtils.setField(bootstrap,"demo",true);
-  org.springframework.test.util.ReflectionTestUtils.setField(bootstrap,"demoPassword","test-password-123");
-  var args=new org.springframework.boot.DefaultApplicationArguments(new String[0]);bootstrap.run(args);bootstrap.run(args);
-  assertEquals(320,db.sql.queryForObject("SELECT COUNT(*) FROM problems",Integer.class));
-  assertEquals(319,db.sql.queryForObject("SELECT COUNT(*) FROM submissions WHERE request_id LIKE 'seed:%'",Integer.class));
-  assertEquals(saved,catalog.document(id));
-  assertEquals(snapshot,db.one("SELECT snapshot FROM submissions WHERE id=?",receipt.path("id").asText()).get("snapshot"));
- }
- @Test void problemCodesStayStableAndAreSearchable() {
-  ObjectNode first=(ObjectNode)createProblem(1,false);String code=first.path("publicId").asText();
-  assertTrue(code.matches("CG-[0-9]{4,}"));
-  ObjectNode edited=first.deepCopy();edited.put("publicId","CG-9999");((ObjectNode)edited.path("general")).put("questionName","Renamed question");
-  var saved=call(author,"QUESTION_SAVE",edited);assertEquals(code,saved.path("publicId").asText());assertEquals(code,catalog.document(first.path("id").asText()).path("publicId").asText());
-  var results=call(coders.getFirst(),"PROBLEMS",data("search",code.toLowerCase(Locale.ROOT)));assertEquals(1,results.size());assertEquals(first.path("id").asText(),results.get(0).path("id").asText());
-  var safe=call(coders.getFirst(),"QUESTION_GET",data("id",first.path("id").asText()));assertEquals(code,safe.path("publicId").asText());assertFalse(safe.has("answer"));assertFalse(safe.has("testcases"));
-  assertNotEquals(code,createProblem(1,false).path("publicId").asText());assertEquals("CG-10000",Catalog.publicId(10000));
- }
- void moreCoders(int count) {
-  while(coders.size()<count){int i=coders.size();coders.add(identity.user(identity.create("extra"+i,"Extra "+i,"test-password-123","CODER")));}
- }
- ObjectNode matched(String mode) {
-  for(int i=0;i<4;i++)createProblem(1,true);
-  JsonNode found=null;for(int i=0;i<5;i++)found=call(coders.get(i),"MATCH_QUEUE_JOIN",data("mode",mode));
-  String id=found.path("roomId").asText();assertFalse(id.isBlank());
-  for(int i=0;i<5;i++)call(coders.get(i),"MATCH_ACCEPT",data("roomId",id));
-  ObjectNode r=rooms.load(id);assertEquals("COUNTDOWN",r.path("state").asText());
-  return nextRound(r);
- }
- @Test void practiceSupportsEverySizeFromTwoToTenWithoutExpOrRankChanges() {
-  moreCoders(10);for(int i=0;i<6;i++)createProblem(1,true);
-  for(int n=2;n<=10;n++) {
-   ObjectNode r=(ObjectNode)call(coders.getFirst(),"ROOM_CREATE",data("capacity",n,"name","Practice "+n));
-   for(int i=1;i<n;i++)r=(ObjectNode)call(coders.get(i),"ROOM_JOIN",data("roomId",r.path("code").asText()));
-   assertEquals(n,r.path("players").size());r=start(r);String rid=r.path("id").asText();
-   for(int rounds=0;rounds<6&&!r.path("state").asText().equals("FINISHED");rounds++){everyoneAc(r);r=rooms.load(rid);if(!r.path("state").asText().equals("FINISHED"))r=nextRound(r);}
-   assertEquals("FINISHED",r.path("state").asText());assertEquals(n,r.path("results").size());
-   for(var result:r.path("results"))assertEquals(0,result.path("exp").asInt());
-   for(int i=0;i<n;i++){assertEquals(1000,progression.get(coders.get(i).id()).path("rating").asInt());assertEquals(0,progression.get(coders.get(i).id()).path("exp").asInt());}
+  @Test
+  void readCommandsDoNotWaitForCompetitionWriteLock() throws Exception {
+    var held = new CountDownLatch(1);
+    var release = new CountDownLatch(1);
+    var pool = Executors.newFixedThreadPool(2);
+    try {
+      var writer =
+          pool.submit(
+              () ->
+                  db.atomic(
+                      () -> {
+                        held.countDown();
+                        try {
+                          release.await(10, TimeUnit.SECONDS);
+                        } catch (InterruptedException e) {
+                          Thread.currentThread().interrupt();
+                          throw new RuntimeException(e);
+                        }
+                        return true;
+                      }));
+      assertTrue(held.await(5, TimeUnit.SECONDS));
+      var reader = pool.submit(() -> call(coders.getFirst(), "ME", data()));
+      assertEquals(coders.getFirst().id(), reader.get(5, TimeUnit.SECONDS).path("id").asText());
+      release.countDown();
+      assertTrue(writer.get(5, TimeUnit.SECONDS));
+    } finally {
+      release.countDown();
+      pool.shutdownNow();
+    }
   }
-  assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM reward_events WHERE kind='PRACTICE'",Integer.class));
- }
- @Test void normalRequiresFiveAndLeavesSixthWaiting() {
-  for(int i=0;i<4;i++)assertEquals("WAITING",call(coders.get(i),"MATCH_QUEUE_JOIN",data("mode","NORMAL")).path("state").asText());
-  assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM rooms",Integer.class));
-  var found=call(coders.get(4),"MATCH_QUEUE_JOIN",data("mode","NORMAL"));assertEquals("MATCH_FOUND",found.path("state").asText());
-  assertEquals(5,found.path("room").path("players").size());
-  assertEquals("WAITING",call(coders.get(5),"MATCH_QUEUE_JOIN",data("mode","NORMAL")).path("state").asText());
-  String rid=found.path("roomId").asText();for(int i=0;i<4;i++)call(coders.get(i),"MATCH_ACCEPT",data("roomId",rid));
-  assertEquals("LOBBY",rooms.load(rid).path("state").asText());
-  assertThrows(Store.Fault.class,()->call(coders.getFirst(),"ROOM_START",data("roomId",rid)));
-  assertThrows(Store.Fault.class,()->call(coders.get(5),"ROOM_JOIN",data("roomId",rid)));
-  assertThrows(Store.Fault.class,()->call(coders.getFirst(),"ROOM_CREATE",data("mode","NORMAL")));
-  call(coders.get(4),"MATCH_DECLINE",data());
-  assertEquals("CLOSED",rooms.load(rid).path("state").asText());
-  assertEquals(1,db.sql.queryForObject("SELECT COUNT(*) FROM rooms WHERE state='LOBBY'",Integer.class));
- }
- @Test void tenAndFifteenQueueEntriesCreateOnlyDistinctFivePlayerRooms() throws Exception {
-  moreCoders(15);
-  var pool=Executors.newFixedThreadPool(8);
-  try {var jobs=new ArrayList<Future<?>>();for(var u:coders)jobs.add(pool.submit(()->call(u,"MATCH_QUEUE_JOIN",data("mode","NORMAL"))));for(var j:jobs)j.get(20,TimeUnit.SECONDS);}
-  finally{pool.shutdownNow();}
-  assertEquals(3,db.sql.queryForObject("SELECT COUNT(*) FROM rooms",Integer.class));
-  Set<String> seen=new HashSet<>();for(var row:db.sql.queryForList("SELECT document FROM rooms")) {var r=db.read((String)row.get("document"));assertEquals(5,r.path("players").size());for(var p:r.path("players"))assertTrue(seen.add(p.path("id").asText()));}
- }
- @Test void rankedChecksWholeGroupSpreadAtEveryTenSecondBoundaryAndCapsAt400() {
-  int[] ratings={1200,1300,1400,1450,1580};
-  for(int i=0;i<5;i++){progression.get(coders.get(i).id());db.sql.update("UPDATE progression SET rating=? WHERE user_id=?",ratings[i],coders.get(i).id());call(coders.get(i),"MATCH_QUEUE_JOIN",data("mode","RANKED"));}
-  for(int seconds:new int[]{0,10,20}) {
-   db.sql.update("UPDATE match_queue SET joined_at=?,last_seen=?",db.now()-seconds*1000L,db.now());matchmaking.tick();
-   assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM rooms",Integer.class));
-  }
-  db.sql.update("UPDATE match_queue SET joined_at=?,last_seen=?",db.now()-30_001,db.now());matchmaking.tick();
-  assertEquals(1,db.sql.queryForObject("SELECT COUNT(*) FROM rooms",Integer.class));
-  String rid=call(coders.getFirst(),"MATCH_SNAPSHOT",data()).path("roomId").asText();call(coders.getFirst(),"MATCH_DECLINE",data());
-  db.sql.update("UPDATE match_queue SET state='WAITING',room_id=NULL,rating=CASE WHEN user_id=? THEN 1701 ELSE 1200 END,joined_at=?,last_seen=?",coders.get(4).id(),db.now()-1_000_000,db.now());
-  matchmaking.tick();assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM rooms WHERE state='LOBBY'",Integer.class));
-  assertEquals(400,call(coders.getFirst(),"MATCH_QUEUE_STATUS",data()).path("ratingRange").asInt());
- }
- @Test void rankedCompatibleFiveMatchImmediatelyAndReplayDoesNotDuplicate() {
-  String rid=db.id();JsonNode last=null;
-  for(int i=0;i<5;i++)last=db.tree(commands.execute(coders.get(i),"MATCH_QUEUE_JOIN",data("mode","RANKED"),i==4?rid:db.id()));
-  assertEquals("MATCH_FOUND",last.path("state").asText());
-  assertEquals(last.toString(),db.tree(commands.execute(coders.get(4),"MATCH_QUEUE_JOIN",data("mode","RANKED"),rid)).toString());
-  assertEquals(1,db.sql.queryForObject("SELECT COUNT(*) FROM rooms",Integer.class));
-  assertThrows(Store.Fault.class,()->call(coders.getFirst(),"MATCH_QUEUE_JOIN",data("mode","NORMAL")));
- }
- @Test void matchTimeoutRequeuesAcceptedPlayersAndKeepsQueueAcrossServiceRestart() {
-  JsonNode last=null;for(int i=0;i<5;i++)last=call(coders.get(i),"MATCH_QUEUE_JOIN",data("mode","NORMAL"));String rid=last.path("roomId").asText();
-  for(int i=0;i<4;i++)call(coders.get(i),"MATCH_ACCEPT",data("roomId",rid));
-  ObjectNode r=rooms.load(rid);r.put("acceptDeadline",0);writeRoom(r);
-  new vn.codegrade.room.Matchmaking(db,rooms,progression,identity).tick();
-  assertEquals("CLOSED",rooms.load(rid).path("state").asText());
-  assertEquals(4,db.sql.queryForObject("SELECT COUNT(*) FROM match_queue WHERE state='WAITING'",Integer.class));
-  assertEquals("WAITING",call(coders.getFirst(),"MATCH_SNAPSHOT",data()).path("state").asText());
-  assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM reward_events",Integer.class));
- }
- @Test void normalAndRankedSettlementAwardsExpExactlyOnceAndPreservesContestElo() {
-  for(String mode:List.of("NORMAL","RANKED")) {
-   ObjectNode r=matched(mode);String rid=r.path("id").asText();
-   for(int round=0;round<5&&!r.path("state").asText().equals("FINISHED");round++){everyoneAc(r);r=rooms.load(rid);if(!r.path("state").asText().equals("FINISHED"))r=nextRound(r);}
-   assertEquals("FINISHED",r.path("state").asText());assertEquals(5,r.path("results").size());
-   assertEquals(280,db.sql.queryForObject("SELECT SUM(exp) FROM match_results WHERE room_id=?",Integer.class,rid));
-   db.atomic(()->{progression.settle(rooms.load(rid));return null;});
-   assertEquals(5,db.sql.queryForObject("SELECT COUNT(*) FROM reward_events WHERE event_key=?",Integer.class,"match:"+rid));
-   assertEquals(1200,identity.user(coders.getFirst().id()).elo());
-   int rating=progression.get(coders.getFirst().id()).path("rating").asInt();assertEquals(mode.equals("RANKED")?1048:1000,rating);
-  }
- }
- @Test void rankMetadataUsesConfiguredThresholdsAndHandlesEveryPromotionBoundary() {
-  String uid=coders.getFirst().id();
-  var initial=call(coders.getFirst(),"PROGRESSION_GET",data());
-  assertEquals(6,initial.path("rankTiers").size());assertEquals(100,initial.path("ratingToNextRank").asInt());assertEquals(3,initial.path("ratingGainMultiplier").asDouble());
-  assertTrue(initial.path("rankTiers").get(0).path("minRating").isNull());assertEquals(1099,initial.path("rankTiers").get(0).path("maxRating").asInt());
-  assertEquals(1900,initial.path("rankTiers").get(5).path("minRating").asInt());assertTrue(initial.path("rankTiers").get(5).path("maxRating").isNull());
-  int[] starts={1100,1300,1500,1700,1900};
-  for(int i=0;i<starts.length;i++) {
-   db.sql.update("UPDATE progression SET rating=? WHERE user_id=?",starts[i]-1,uid);
-   var before=progression.get(uid);assertEquals(1,before.path("ratingToNextRank").asInt());assertEquals(starts[i],before.path("nextRankRating").asInt());
-   db.sql.update("UPDATE progression SET rating=? WHERE user_id=?",starts[i],uid);
-   var after=progression.get(uid);assertEquals(before.path("nextRank").asText(),after.path("rank").asText());assertEquals(starts[i],after.path("rankMinRating").asInt());
-   if(i==4){assertTrue(after.path("nextRank").isNull());assertTrue(after.path("nextRankRating").isNull());assertEquals(0,after.path("ratingToNextRank").asInt());}
-   else assertEquals(starts[i+1]-starts[i],after.path("ratingToNextRank").asInt());
-  }
-  db.sql.update("UPDATE progression SET rating=1000 WHERE user_id=?",uid);
-  var custom=new vn.codegrade.room.Progression(db);
-  org.springframework.test.util.ReflectionTestUtils.setField(custom,"thresholds",new int[]{1050,1200,1400,1700,2000});custom.validateConfiguration();
-  var configured=custom.get(uid);assertEquals(50,configured.path("ratingToNextRank").asInt());assertEquals(1050,configured.path("nextRankRating").asInt());assertEquals(1049,configured.path("rankTiers").get(0).path("maxRating").asInt());
- }
- @Test void independentPracticeNeverAwardsExpIncludingFirstAcAndReplay() {
-  progression.get(coders.getFirst().id());db.sql.update("UPDATE progression SET exp=123,rating=1750 WHERE user_id=?",coders.getFirst().id());
-  var q=createProblem(6,false);var p=data("problemId",q.path("id").asText(),"source","pass","language","PY311");
-  call(coders.getFirst(),"RUN_EXAMPLES",p);gradeNext(true);assertEquals(123,progression.get(coders.getFirst().id()).path("exp").asInt());
-  String rid=db.id();commands.execute(coders.getFirst(),"SUBMIT",p,rid);gradeNext(true);commands.execute(coders.getFirst(),"SUBMIT",p,rid);
-  call(coders.getFirst(),"SUBMIT",p);gradeNext(true);assertEquals(123,progression.get(coders.getFirst().id()).path("exp").asInt());
-  assertEquals(1750,progression.get(coders.getFirst().id()).path("rating").asInt());
-  assertEquals(1,db.sql.queryForObject("SELECT COUNT(*) FROM solved WHERE user_id=? AND problem_id=?",Integer.class,coders.getFirst().id(),q.path("id").asText()));
-  assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM reward_events WHERE user_id=?",Integer.class,coders.getFirst().id()));
- }
- @Test void competitiveSubmissionClearsLegacyDraftAndNeverReturnsProofs() {
-  ObjectNode r=start(lobby(2,List.of(1),3));String pid=r.path("current").path("problemId").asText();
-  call(coders.getFirst(),"DRAFT_SAVE",data("problemId",pid,"language","PY311","source","old code"));
-  var ack=call(coders.getFirst(),"SUBMIT",submitPayload(r));assertFalse(ack.has("receipt"));
-  assertEquals(0,call(coders.getFirst(),"DRAFT_GET",data("problemId",pid)).size());
-  assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM receipts",Integer.class));
-  assertThrows(Store.Fault.class,()->call(coders.getFirst(),"RECEIPT_GET",data("id",ack.path("id").asText())));
-  assertThrows(Store.Fault.class,()->call(coders.getFirst(),"DRAFT_SAVE",data("roomId",r.path("id").asText(),"problemId",pid,"language","PY311","source","late code")));
-  assertEquals("print(sum(map(int,input().split())))",db.one("SELECT source_code FROM submissions WHERE id=?",ack.path("id").asText()).get("source_code"));
- }
- @Test void rankedWindowsIncludeTheirBoundaryAndExcludeTheNextPoint() {
-  for(int[] c:List.of(new int[]{0,150,1},new int[]{0,151,0},new int[]{10,250,1},new int[]{10,251,0},new int[]{20,350,1},new int[]{20,351,0},new int[]{30,400,1},new int[]{30,401,0})) {
-   db.sql.update("DELETE FROM match_queue");db.sql.update("DELETE FROM rooms");
-   for(int i=0;i<5;i++){progression.get(coders.get(i).id());db.sql.update("UPDATE progression SET rating=? WHERE user_id=?",1000+(i==4?c[1]:0),coders.get(i).id());call(coders.get(i),"MATCH_QUEUE_JOIN",data("mode","RANKED"));}
-   db.sql.update("UPDATE match_queue SET joined_at=?",db.now()-c[0]*1000L);matchmaking.tick();
-   assertEquals(c[2],db.sql.queryForObject("SELECT COUNT(*) FROM rooms WHERE state='LOBBY'",Integer.class),Arrays.toString(c));
-  }
- }
- @Test void tiesUseLowestOccupiedRewardInBothModesAndCancelledMatchesNeverReward() {
-  var ids=coders.subList(0,5).stream().map(User::id).toList();
-  for(String mode:List.of("NORMAL","RANKED")) {
-   var r=data("id",db.id(),"state","UNRESOLVED","mode",mode,"participants",ids,"winnerId",ids.getFirst());String rid=r.path("id").asText();
-   db.atomic(()->{progression.settle(r);return null;});assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM match_results WHERE room_id=?",Integer.class,rid));
-   r.put("state","FINISHED");db.atomic(()->{progression.settle(r);progression.settle(r);return null;});
-   assertEquals(180,db.sql.queryForObject("SELECT SUM(exp) FROM match_results WHERE room_id=?",Integer.class,rid));
-   assertEquals(100,((Number)db.one("SELECT exp FROM match_results WHERE room_id=? AND user_id=?",rid,ids.getFirst()).get("exp")).intValue());
-   assertEquals(5,db.sql.queryForObject("SELECT COUNT(*) FROM reward_events WHERE event_key=?",Integer.class,"match:"+rid));
-   for(int i=1;i<5;i++){var result=db.one("SELECT * FROM match_results WHERE room_id=? AND user_id=?",rid,ids.get(i));assertEquals(2,((Number)result.get("placement")).intValue());assertEquals(20,((Number)result.get("exp")).intValue());assertEquals(mode.equals("RANKED")?996:1000,((Number)result.get("rating_after")).intValue());}
-  }
- }
- @Test void multipleConnectionsAndAcceptCancelRaceCannotDuplicateMembership() throws Exception {
-  var pool=Executors.newFixedThreadPool(2);
-  try {
-   var joins=new ArrayList<Future<Boolean>>();for(int i=0;i<2;i++)joins.add(pool.submit(()->{try{call(coders.getFirst(),"MATCH_QUEUE_JOIN",data("mode","NORMAL"));return true;}catch(Store.Fault e){return false;}}));
-   int count=0;for(var f:joins)if(f.get())count++;assertEquals(1,count);
-   JsonNode found=null;for(int i=1;i<5;i++)found=call(coders.get(i),"MATCH_QUEUE_JOIN",data("mode","NORMAL"));String rid=found.path("roomId").asText();
-   for(int i=0;i<3;i++)call(coders.get(i),"MATCH_ACCEPT",data("roomId",rid));
-   var accept=pool.submit(()->{try{call(coders.get(3),"MATCH_ACCEPT",data("roomId",rid));}catch(Store.Fault ignored){}});
-   var cancel=pool.submit(()->call(coders.get(4),"MATCH_DECLINE",data()));accept.get();cancel.get();
-   assertEquals("CLOSED",rooms.load(rid).path("state").asText());assertEquals(4,db.sql.queryForObject("SELECT COUNT(*) FROM match_queue WHERE state='WAITING'",Integer.class));
-  }finally{pool.shutdownNow();}
- }
- @Test void placementExpHandlesDistinctMiddleAndBottomTieGroups() {
-  int[][] stages={{5,4,3,2,1},{5,4,4,3,2},{5,4,3,2,2},{5,4,4,3,3}};
-  int[][] awards={{100,80,60,40,20},{100,60,60,40,20},{100,80,60,20,20},{100,60,60,20,20}};
-  var ids=coders.subList(0,5).stream().map(User::id).toList();
-  for(String mode:List.of("NORMAL","RANKED"))for(int scenario=0;scenario<stages.length;scenario++) {
-   var r=data("id",db.id(),"state","FINISHED","mode",mode,"participants",ids,"winnerId",ids.getFirst());
-   var players=r.putArray("players");for(int i=0;i<5;i++)players.add(data("id",ids.get(i),"eliminatedStage",stages[scenario][i]));
-   db.atomic(()->{progression.settle(r);return null;});
-   for(int i=0;i<5;i++)assertEquals(awards[scenario][i],r.path("results").get(i).path("exp").asInt(),mode+" scenario "+scenario+" player "+i);
-  }
- }
- @Test void validationBacklogCannotStarveRealCompetitiveSubmissions() {
-  ObjectNode r=start(lobby(2,List.of(1),3));var extra=createProblem(1,false);call(author,"QUESTION_VALIDATE",data("id",extra.path("id").asText()));
-  db.sql.update("UPDATE submissions SET received_at=0 WHERE status='QUEUED'");
-  var ack=call(coders.getFirst(),"SUBMIT",submitPayload(r));var job=db.tree(judge.claim("test-worker"));assertEquals(ack.path("id").asText(),job.path("id").asText());
- }
- @Test void legacySolvedProblemCannotBeFarmedAfterInstallingProgression() {
-  var q=createProblem(1,false);String pid=q.path("id").asText();db.sql.update("INSERT INTO solved VALUES(?,?)",coders.getFirst().id(),pid);
-  call(coders.getFirst(),"SUBMIT",data("problemId",pid,"language","PY311","source","pass"));gradeNext(true);
-  assertEquals(0,progression.get(coders.getFirst().id()).path("exp").asInt());
- }
- @Test void leavingAfterEliminationCannotImprovePlacement() {
-  ObjectNode r=start(lobby(5,List.of(1),4));String rid=r.path("id").asText();everyoneAc(r);r=nextRound(rooms.load(rid));
-  call(coders.get(4),"ROOM_LEAVE",data("roomId",rid));
-  everyoneAc(r);r=nextRound(rooms.load(rid));everyoneAc(r);r=rooms.load(rid);assertEquals("FINISHED",r.path("state").asText());
-  assertEquals(4,db.one("SELECT placement FROM match_results WHERE room_id=? AND user_id=?",rid,coders.get(4).id()).get("placement"));
- }
- @Test void retiredProofCommandCannotReplayLegacySignedResponse() {
-  String rid=db.id();var p=data("id","legacy");String fingerprint=Store.hash("RECEIPT_GET"+commands.canonical(p));
-  db.sql.update("INSERT INTO commands VALUES(?,?,?,?,?)",coders.getFirst().id(),rid,fingerprint,"{\"signature\":\"old\",\"payload\":\"old\"}",db.now());
-  assertThrows(Store.Fault.class,()->commands.execute(coders.getFirst(),"RECEIPT_GET",p,rid));
-  var stripped=Commands.withoutProofs(data("receipt",data("signature","old"),"nested",data("certificate",data("signature","old"))));assertFalse(stripped.has("receipt"));assertFalse(stripped.path("nested").has("certificate"));
- }
- @Test void earlierInfrastructureFailureVoidsFinalRatherThanChargingRankLoss() {
-  ObjectNode r=start(lobby(2,List.of(1),3));call(coders.getFirst(),"SUBMIT",submitPayload(r));var first=db.tree(judge.claim("test-worker"));
-  call(coders.get(1),"SUBMIT",submitPayload(r));var second=db.tree(judge.claim("test-worker"));grade(second,true);
-  for(int i=0;i<3;i++) {judge.complete("test-worker",data("id",first.path("id").asText(),"leaseToken",first.path("leaseToken").asText(),"systemError",true));if(i<2)first=db.tree(judge.claim("test-worker"));}
-  var current=rooms.load(r.path("id").asText());assertEquals("RESCUE",current.path("nextKind").asText());assertFalse(current.has("winnerId"));assertEquals(0,db.sql.queryForObject("SELECT COUNT(*) FROM reward_events",Integer.class));
- }
- @Test void frozenRoomKeepsItsTestsUntilTheMatchEnds() throws Exception {
-  ObjectNode r=start(lobby(2,List.of(1),3));ObjectNode original=fixture.deepCopy();((ArrayNode)original.path("testcases")).add(original.path("testcases").get(0).deepCopy());
-  ((ObjectNode)r.path("frozenProblem")).set("testcases",original.path("testcases"));writeRoom(r);
-  var ack=call(coders.getFirst(),"SUBMIT",submitPayload(r));var frozen=db.read((String)db.one("SELECT snapshot FROM submissions WHERE id=?",ack.path("id").asText()).get("snapshot"));
-  assertEquals(original.path("testcases").size(),frozen.path("testcases").size());assertTrue(frozen.path("testcases").size()>5);
- }
- @Test void contestProblemStillWorksInIndependentPractice() throws Exception {
-  ObjectNode q=(ObjectNode)createProblem(1,false);String pid=q.path("id").asText();ObjectNode baseline=fixture.deepCopy();((ArrayNode)baseline.path("testcases")).add(baseline.path("testcases").get(0).deepCopy());
-  q.set("testcases",baseline.path("testcases"));db.sql.update("UPDATE problems SET document=? WHERE id=?",db.write(q),pid);
-  var c=data("startsAt",db.now()-1000,"endsAt",db.now()+60000,"problemIds",List.of(pid));db.sql.update("INSERT INTO contests VALUES(?,?,?)",db.id(),author.id(),db.write(c));
-  var ack=call(coders.getFirst(),"SUBMIT",data("problemId",pid,"source","pass","language","PY311"));
-  var snapshot=db.read((String)db.one("SELECT snapshot FROM submissions WHERE id=?",ack.path("id").asText()).get("snapshot"));assertEquals(baseline.path("testcases").size(),snapshot.path("testcases").size());
- }
- @Test void auditSummaryOmitsLargePayloadWithoutChangingLegacyResponseOrPermissions() throws Exception {
-  db.audit(admin.id(),"LARGE_EVENT","entity",data("details","x".repeat(1_100_000),"receipt",data("signature","legacy")));
-  var summary=call(admin,"AUDIT",data("summaryOnly",true));
-  assertEquals(1,summary.size());assertEquals("LARGE_EVENT",summary.get(0).path("action").asText());
-  assertEquals(admin.id(),summary.get(0).path("actor_id").asText());assertTrue(summary.get(0).has("created_at"));
-  assertFalse(summary.get(0).has("payload"));assertTrue(db.write(summary).length()<1000);
-  var legacy=call(admin,"AUDIT",data());var payload=db.read(legacy.get(0).path("payload").asText());
-  assertEquals(1_100_000,payload.path("details").asText().length());assertFalse(payload.has("receipt"));
-  assertThrows(Store.Fault.class,()->call(author,"AUDIT",data("summaryOnly",true)));
- }
 
+  @Test
+  void invalidRegistrationDoesNotLeaveAnAccountOrProgression() {
+    assertThrows(
+        DomainException.class,
+        () ->
+            identity.register(
+                data(
+                    "username",
+                    "invalidmail",
+                    "displayName",
+                    "Test",
+                    "password",
+                    "valid-password-123",
+                    "email",
+                    "invalid")));
+    assertEquals(
+        0,
+        db.sql.queryForObject(
+            "SELECT COUNT(*) FROM users WHERE username='invalidmail'", Integer.class));
+  }
+
+  @Test
+  void relationalRoomMembershipTracksJoinLeaveAndSync() {
+    var room = call(coders.getFirst(), "ROOM_CREATE", data("capacity", 3));
+    String rid = room.path("id").asText();
+    call(coders.get(1), "ROOM_JOIN", data("roomId", rid));
+    assertEquals(
+        "ALIVE",
+        db.sql.queryForObject(
+            "SELECT status FROM room_members WHERE room_id=? AND user_id=?",
+            String.class,
+            rid,
+            coders.get(1).id()));
+    assertEquals(1, call(coders.get(1), "SYNC", data()).path("rooms").size());
+    assertEquals(0, call(coders.get(2), "SYNC", data()).path("rooms").size());
+    call(coders.get(1), "ROOM_LEAVE", data("roomId", rid));
+    assertEquals(
+        "LEFT",
+        db.sql.queryForObject(
+            "SELECT status FROM room_members WHERE room_id=? AND user_id=?",
+            String.class,
+            rid,
+            coders.get(1).id()));
+  }
+
+  @Test
+  void contestRelationsTrackPendingAndApprovedParticipants() {
+    String pid = createProblem(1, false).path("id").asText();
+    var contest =
+        call(
+            author,
+            "CONTEST_CREATE",
+            data(
+                "title",
+                "Relational contest",
+                "startsAt",
+                db.now() + 60000,
+                "endsAt",
+                db.now() + 120000,
+                "approvalRequired",
+                true,
+                "problemIds",
+                List.of(pid)));
+    String cid = contest.path("id").asText();
+    call(coders.getFirst(), "CONTEST_JOIN", data("contestId", cid));
+    assertEquals(
+        "PENDING",
+        db.sql.queryForObject(
+            "SELECT status FROM contest_registrations WHERE contest_id=? AND user_id=?",
+            String.class,
+            cid,
+            coders.getFirst().id()));
+    call(
+        author,
+        "CONTEST_APPROVE",
+        data("contestId", cid, "userId", coders.getFirst().id(), "approve", true));
+    assertEquals(
+        "ACCEPTED",
+        db.sql.queryForObject(
+            "SELECT status FROM contest_registrations WHERE contest_id=? AND user_id=?",
+            String.class,
+            cid,
+            coders.getFirst().id()));
+    assertEquals(
+        pid,
+        db.sql.queryForObject(
+            "SELECT problem_id FROM contest_problems WHERE contest_id=?", String.class, cid));
+  }
+
+  @Test
+  void admissionSequenceSurvivesRemovalOfSubmissionHistory() {
+    String pid = createProblem(1, false).path("id").asText();
+    var payload = data("problemId", pid, "source", "pass", "language", "PY311");
+    var first = call(coders.getFirst(), "SUBMIT", payload);
+    db.sql.update("DELETE FROM submissions WHERE id=?", first.path("id").asText());
+    var second = call(coders.getFirst(), "SUBMIT", payload);
+    assertTrue(second.path("admissionOrder").asLong() > first.path("admissionOrder").asLong());
+  }
+
+  @Test
+  void eventFeedMergesPublicAndPersonalEventsWithoutExposingOtherUsers() {
+    db.event(coders.get(1).id(), "private_other", Map.of());
+    db.event(null, "public", Map.of());
+    db.event(coders.getFirst().id(), "private_mine", Map.of());
+    var service = new vn.codegrade.service.EventService(activityRepository);
+    var events = service.poll(0, coders.getFirst().id());
+    assertTrue(events.stream().anyMatch(e -> e.get("type").equals("public")));
+    assertTrue(events.stream().anyMatch(e -> e.get("type").equals("private_mine")));
+    assertFalse(events.stream().anyMatch(e -> e.get("type").equals("private_other")));
+    long previous = 0;
+    for (var event : events) {
+      long id = ((Number) event.get("id")).longValue();
+      assertTrue(id > previous);
+      previous = id;
+    }
+  }
+
+  @BeforeEach
+  void setup() throws Exception {
+    db.atomic(
+        () -> {
+          for (String t :
+              List.of(
+                  "reward_events",
+                  "match_results",
+                  "match_queue",
+                  "progression",
+                  "room_presence",
+                  "submissions",
+                  "rooms",
+                  "contests",
+                  "solved",
+                  "commands",
+                  "drafts",
+                  "events",
+                  "audit",
+                  "problems",
+                  "sessions",
+                  "users",
+                  "categories")) db.sql.update("DELETE FROM " + t);
+          db.sql.update("INSERT INTO categories VALUES('algorithms','Algorithms','Tests')");
+          admin = identity.user(identity.create("admin", "Admin", "test-password-123", "ADMIN"));
+          author =
+              identity.user(identity.create("author", "Author", "test-password-123", "AUTHOR"));
+          coders = new ArrayList<>();
+          for (int i = 0; i < 6; i++)
+            coders.add(
+                identity.user(
+                    identity.create("coder" + i, "Coder " + i, "test-password-123", "CODER")));
+          return null;
+        });
+    fixture =
+        (ObjectNode)
+            db.json.readTree(getClass().getResourceAsStream("/dataset.json")).get(0).deepCopy();
+    ((ObjectNode) fixture.path("answer")).put("validateOnSave", false);
+    ((ObjectNode) fixture.path("general")).put("categoryId", "algorithms");
+  }
+
+  JsonNode call(User u, String type, JsonNode payload) {
+    return db.tree(commands.execute(u, type, payload, db.id()));
+  }
+
+  ObjectNode data(Object... a) {
+    ObjectNode p = db.obj();
+    for (int i = 0; i < a.length; i += 2) p.set(a[i].toString(), db.tree(a[i + 1]));
+    return p;
+  }
+
+  JsonNode createProblem(int difficulty, boolean validate) {
+    ObjectNode q = fixture.deepCopy();
+    q.put("difficulty", difficulty);
+    ((ObjectNode) q.path("general")).put("questionName", "Problem " + db.id());
+    JsonNode saved = call(author, "QUESTION_SAVE", q);
+    if (validate) {
+      call(author, "QUESTION_VALIDATE", data("id", saved.path("id").asText()));
+      gradeNext(true);
+    }
+    return saved;
+  }
+
+  JsonNode gradeNext(boolean pass) {
+    JsonNode job = db.tree(judge.claim("test-worker"));
+    assertTrue(job.path("job").asBoolean());
+    grade(job, pass);
+    return job;
+  }
+
+  void grade(JsonNode job, boolean pass) {
+    JsonNode q =
+        db.read(
+            (String)
+                db.one("SELECT snapshot FROM submissions WHERE id=?", job.path("id").asText())
+                    .get("snapshot"));
+    ObjectNode result =
+        data("id", job.path("id").asText(), "leaseToken", job.path("leaseToken").asText());
+    ArrayNode cases = result.putArray("cases");
+    for (var t : q.path("testcases"))
+      cases.add(
+          data(
+              "verdict",
+              "OK",
+              "stdout",
+              pass ? t.path("expected").asText() : "WRONG\n",
+              "timeMs",
+              1,
+              "compileMs",
+              1));
+    assertTrue(db.tree(judge.complete("test-worker", result)).path("accepted").asBoolean());
+  }
+
+  ObjectNode lobby(int count, List<Integer> selected, int bankSize) {
+    for (int i = 0; i < bankSize; i++) createProblem(selected.getFirst(), true);
+    var r =
+        (ObjectNode) call(coders.getFirst(), "ROOM_CREATE", data("selectedDifficulties", selected));
+    for (int i = 1; i < count; i++)
+      r = (ObjectNode) call(coders.get(i), "ROOM_JOIN", data("roomId", r.path("id").asText()));
+    return r;
+  }
+
+  ObjectNode start(ObjectNode r) {
+    call(coders.getFirst(), "ROOM_START", data("roomId", r.path("id").asText()));
+    ObjectNode loaded = rooms.load(r.path("id").asText());
+    loaded.put("nextAt", db.now() - 1);
+    writeRoom(loaded);
+    db.atomic(
+        () -> {
+          rooms.advance(loaded);
+          return null;
+        });
+    return rooms.load(r.path("id").asText());
+  }
+
+  void writeRoom(ObjectNode r) {
+    db.sql.update(
+        "UPDATE rooms SET state=?,document=? WHERE id=?",
+        r.path("state").asText(),
+        db.write(r),
+        r.path("id").asText());
+  }
+
+  ObjectNode submitPayload(ObjectNode r) {
+    return data(
+        "roomId",
+        r.path("id").asText(),
+        "roundId",
+        r.path("current").path("id").asText(),
+        "problemId",
+        r.path("current").path("problemId").asText(),
+        "source",
+        "print(sum(map(int,input().split())))",
+        "language",
+        "PY311");
+  }
+
+  @Test
+  void liveStandingsTrackOfficialSubmissionsWithoutExposingSourceOrCountingExamples() {
+    ObjectNode r = start(lobby(5, List.of(1), 4));
+    String id = r.path("id").asText(), uid = coders.getFirst().id();
+    var initial = rooms.publicState(r).path("liveStandings");
+    assertEquals(5, initial.size());
+    assertTrue(initial.get(0).path("rank").isNull());
+    for (var row : initial) {
+      assertEquals("NOT_SUBMITTED", row.path("status").asText());
+      assertEquals(0, row.path("attempts").asInt());
+    }
+    call(coders.getFirst(), "RUN_EXAMPLES", submitPayload(r));
+    gradeNext(true);
+    assertEquals(
+        0, rooms.publicState(rooms.load(id)).path("liveStandings").get(0).path("attempts").asInt());
+    call(coders.getFirst(), "SUBMIT", submitPayload(r));
+    var queued = rooms.publicState(rooms.load(id)).path("liveStandings");
+    JsonNode mine = null;
+    for (var row : queued) if (row.path("userId").asText().equals(uid)) mine = row;
+    assertNotNull(mine);
+    assertEquals("QUEUED", mine.path("status").asText());
+    assertEquals(1, mine.path("attempts").asInt());
+    assertEquals(1, mine.path("pending").asInt());
+    assertTrue(mine.path("rank").isNull());
+    var job = db.tree(judge.claim("test-worker"));
+    assertEquals(
+        1,
+        db.sql.queryForObject(
+            "SELECT COUNT(*) FROM events WHERE user_id=? AND type='room_submission_running'",
+            Integer.class,
+            coders.get(1).id()));
+    var running = rooms.publicState(rooms.load(id)).path("liveStandings");
+    for (var row : running)
+      if (row.path("userId").asText().equals(uid))
+        assertEquals("RUNNING", row.path("status").asText());
+    grade(job, false);
+    call(coders.getFirst(), "SUBMIT", submitPayload(r));
+    gradeNext(true);
+    var accepted = rooms.publicState(rooms.load(id)).path("liveStandings").get(0);
+    assertEquals(uid, accepted.path("userId").asText());
+    assertEquals("AC", accepted.path("status").asText());
+    assertEquals(1, accepted.path("rank").asInt());
+    assertEquals(100, accepted.path("score").asInt());
+    assertEquals(2, accepted.path("attempts").asInt());
+    assertEquals(0, accepted.path("pending").asInt());
+    assertTrue(accepted.path("effectiveMs").asLong() >= 10_000);
+    assertFalse(accepted.has("source"));
+    assertFalse(accepted.has("source_code"));
+    assertFalse(accepted.has("cases"));
+    assertEquals("ROUND_ACTIVE", rooms.load(id).path("state").asText());
+  }
+
+  @Test
+  void problemListKeepsBookmarksPrivateAndPreservesFilters() {
+    var first = createProblem(1, false);
+    var second = createProblem(2, false);
+    String firstId = first.path("id").asText(), secondId = second.path("id").asText();
+    call(coders.getFirst(), "BOOKMARK_SET", data("problemId", firstId, "starred", true));
+    call(coders.get(1), "BOOKMARK_SET", data("problemId", secondId, "starred", true));
+    var mine =
+        call(coders.getFirst(), "PROBLEMS", data("difficulty", 1, "categoryId", "algorithms"));
+    assertEquals(1, mine.size());
+    assertEquals(firstId, mine.get(0).path("id").asText());
+    assertTrue(mine.get(0).path("starred").asBoolean());
+    var other = call(coders.get(1), "PROBLEMS", data("search", first.path("publicId").asText()));
+    assertEquals(1, other.size());
+    assertFalse(other.get(0).path("starred").asBoolean());
+  }
+
+  @Test
+  void demoBootstrapIsRepeatableAndPreservesExistingProblemContentAndBookmarks() throws Exception {
+    var existing = createProblem(1, false);
+    String pid = existing.path("id").asText();
+    call(coders.getFirst(), "BOOKMARK_SET", data("problemId", pid, "starred", true));
+    var bootstrap =
+        new vn.codegrade.service.SeedService(
+            db, identity, catalog, problemRepository, submissionRepository, userRepository);
+    org.springframework.test.util.ReflectionTestUtils.setField(
+        bootstrap, "adminPassword", "test-password-123");
+    org.springframework.test.util.ReflectionTestUtils.setField(
+        bootstrap, "workerToken", "test-worker-token-long-enough-1234567890");
+    org.springframework.test.util.ReflectionTestUtils.setField(
+        bootstrap, "demoPassword", "test-password-123");
+    org.springframework.test.util.ReflectionTestUtils.setField(bootstrap, "demo", true);
+    bootstrap.run(null);
+    int problems = db.sql.queryForObject("SELECT COUNT(*) FROM problems", Integer.class),
+        jobs = db.sql.queryForObject("SELECT COUNT(*) FROM submissions", Integer.class);
+    assertEquals(320, problems);
+    bootstrap.run(null);
+    assertEquals(problems, db.sql.queryForObject("SELECT COUNT(*) FROM problems", Integer.class));
+    assertEquals(jobs, db.sql.queryForObject("SELECT COUNT(*) FROM submissions", Integer.class));
+    assertEquals(existing.path("general"), catalog.document(pid).path("general"));
+    assertEquals(existing.path("publicId"), catalog.document(pid).path("publicId"));
+    assertEquals(
+        1,
+        db.sql.queryForObject(
+            "SELECT COUNT(*) FROM bookmarks WHERE user_id=? AND problem_id=?",
+            Integer.class,
+            coders.getFirst().id(),
+            pid));
+  }
+
+  @Test
+  void everyoneSubmittingClosesEarlyAndWaitsForAllJudgments() {
+    ObjectNode r = start(lobby(5, List.of(1), 4));
+    String id = r.path("id").asText();
+    for (int i = 0; i < 4; i++) call(coders.get(i), "SUBMIT", submitPayload(r));
+    assertEquals("ROUND_ACTIVE", rooms.load(id).path("state").asText());
+    call(coders.get(4), "SUBMIT", submitPayload(r));
+    assertEquals("ROUND_GRADING", rooms.load(id).path("state").asText());
+    assertThrows(DomainException.class, () -> call(coders.getFirst(), "SUBMIT", submitPayload(r)));
+    for (int i = 0; i < 4; i++) gradeNext(true);
+    assertEquals("ROUND_GRADING", rooms.load(id).path("state").asText());
+    gradeNext(true);
+    var settled = rooms.load(id);
+    assertEquals("ROUND_RESULT", settled.path("state").asText());
+    assertEquals(1, settled.path("history").size());
+    assertTrue(settled.path("current").path("deadline").asLong() > db.now());
+  }
+
+  @Test
+  void examplesDoNotCloseRoundAndPlayersCanRetryBeforeEveryoneSubmits() {
+    ObjectNode r = start(lobby(5, List.of(1), 4));
+    String id = r.path("id").asText();
+    for (int i = 0; i < 5; i++) call(coders.get(i), "RUN_EXAMPLES", submitPayload(r));
+    assertEquals("ROUND_ACTIVE", rooms.load(id).path("state").asText());
+    for (int i = 0; i < 5; i++) gradeNext(true);
+    call(coders.getFirst(), "SUBMIT", submitPayload(r));
+    gradeNext(false);
+    assertEquals("ROUND_ACTIVE", rooms.load(id).path("state").asText());
+    assertDoesNotThrow(() -> call(coders.getFirst(), "SUBMIT", submitPayload(r)));
+  }
+
+  @Test
+  void forfeitedPlayerDoesNotBlockEarlyClose() {
+    ObjectNode r = start(lobby(5, List.of(1), 4));
+    String id = r.path("id").asText();
+    call(coders.get(4), "ROOM_LEAVE", data("roomId", id));
+    for (int i = 0; i < 4; i++) call(coders.get(i), "SUBMIT", submitPayload(r));
+    assertEquals("ROUND_GRADING", rooms.load(id).path("state").asText());
+  }
+
+  @Test
+  void finalWaitsForEarlierPendingAdmissionAndWorkerOrderCannotChooseWinner() {
+    ObjectNode r = start(lobby(5, List.of(1), 4));
+    String id = r.path("id").asText();
+    for (int i = 0; i < 2; i++) {
+      everyoneAc(r);
+      r = nextRound(rooms.load(id));
+    }
+    assertEquals("FINAL", r.path("current").path("kind").asText());
+    var payload = submitPayload(r);
+    call(coders.getFirst(), "SUBMIT", payload);
+    JsonNode first = db.tree(judge.claim("test-worker"));
+    call(coders.get(1), "SUBMIT", payload);
+    JsonNode second = db.tree(judge.claim("test-worker"));
+    grade(second, true);
+    assertEquals("ROUND_GRADING", rooms.load(id).path("state").asText());
+    grade(first, true);
+    ObjectNode finished = rooms.load(id);
+    assertEquals("FINISHED", finished.path("state").asText());
+    assertEquals(coders.getFirst().id(), finished.path("winnerId").asText());
+    assertEquals(1, identity.user(coders.getFirst().id()).wins());
+    assertThrows(DomainException.class, () -> call(coders.getFirst(), "SUBMIT", payload));
+    assertFalse(
+        db.tree(
+                judge.complete(
+                    "test-worker",
+                    data(
+                        "id",
+                        first.path("id").asText(),
+                        "leaseToken",
+                        first.path("leaseToken").asText())))
+            .path("accepted")
+            .asBoolean());
+    assertEquals(finished, rooms.load(id));
+    assertEquals(0, identity.user(coders.get(1).id()).wins());
+    assertEquals(1, identity.user(coders.getFirst().id()).wins());
+  }
+
+  @Test
+  void finalAcDoesNotWaitForOpponentToSubmit() {
+    ObjectNode r = start(lobby(5, List.of(1), 4));
+    String id = r.path("id").asText();
+    for (int i = 0; i < 2; i++) {
+      everyoneAc(r);
+      r = nextRound(rooms.load(id));
+    }
+    call(coders.getFirst(), "SUBMIT", submitPayload(r));
+    gradeNext(true);
+    assertEquals("FINISHED", rooms.load(id).path("state").asText());
+    assertEquals(coders.getFirst().id(), rooms.load(id).path("winnerId").asText());
+  }
+
+  @Test
+  void queuedSubmissionStillFinishesAndEmptyRoomHistoryIsPreserved() {
+    ObjectNode r = start(lobby(5, List.of(1), 4));
+    String rid = r.path("id").asText();
+    JsonNode receipt = call(coders.getFirst(), "SUBMIT", submitPayload(r));
+    for (int i = 0; i < 5; i++) call(coders.get(i), "ROOM_LEAVE", data("roomId", rid));
+    assertEquals(
+        1, db.sql.queryForObject("SELECT COUNT(*) FROM rooms WHERE id=?", Integer.class, rid));
+    assertEquals("UNRESOLVED", rooms.load(rid).path("state").asText());
+    gradeNext(true);
+    assertEquals(
+        "AC",
+        db.one("SELECT status FROM submissions WHERE id=?", receipt.path("id").asText())
+            .get("status"));
+  }
+
+  @Test
+  void activeContestPreventsEditingItsProblemsAndRejectsDuplicates() {
+    JsonNode q = createProblem(1, false);
+    String pid = q.path("id").asText();
+    var p =
+        data(
+            "title",
+            "Stable contest",
+            "startsAt",
+            db.now() - 100,
+            "endsAt",
+            db.now() + 120000,
+            "problemIds",
+            List.of(pid, pid));
+    assertThrows(DomainException.class, () -> call(author, "CONTEST_CREATE", p));
+    p.set("problemIds", db.tree(List.of(pid)));
+    call(author, "CONTEST_CREATE", p);
+    assertThrows(DomainException.class, () -> call(author, "QUESTION_SAVE", q));
+  }
+
+  @Test
+  void disabledContestMemberDoesNotBlockSettlementAndFinalStandingsStayFrozen() {
+    String pid = createProblem(1, false).path("id").asText();
+    JsonNode c =
+        call(
+            author,
+            "CONTEST_CREATE",
+            data(
+                "title",
+                "Archive",
+                "startsAt",
+                db.now() - 100,
+                "endsAt",
+                db.now() + 120000,
+                "rated",
+                true,
+                "problemIds",
+                List.of(pid)));
+    String cid = c.path("id").asText();
+    for (int i = 0; i < 2; i++) call(coders.get(i), "CONTEST_JOIN", data("contestId", cid));
+    call(admin, "USER_SET", data("id", coders.get(1).id(), "enabled", false));
+    ObjectNode ended =
+        (ObjectNode)
+            db.read(
+                (String) db.one("SELECT document FROM contests WHERE id=?", cid).get("document"));
+    ended.put("endsAt", db.now() - 1);
+    contestRepository.updateDocument(db.write(ended), cid);
+    contests.settle();
+    JsonNode first = call(author, "CONTEST_GET", data("contestId", cid));
+    assertTrue(first.path("contest").path("settled").asBoolean());
+    assertEquals(2, first.path("standings").size());
+    call(admin, "USER_SET", data("id", coders.getFirst().id(), "role", "AUTHOR"));
+    assertEquals(
+        first.path("standings"),
+        call(author, "CONTEST_GET", data("contestId", cid)).path("standings"));
+  }
+
+  ObjectNode tiedCutoff() {
+    ObjectNode r = start(lobby(6, List.of(1), 5));
+    long started = r.path("current").path("startedAt").asLong();
+    for (int i = 0; i < 6; i++) {
+      JsonNode ack = call(coders.get(i), "SUBMIT", submitPayload(r));
+      db.sql.update(
+          "UPDATE submissions SET received_at=? WHERE id=?",
+          started + (i == 0 ? 100 : 200),
+          ack.path("id").asText());
+    }
+    while (true) {
+      JsonNode job = db.tree(judge.claim("test-worker"));
+      if (!job.path("job").asBoolean()) break;
+      grade(job, true);
+    }
+    closeRound(r);
+    return rooms.load(r.path("id").asText());
+  }
+
+  @Test
+  void tieBreakRetainsOriginalRemainingSlots() {
+    ObjectNode r = tiedCutoff();
+    assertEquals(3, r.path("tieSlots").asInt());
+    assertEquals(5, r.path("tiePlayers").size());
+    r = nextRound(r);
+    int i = 0;
+    for (var uid : r.path("current").path("players")) {
+      JsonNode ack = call(identity.user(uid.asText()), "SUBMIT", submitPayload(r));
+      db.sql.update(
+          "UPDATE submissions SET received_at=? WHERE id=?",
+          r.path("current").path("startedAt").asLong() + 100 + (i++) * 100,
+          ack.path("id").asText());
+    }
+    while (true) {
+      JsonNode job = db.tree(judge.claim("test-worker"));
+      if (!job.path("job").asBoolean()) break;
+      grade(job, true);
+    }
+    closeRound(r);
+    r = rooms.load(r.path("id").asText());
+    int alive = 0;
+    for (var player : r.path("players"))
+      if (player.path("status").asText().equals("ALIVE")) alive++;
+    assertEquals(4, alive);
+  }
+
+  @Test
+  void submissionCannotBelongToBothRoomAndContestOrOrphanRound() {
+    String pid = createProblem(1, false).path("id").asText();
+    var p =
+        data(
+            "problemId",
+            pid,
+            "source",
+            "print(5)",
+            "language",
+            "PY311",
+            "roomId",
+            "room",
+            "contestId",
+            "contest");
+    assertThrows(DomainException.class, () -> call(coders.getFirst(), "SUBMIT", p));
+    p.remove(List.of("roomId", "contestId"));
+    p.put("roundId", "orphan");
+    assertThrows(DomainException.class, () -> call(coders.getFirst(), "SUBMIT", p));
+  }
+
+  @Test
+  void safeQualifierStillWinsWhenAllTiedPlayersFailTheTieBreak() {
+    ObjectNode r = nextRound(tiedCutoff());
+    String rid = r.path("id").asText();
+    closeRound(r);
+    r = rooms.load(rid);
+    assertEquals("FINISHED", r.path("state").asText());
+    assertEquals(coders.getFirst().id(), r.path("winnerId").asText());
+  }
+
+  @Test
+  void forfeitedQualifierCannotReturnAsWinnerAfterTheTieBreak() {
+    ObjectNode r = tiedCutoff();
+    String rid = r.path("id").asText();
+    call(coders.getFirst(), "ROOM_LEAVE", data("roomId", rid));
+    r = nextRound(rooms.load(rid));
+    closeRound(r);
+    r = rooms.load(rid);
+    assertEquals("UNRESOLVED", r.path("state").asText());
+    assertFalse(r.has("winnerId"));
+  }
+
+  @Test
+  void failedReauthenticationClearsOldSocketIdentity() throws Exception {
+    try (Peer peer = new Peer()) {
+      JsonNode login =
+          peer.send("LOGIN", data("username", "coder0", "password", "test-password-123"));
+      assertTrue(
+          peer.send("AUTH", data("token", login.path("data").path("token").asText()))
+              .path("ok")
+              .asBoolean());
+      assertFalse(peer.send("AUTH", data("token", "invalid")).path("ok").asBoolean());
+      assertFalse(peer.send("ME", data()).path("ok").asBoolean());
+    }
+  }
+
+  @Test
+  void revokedSocketStopsReceivingPrivateEvents() throws Exception {
+    try (Peer peer = new Peer()) {
+      JsonNode login =
+          peer.send("LOGIN", data("username", "coder0", "password", "test-password-123"));
+      assertTrue(
+          peer.send("AUTH", data("token", login.path("data").path("token").asText()))
+              .path("ok")
+              .asBoolean());
+      db.sql.update("DELETE FROM sessions WHERE user_id=?", coders.getFirst().id());
+      db.event(coders.getFirst().id(), "private_after_revoke", Map.of("secret", true));
+      clients.events();
+      JsonNode event = peer.inbox.poll(5, TimeUnit.SECONDS);
+      assertNotNull(event);
+      assertEquals("session_revoked", event.path("event").asText());
+      assertFalse(peer.send("ME", data()).path("ok").asBoolean());
+    }
+  }
+
+  @Test
+  void serverRejectsRoleEscalationAndForgedValidation() {
+    assertThrows(DomainException.class, () -> call(coders.getFirst(), "QUESTION_SAVE", fixture));
+    assertThrows(
+        DomainException.class,
+        () -> call(author, "USER_SET", data("id", coders.getFirst().id(), "role", "ADMIN")));
+    fixture.put("validatedVersion", 1);
+    JsonNode q = call(author, "QUESTION_SAVE", fixture);
+    assertFalse(q.has("validatedVersion"));
+  }
+
+  @Test
+  void mutationIdempotenceBindsPayload() {
+    JsonNode q = createProblem(1, false);
+    var p = data("problemId", q.path("id").asText(), "source", "print(5)", "language", "PY311");
+    String key = db.id();
+    Object first = commands.execute(coders.getFirst(), "SUBMIT", p, key),
+        again = commands.execute(coders.getFirst(), "SUBMIT", p, key);
+    assertEquals(db.write(first), db.write(again));
+    assertEquals(1, db.sql.queryForObject("SELECT COUNT(*) FROM submissions", Integer.class));
+    p.put("source", "print(6)");
+    assertThrows(
+        DomainException.class, () -> commands.execute(coders.getFirst(), "SUBMIT", p, key));
+  }
+
+  @Test
+  void leaderboardsSeparateContestEloRankExpAndCompletedMatchCounts() {
+    for (User u : List.of(coders.get(0), coders.get(1), coders.get(3), admin))
+      progression.get(u.id());
+    db.sql.update("UPDATE users SET elo=1800 WHERE id=?", coders.get(0).id());
+    db.sql.update("UPDATE progression SET exp=900,rating=1050 WHERE user_id=?", coders.get(0).id());
+    db.sql.update("UPDATE progression SET exp=300,rating=1750 WHERE user_id=?", coders.get(1).id());
+    db.sql.update(
+        "UPDATE progression SET exp=9999,rating=2500 WHERE user_id IN (?,?)",
+        coders.get(3).id(),
+        admin.id());
+    db.sql.update("UPDATE users SET enabled=FALSE WHERE id=?", coders.get(3).id());
+    var completed =
+        List.of(
+            List.of("NORMAL", "NORMAL", "RANKED"),
+            List.of("NORMAL", "RANKED", "RANKED"),
+            List.of("PRACTICE", "PRACTICE", "PRACTICE"));
+    for (int i = 0; i < completed.size(); i++)
+      for (String mode : completed.get(i))
+        db.sql.update(
+            "INSERT INTO match_results VALUES(?,?,?,?,?,?,?,?)",
+            db.id(),
+            coders.get(i).id(),
+            mode,
+            1,
+            0,
+            1000,
+            1000,
+            db.now());
+    for (int i = 0; i < 2; i++) {
+      JsonNode q = createProblem(1, false);
+      db.sql.update(
+          "INSERT INTO solved(user_id,problem_id) VALUES(?,?)",
+          coders.get(0).id(),
+          q.path("id").asText());
+    }
+    for (String metric : List.of("elo", "ac", "exp", "rank", "normal_games", "ranked_games")) {
+      JsonNode board = db.tree(catalog.leaderboard(metric));
+      assertEquals(5, board.size());
+      String expected =
+          List.of("rank", "ranked_games").contains(metric)
+              ? coders.get(1).id()
+              : coders.get(0).id();
+      assertEquals(expected, board.get(0).path("id").asText(), metric);
+      for (JsonNode row : board) {
+        assertNotEquals(admin.id(), row.path("id").asText());
+        assertNotEquals(coders.get(3).id(), row.path("id").asText());
+        if (row.path("id").asText().equals(coders.get(0).id())) {
+          assertEquals(2, row.path("ac").asInt());
+          assertEquals(2, row.path("normal_games").asInt());
+          assertEquals(1, row.path("ranked_games").asInt());
+          assertEquals(1800, row.path("elo").asInt());
+          assertEquals(900, row.path("exp").asInt());
+          assertEquals(1050, row.path("rating").asInt());
+        }
+        if (row.path("id").asText().equals(coders.get(2).id())) {
+          assertEquals(0, row.path("normal_games").asInt());
+          assertEquals(0, row.path("ranked_games").asInt());
+          assertEquals(0, row.path("exp").asInt());
+          assertEquals(1000, row.path("rating").asInt());
+        }
+        assertEquals(progression.tier(row.path("rating").asInt()), row.path("rank").asText());
+      }
+    }
+  }
+
+  @Test
+  void adminAcNeverEntersAnyLeaderboard() {
+    JsonNode q = createProblem(1, false);
+    call(
+        admin,
+        "SUBMIT",
+        data("problemId", q.path("id").asText(), "source", "pass", "language", "PY311"));
+    gradeNext(true);
+    assertEquals(
+        0,
+        db.sql.queryForObject(
+            "SELECT COUNT(*) FROM solved WHERE user_id=?", Integer.class, admin.id()));
+    for (String metric : List.of("elo", "ac", "wins"))
+      assertFalse(db.write(catalog.leaderboard(metric)).contains(admin.id()));
+    assertEquals(1200, identity.user(admin.id()).elo());
+    for (int i = 0; i < 2; i++) {
+      call(
+          coders.getFirst(),
+          "SUBMIT",
+          data("problemId", q.path("id").asText(), "source", "pass", "language", "PY311"));
+      gradeNext(true);
+    }
+    assertEquals(
+        1,
+        db.sql.queryForObject(
+            "SELECT COUNT(*) FROM solved WHERE user_id=?", Integer.class, coders.getFirst().id()));
+    JsonNode board = db.tree(catalog.leaderboard("ac"));
+    assertEquals(coders.getFirst().id(), board.get(0).path("id").asText());
+    assertEquals(1, board.get(0).path("ac").asInt());
+  }
+
+  @Test
+  void changingAdminToCoderWhileGradingDoesNotRetroactivelyCountAdminSubmission() {
+    JsonNode q = createProblem(1, false);
+    call(
+        admin,
+        "SUBMIT",
+        data("problemId", q.path("id").asText(), "source", "pass", "language", "PY311"));
+    db.sql.update("UPDATE users SET role='CODER' WHERE id=?", admin.id());
+    gradeNext(true);
+    assertEquals(
+        0,
+        db.sql.queryForObject(
+            "SELECT COUNT(*) FROM solved WHERE user_id=?", Integer.class, admin.id()));
+  }
+
+  @Test
+  void frozenSnapshotAndVisibilityAreEnforced() {
+    JsonNode q = createProblem(1, false);
+    String publicDoc = db.write(catalog.get(coders.getFirst(), q.path("id").asText(), false));
+    assertFalse(publicDoc.contains("sampleAnswer"));
+    assertFalse(publicDoc.contains("-4 9"));
+    JsonNode receipt =
+        call(
+            coders.getFirst(),
+            "SUBMIT",
+            data("problemId", q.path("id").asText(), "source", "pass", "language", "PY311"));
+    gradeNext(true);
+    JsonNode detail =
+        call(coders.getFirst(), "SUBMISSION_GET", data("id", receipt.path("id").asText()));
+    assertTrue(detail.path("result").path("cases").get(1).path("hidden").asBoolean());
+    assertFalse(detail.has("snapshot"));
+    assertThrows(
+        DomainException.class,
+        () -> call(coders.get(1), "SUBMISSION_GET", data("id", receipt.path("id").asText())));
+  }
+
+  @Test
+  void defaultLevelsAndServerLockCannotBeBypassed() {
+    ObjectNode r = lobby(5, List.of(1, 3), 4);
+    String id = r.path("id").asText();
+    assertThrows(
+        DomainException.class,
+        () ->
+            call(
+                coders.get(1),
+                "ROOM_CONFIG",
+                data("roomId", id, "selectedDifficulties", List.of(2))));
+    assertThrows(
+        DomainException.class,
+        () ->
+            call(
+                coders.getFirst(),
+                "ROOM_CONFIG",
+                data("roomId", id, "selectedDifficulties", List.of())));
+    r = start(r);
+    assertTrue(List.of(1, 3).contains(r.path("current").path("difficulty").asInt()));
+    assertThrows(
+        DomainException.class,
+        () ->
+            call(
+                coders.getFirst(),
+                "ROOM_CONFIG",
+                data("roomId", id, "selectedDifficulties", List.of(2))));
+    assertEquals(4, r.path("bank").size());
+    assertFalse(rooms.publicState(r).has("bank"));
+  }
+
+  @Test
+  void shortageIsReportedWithoutExpandingLevels() {
+    ObjectNode r = lobby(5, List.of(5), 1);
+    for (int i = 0; i < 5; i++) createProblem(1, true);
+    assertThrows(
+        DomainException.class,
+        () -> call(coders.getFirst(), "ROOM_START", data("roomId", r.path("id").asText())));
+    assertEquals("LOBBY", rooms.load(r.path("id").asText()).path("state").asText());
+  }
+
+  @Test
+  void concurrentAdmissionNeverConsumesMoreThanTwoAttempts() throws Exception {
+    ObjectNode r = start(lobby(5, List.of(1), 4));
+    ObjectNode payload = submitPayload(r);
+    ExecutorService pool = Executors.newFixedThreadPool(8);
+    var futures = new ArrayList<Future<Boolean>>();
+    try {
+      for (int i = 0; i < 8; i++)
+        futures.add(
+            pool.submit(
+                () -> {
+                  try {
+                    call(coders.getFirst(), "SUBMIT", payload);
+                    return true;
+                  } catch (DomainException ex) {
+                    return false;
+                  }
+                }));
+      int accepted = 0;
+      for (var f : futures) if (f.get(10, TimeUnit.SECONDS)) accepted++;
+      assertEquals(2, accepted);
+    } finally {
+      pool.shutdownNow();
+    }
+  }
+
+  @Test
+  void lateWorkerCompletionWaitsAndDoesNotDetermineElimination() {
+    ObjectNode r = start(lobby(5, List.of(1), 4));
+    String id = r.path("id").asText();
+    long started = r.path("current").path("startedAt").asLong();
+    for (int i = 0; i < 5; i++) {
+      var receipt = call(coders.get(i), "SUBMIT", submitPayload(r));
+      db.sql.update(
+          "UPDATE submissions SET received_at=? WHERE id=?",
+          started + 100 + i * 20,
+          receipt.path("id").asText());
+    }
+    var jobs = new ArrayList<JsonNode>();
+    for (int i = 0; i < 5; i++) jobs.add(db.tree(judge.claim("test-worker")));
+    ((ObjectNode) r.path("current")).put("deadline", db.now() - 1);
+    writeRoom(r);
+    rooms.advance(r);
+    r = rooms.load(id);
+    rooms.advance(r);
+    assertEquals("ROUND_GRADING", rooms.load(id).path("state").asText());
+    Collections.reverse(jobs);
+    for (var job : jobs) grade(job, true);
+    rooms.advance(rooms.load(id));
+    r = rooms.load(id);
+    assertEquals("ROUND_RESULT", r.path("state").asText());
+    assertEquals(coders.getFirst().id(), r.path("standings").get(0).path("userId").asText());
+    assertEquals(
+        3,
+        java.util.stream.StreamSupport.stream(r.path("players").spliterator(), false)
+            .filter(p -> p.path("status").asText().equals("ALIVE"))
+            .count());
+  }
+
+  @Test
+  void expiredLeaseCannotOverwriteNewWorkerResult() {
+    JsonNode q = createProblem(1, false);
+    call(
+        coders.getFirst(),
+        "SUBMIT",
+        data("problemId", q.path("id").asText(), "source", "pass", "language", "PY311"));
+    JsonNode old = db.tree(judge.claim("test-worker"));
+    db.sql.update("UPDATE submissions SET lease_until=0 WHERE id=?", old.path("id").asText());
+    judge.recover();
+    JsonNode fresh = db.tree(judge.claim("test-worker"));
+    assertNotEquals(old.path("leaseToken"), fresh.path("leaseToken"));
+    assertFalse(
+        db.tree(
+                judge.complete(
+                    "test-worker",
+                    data(
+                        "id",
+                        old.path("id").asText(),
+                        "leaseToken",
+                        old.path("leaseToken").asText(),
+                        "systemError",
+                        true)))
+            .path("accepted")
+            .asBoolean());
+    grade(fresh, true);
+    assertEquals(
+        "AC",
+        db.one("SELECT status FROM submissions WHERE id=?", fresh.path("id").asText())
+            .get("status"));
+  }
+
+  @Test
+  void allZeroEndsWithoutWinner() {
+    ObjectNode r = start(lobby(5, List.of(3), 4));
+    String id = r.path("id").asText();
+    r.put("state", "ROUND_GRADING");
+    writeRoom(r);
+    rooms.advance(r);
+    assertEquals("UNRESOLVED", rooms.load(id).path("state").asText());
+  }
+
+  @Test
+  void lateJoinerBecomesSpectatorAndCannotSubmit() {
+    ObjectNode r = start(lobby(5, List.of(1), 4));
+    JsonNode joined = call(coders.get(5), "ROOM_JOIN", data("roomId", r.path("id").asText()));
+    assertEquals("SPECTATOR", joined.path("players").get(5).path("status").asText());
+    assertThrows(DomainException.class, () -> call(coders.get(5), "SUBMIT", submitPayload(r)));
+  }
+
+  @Test
+  void draftsAndMultilineSurviveRoundTrip() {
+    JsonNode q = createProblem(1, false);
+    String source = "a = '\\t'\nprint(a)\n\n";
+    call(
+        coders.getFirst(),
+        "DRAFT_SAVE",
+        data("problemId", q.path("id").asText(), "source", source, "language", "PY311"));
+    assertEquals(
+        source,
+        call(coders.getFirst(), "DRAFT_GET", data("problemId", q.path("id").asText()))
+            .get(0)
+            .path("source_code")
+            .asText());
+  }
+
+  @Test
+  void disabledAccountCanBeReenabled() {
+    call(admin, "USER_SET", data("id", coders.getFirst().id(), "role", "CODER", "enabled", false));
+    assertThrows(DomainException.class, () -> identity.user(coders.getFirst().id()));
+    call(admin, "USER_SET", data("id", coders.getFirst().id(), "role", "CODER", "enabled", true));
+    assertTrue(identity.user(coders.getFirst().id()).coder());
+  }
+
+  void closeRound(ObjectNode r) {
+    r = rooms.load(r.path("id").asText());
+    if (!List.of("ROUND_ACTIVE", "ROUND_GRADING").contains(r.path("state").asText())) return;
+    ((ObjectNode) r.path("current")).put("deadline", 0);
+    writeRoom(r);
+    rooms.advance(r);
+    rooms.advance(rooms.load(r.path("id").asText()));
+  }
+
+  ObjectNode nextRound(ObjectNode r) {
+    r.put("nextAt", 0);
+    writeRoom(r);
+    rooms.advance(r);
+    return rooms.load(r.path("id").asText());
+  }
+
+  void everyoneAc(ObjectNode r) {
+    int index = 0;
+    for (var player : r.path("players"))
+      if (player.path("status").asText().equals("ALIVE")) {
+        User u = identity.user(player.path("id").asText());
+        var receipt = call(u, "SUBMIT", submitPayload(r));
+        db.sql.update(
+            "UPDATE submissions SET received_at=? WHERE id=?",
+            r.path("current").path("startedAt").asLong() + 1000 + (index++) * 50,
+            receipt.path("id").asText());
+      }
+    while (true) {
+      var job = db.tree(judge.claim("test-worker"));
+      if (!job.path("job").asBoolean()) break;
+      grade(job, true);
+    }
+  }
+
+  @Test
+  void completeMatchUpdatesWinsOnceWithoutChangingAnyElo() {
+    ObjectNode r = start(lobby(5, List.of(1), 4));
+    String id = r.path("id").asText();
+    Map<String, Integer> ratings = new HashMap<>();
+    for (int i = 0; i < 6; i++) {
+      int elo = 950 + i * 137;
+      db.sql.update("UPDATE users SET elo=? WHERE id=?", elo, coders.get(i).id());
+      ratings.put(coders.get(i).id(), elo);
+    }
+    call(coders.get(5), "ROOM_JOIN", data("roomId", id));
+    for (int round = 0; round < 3; round++) {
+      everyoneAc(r);
+      closeRound(r);
+      r = rooms.load(id);
+      if (!r.path("state").asText().equals("FINISHED")) r = nextRound(r);
+    }
+    assertEquals("FINISHED", r.path("state").asText());
+    assertEquals(coders.getFirst().id(), r.path("winnerId").asText());
+    assertEquals(1, identity.user(coders.getFirst().id()).wins());
+    for (User coder : coders)
+      assertEquals(ratings.get(coder.id()).intValue(), identity.user(coder.id()).elo());
+    rooms.advance(r);
+    assertEquals(1, identity.user(coders.getFirst().id()).wins());
+  }
+
+  @Test
+  void passwordChangeChecksCurrentPasswordAndRevokesAllSessions() {
+    User u = coders.getFirst();
+    String old =
+        (String)
+            identity
+                .login(data("username", u.username(), "password", "test-password-123"))
+                .get("token");
+    String other =
+        (String)
+            identity
+                .login(data("username", u.username(), "password", "test-password-123"))
+                .get("token");
+    assertThrows(
+        DomainException.class,
+        () ->
+            call(
+                u,
+                "PASSWORD_CHANGE",
+                data("currentPassword", "wrong", "newPassword", "new-password-123")));
+    assertEquals(u.id(), identity.authenticate(old).id());
+    assertThrows(
+        DomainException.class,
+        () ->
+            call(
+                u,
+                "PASSWORD_CHANGE",
+                data("currentPassword", "test-password-123", "newPassword", "short")));
+    assertThrows(
+        DomainException.class,
+        () ->
+            call(
+                u,
+                "PASSWORD_CHANGE",
+                data("currentPassword", "test-password-123", "newPassword", "ậ".repeat(25))));
+    assertThrows(
+        DomainException.class,
+        () ->
+            call(
+                u,
+                "PASSWORD_CHANGE",
+                data("currentPassword", "test-password-123", "newPassword", "test-password-123")));
+    assertTrue(
+        call(
+                u,
+                "PASSWORD_CHANGE",
+                data("currentPassword", "test-password-123", "newPassword", "new-password-123"))
+            .path("changed")
+            .asBoolean());
+    assertThrows(DomainException.class, () -> identity.authenticate(old));
+    assertThrows(DomainException.class, () -> identity.authenticate(other));
+    assertThrows(
+        DomainException.class,
+        () -> identity.login(data("username", u.username(), "password", "test-password-123")));
+    assertNotNull(
+        identity
+            .login(data("username", u.username(), "password", "new-password-123"))
+            .get("token"));
+    assertNotNull(
+        identity
+            .login(data("username", coders.get(1).username(), "password", "test-password-123"))
+            .get("token"));
+  }
+
+  @Test
+  void progressIsBoundedMonotonicPrivateAndRestrictedToActiveLease() {
+    String pid = createProblem(1, false).path("id").asText();
+    User u = coders.getFirst();
+    String id =
+        call(u, "SUBMIT", data("problemId", pid, "source", "pass", "language", "PY311"))
+            .path("id")
+            .asText();
+    JsonNode job = db.tree(judge.claim("test-worker"));
+    String lease = job.path("leaseToken").asText();
+    int total = job.path("runner").path("tests").size();
+    assertFalse(
+        db.tree(
+                judge.progress(
+                    "other-worker",
+                    data("id", id, "leaseToken", lease, "currentTest", 1, "completedTests", 0)))
+            .path("accepted")
+            .asBoolean());
+    assertTrue(
+        db.tree(
+                judge.progress(
+                    "test-worker",
+                    data("id", id, "leaseToken", lease, "currentTest", 2, "completedTests", 1)))
+            .path("accepted")
+            .asBoolean());
+    judge.progress(
+        "test-worker", data("id", id, "leaseToken", lease, "currentTest", 1, "completedTests", 0));
+    var detail = call(u, "SUBMISSION_GET", data("id", id));
+    assertEquals(2, detail.path("current_test").asInt());
+    assertEquals(1, detail.path("completed_tests").asInt());
+    assertEquals(total, detail.path("total_tests").asInt());
+    assertFalse(detail.has("lease_token"));
+    assertThrows(
+        DomainException.class, () -> call(coders.get(1), "SUBMISSION_GET", data("id", id)));
+    assertThrows(
+        DomainException.class,
+        () ->
+            judge.progress(
+                "test-worker",
+                data(
+                    "id",
+                    id,
+                    "leaseToken",
+                    lease,
+                    "currentTest",
+                    total + 1,
+                    "completedTests",
+                    total)));
+    grade(job, true);
+    assertEquals(total, call(u, "SUBMISSION_GET", data("id", id)).path("completed_tests").asInt());
+    assertFalse(
+        db.tree(
+                judge.progress(
+                    "test-worker",
+                    data("id", id, "leaseToken", lease, "currentTest", 2, "completedTests", 1)))
+            .path("accepted")
+            .asBoolean());
+    assertEquals(
+        1,
+        db.sql.queryForObject(
+            "SELECT COUNT(*) FROM events WHERE user_id=? AND type='submission_progress'",
+            Integer.class,
+            u.id()));
+  }
+
+  @Test
+  void historyPaginationIncludesOldRowsAndKeepsAccountAndFilterBoundaries() {
+    String pid = createProblem(1, false).path("id").asText();
+    User u = coders.getFirst();
+    for (int i = 0; i < 107; i++)
+      db.sql.update(
+          "INSERT INTO"
+              + " submissions(id,user_id,problem_id,request_id,source_code,language,mode,received_at,status,snapshot)"
+              + " VALUES(?,?,?,?,?,?,?,?,?,?)",
+          db.id(),
+          i < 105 ? u.id() : coders.get(1).id(),
+          pid,
+          db.id(),
+          "pass",
+          "PY311",
+          "OFFICIAL",
+          i,
+          i % 2 == 0 ? "AC" : "WA",
+          "{}");
+    var first = call(u, "SUBMISSIONS_PAGE", data("page", 1, "pageSize", 20));
+    assertEquals(105, first.path("total").asInt());
+    assertEquals(6, first.path("totalPages").asInt());
+    assertEquals(20, first.path("items").size());
+    var last = call(u, "SUBMISSIONS_PAGE", data("page", 99, "pageSize", 20));
+    assertEquals(6, last.path("page").asInt());
+    assertEquals(5, last.path("items").size());
+    assertEquals(0, last.path("items").get(4).path("received_at").asInt());
+    var ac = call(u, "SUBMISSIONS_PAGE", data("page", 1, "pageSize", 50, "filter", "ac"));
+    assertEquals(53, ac.path("total").asInt());
+    for (var s : ac.path("items")) assertEquals("AC", s.path("status").asText());
+    assertEquals(100, call(u, "SUBMISSIONS", data()).size());
+    assertThrows(DomainException.class, () -> call(u, "SUBMISSIONS_PAGE", data("pageSize", 500)));
+  }
+
+  @Test
+  void perProblemRankingUsesBestAcPerCoderWithoutRevealingSources() {
+    String pid = createProblem(1, false).path("id").asText();
+    int index = 0;
+    String bestId = "";
+    for (User u : List.of(coders.getFirst(), coders.getFirst(), coders.get(1), admin, author)) {
+      String id =
+          call(u, "SUBMIT", data("problemId", pid, "source", "pass", "language", "PY311"))
+              .path("id")
+              .asText();
+      gradeNext(true);
+      var result =
+          (ObjectNode)
+              db.read(
+                  (String) db.one("SELECT result FROM submissions WHERE id=?", id).get("result"));
+      for (var c : result.path("cases"))
+        ((ObjectNode) c).put("timeMs", index == 0 ? 50 : index == 1 ? 0.5 : 1);
+      db.sql.update("UPDATE submissions SET result=? WHERE id=?", db.write(result), id);
+      if (index++ == 1) bestId = id;
+    }
+    var ranked = call(coders.get(2), "PROBLEM_RANKING", data("problemId", pid));
+    assertEquals(2, ranked.size());
+    assertEquals(coders.getFirst().id(), ranked.get(0).path("userId").asText());
+    assertEquals(1, ranked.get(0).path("rank").asInt());
+    assertEquals(bestId, ranked.get(0).path("submissionId").asText());
+    assertFalse(ranked.toString().contains("source_code"));
+    assertFalse(ranked.toString().contains("expected"));
+    assertFalse(ranked.toString().contains("stdout"));
+    db.sql.update("UPDATE users SET enabled=FALSE WHERE id=?", coders.getFirst().id());
+    assertEquals(1, call(coders.get(2), "PROBLEM_RANKING", data("problemId", pid)).size());
+    ObjectNode q = fixture.deepCopy();
+    ((ObjectNode) q.path("general")).put("status", "draft");
+    String draft = call(author, "QUESTION_SAVE", q).path("id").asText();
+    assertThrows(
+        DomainException.class,
+        () -> call(coders.get(2), "PROBLEM_RANKING", data("problemId", draft)));
+  }
+
+  @Test
+  void finalWithoutAcHasNoWinner() {
+    ObjectNode r = start(lobby(5, List.of(1), 4));
+    String id = r.path("id").asText();
+    for (int i = 0; i < 2; i++) {
+      everyoneAc(r);
+      closeRound(r);
+      r = nextRound(rooms.load(id));
+    }
+    closeRound(r);
+    assertEquals("UNRESOLVED", rooms.load(id).path("state").asText());
+  }
+
+  @Test
+  void emptySourcesAndOutOfRangeLanguageCannotEnterQueue() {
+    JsonNode q = createProblem(1, false);
+    assertThrows(
+        DomainException.class,
+        () ->
+            call(
+                coders.getFirst(),
+                "SUBMIT",
+                data("problemId", q.path("id").asText(), "source", " ", "language", "PY311")));
+    assertThrows(
+        DomainException.class,
+        () ->
+            call(
+                coders.getFirst(),
+                "SUBMIT",
+                data("problemId", q.path("id").asText(), "source", "x", "language", "CPP23")));
+    assertEquals(0, db.sql.queryForObject("SELECT COUNT(*) FROM submissions", Integer.class));
+  }
+
+  class Peer implements java.net.http.WebSocket.Listener, AutoCloseable {
+    java.net.http.WebSocket ws;
+    BlockingQueue<JsonNode> inbox = new LinkedBlockingQueue<>();
+    StringBuilder text = new StringBuilder();
+
+    Peer() throws Exception {
+      this("/ws");
+    }
+
+    Peer(String path) throws Exception {
+      ws =
+          java.net.http.HttpClient.newHttpClient()
+              .newWebSocketBuilder()
+              .buildAsync(java.net.URI.create("ws://127.0.0.1:" + port + path), this)
+              .get(5, TimeUnit.SECONDS);
+    }
+
+    public void onOpen(java.net.http.WebSocket w) {
+      w.request(1);
+    }
+
+    public CompletionStage<?> onText(java.net.http.WebSocket w, CharSequence data, boolean last) {
+      text.append(data);
+      if (last) {
+        inbox.add(db.read(text.toString()));
+        text.setLength(0);
+      }
+      w.request(1);
+      return CompletableFuture.completedFuture(null);
+    }
+
+    JsonNode send(String type, JsonNode p) throws Exception {
+      String id = db.id();
+      ws.sendText(db.write(Map.of("v", 1, "type", type, "requestId", id, "payload", p)), true)
+          .join();
+      for (int i = 0; i < 20; i++) {
+        var m = inbox.poll(5, TimeUnit.SECONDS);
+        assertNotNull(m);
+        if (m.path("requestId").asText().equals(id)) return m;
+      }
+      throw new AssertionError("No ACK");
+    }
+
+    public void close() {
+      ws.abort();
+    }
+  }
+
+  @Test
+  void realWebSocketAuthAuthorizationReplayAndSnapshot() throws Exception {
+    String token;
+    try (Peer peer = new Peer()) {
+      assertFalse(peer.send("PROBLEMS", data()).path("ok").asBoolean());
+      var login = peer.send("LOGIN", data("username", "coder0", "password", "test-password-123"));
+      assertTrue(login.path("ok").asBoolean());
+      token = login.path("data").path("token").asText();
+      assertTrue(peer.send("AUTH", data("token", token)).path("ok").asBoolean());
+      assertFalse(
+          peer.send("CATEGORY_SAVE", data("name", "Escalation", "description", ""))
+              .path("ok")
+              .asBoolean());
+    }
+    call(
+        author,
+        "CATEGORY_SAVE",
+        data("name", "Replay category", "description", "while disconnected"));
+    try (Peer peer = new Peer()) {
+      assertTrue(peer.send("AUTH", data("token", token, "lastSeq", 0)).path("ok").asBoolean());
+      clients.events();
+      JsonNode event = peer.inbox.poll(5, TimeUnit.SECONDS);
+      assertNotNull(event);
+      assertEquals("catalog_changed", event.path("event").asText());
+      var snapshot = peer.send("SYNC", data());
+      assertTrue(snapshot.path("ok").asBoolean());
+      assertEquals(coders.getFirst().id(), snapshot.path("data").path("user").path("id").asText());
+    }
+  }
+
+  @Test
+  void workerSocketReportsRealProgressUsingItsLease() throws Exception {
+    String pid = createProblem(1, false).path("id").asText();
+    String id =
+        call(
+                coders.getFirst(),
+                "SUBMIT",
+                data("problemId", pid, "source", "pass", "language", "PY311"))
+            .path("id")
+            .asText();
+    try (Peer peer = new Peer("/worker-ws")) {
+      assertFalse(peer.send("CLAIM", data()).path("ok").asBoolean());
+      assertTrue(
+          peer.send(
+                  "WORKER_AUTH",
+                  data(
+                      "token",
+                      "test-worker-token-long-enough-1234567890",
+                      "workerId",
+                      "test-worker"))
+              .path("ok")
+              .asBoolean());
+      var job = peer.send("CLAIM", data()).path("data");
+      assertEquals(id, job.path("id").asText());
+      var response =
+          peer.send(
+              "PROGRESS",
+              data(
+                  "id",
+                  id,
+                  "leaseToken",
+                  job.path("leaseToken").asText(),
+                  "currentTest",
+                  1,
+                  "completedTests",
+                  0));
+      assertTrue(response.path("data").path("accepted").asBoolean());
+      var mine = call(coders.getFirst(), "SUBMISSIONS", data()).get(0);
+      assertEquals(1, mine.path("current_test").asInt());
+      assertEquals(job.path("runner").path("tests").size(), mine.path("total_tests").asInt());
+      grade(job, true);
+    }
+  }
+
+  @Test
+  void passwordChangeOverSocketRequiresReauthenticationAndLimitsAttempts() throws Exception {
+    try (Peer peer = new Peer()) {
+      String token =
+          peer.send("LOGIN", data("username", "coder0", "password", "test-password-123"))
+              .path("data")
+              .path("token")
+              .asText();
+      assertTrue(peer.send("AUTH", data("token", token)).path("ok").asBoolean());
+      assertTrue(
+          peer.send(
+                  "PASSWORD_CHANGE",
+                  data(
+                      "currentPassword",
+                      "test-password-123",
+                      "newPassword",
+                      "changed-password-123"))
+              .path("ok")
+              .asBoolean());
+      assertFalse(peer.send("ME", data()).path("ok").asBoolean());
+      String fresh =
+          peer.send("LOGIN", data("username", "coder0", "password", "changed-password-123"))
+              .path("data")
+              .path("token")
+              .asText();
+      assertTrue(peer.send("AUTH", data("token", fresh)).path("ok").asBoolean());
+      for (int i = 0; i < 4; i++)
+        assertFalse(
+            peer.send(
+                    "PASSWORD_CHANGE",
+                    data(
+                        "currentPassword", "wrong-password", "newPassword", "another-password-123"))
+                .path("ok")
+                .asBoolean());
+      var blocked =
+          peer.send(
+              "PASSWORD_CHANGE",
+              data(
+                  "currentPassword",
+                  "changed-password-123",
+                  "newPassword",
+                  "another-password-123"));
+      assertFalse(blocked.path("ok").asBoolean());
+      assertTrue(blocked.path("error").path("message").asText().contains("5"));
+      assertDoesNotThrow(() -> identity.authenticate(fresh));
+    }
+  }
+
+  @Test
+  void contestRegistrationFinalizationAndEloExcludeAdmin() {
+    JsonNode q = createProblem(1, false);
+    JsonNode c =
+        call(
+            author,
+            "CONTEST_CREATE",
+            data(
+                "title",
+                "Rated test",
+                "startsAt",
+                db.now() - 100,
+                "endsAt",
+                db.now() + 120000,
+                "rated",
+                true,
+                "problemIds",
+                List.of(q.path("id").asText())));
+    String cid = c.path("id").asText();
+    call(coders.get(0), "CONTEST_JOIN", data("contestId", cid));
+    call(coders.get(1), "CONTEST_JOIN", data("contestId", cid));
+    for (User u : List.of(coders.get(0), coders.get(1), admin)) {
+      call(
+          u,
+          "SUBMIT",
+          data(
+              "contestId",
+              cid,
+              "problemId",
+              q.path("id").asText(),
+              "language",
+              "PY311",
+              "source",
+              "pass"));
+      gradeNext(!u.id().equals(coders.get(1).id()));
+    }
+    ObjectNode ended = (ObjectNode) c.deepCopy();
+    ended.set("participants", db.tree(List.of(coders.get(0).id(), coders.get(1).id())));
+    ended.put("endsAt", db.now() - 1);
+    contestRepository.updateDocument(db.write(ended), cid);
+    contests.settle();
+    assertTrue(identity.user(coders.get(0).id()).elo() > 1200);
+    assertTrue(identity.user(coders.get(1).id()).elo() < 1200);
+    assertEquals(1200, identity.user(admin.id()).elo());
+    int rating = identity.user(coders.get(0).id()).elo();
+    contests.settle();
+    assertEquals(rating, identity.user(coders.get(0).id()).elo());
+    assertThrows(
+        DomainException.class,
+        () ->
+            call(
+                coders.get(0),
+                "SUBMIT",
+                data(
+                    "contestId",
+                    cid,
+                    "problemId",
+                    q.path("id").asText(),
+                    "language",
+                    "PY311",
+                    "source",
+                    "pass")));
+  }
+
+  @Test
+  void approvalGatesPrivateContestProblems() {
+    ObjectNode q = fixture.deepCopy();
+    ((ObjectNode) q.path("general")).put("status", "draft");
+    JsonNode saved = call(author, "QUESTION_SAVE", q);
+    String pid = saved.path("id").asText();
+    JsonNode c =
+        call(
+            author,
+            "CONTEST_CREATE",
+            data(
+                "title",
+                "Private",
+                "startsAt",
+                db.now() - 100,
+                "endsAt",
+                db.now() + 120000,
+                "approvalRequired",
+                true,
+                "problemIds",
+                List.of(pid)));
+    String cid = c.path("id").asText();
+    call(coders.getFirst(), "CONTEST_JOIN", data("contestId", cid));
+    assertThrows(
+        DomainException.class, () -> call(coders.getFirst(), "QUESTION_GET", data("id", pid)));
+    assertThrows(
+        DomainException.class,
+        () ->
+            call(
+                coders.getFirst(),
+                "CONTEST_APPROVE",
+                data("contestId", cid, "userId", coders.getFirst().id(), "approve", true)));
+    call(
+        author,
+        "CONTEST_APPROVE",
+        data("contestId", cid, "userId", coders.getFirst().id(), "approve", true));
+    assertTrue(call(coders.getFirst(), "QUESTION_GET", data("id", pid)).has("general"));
+  }
+
+  @Test
+  void onlyAcSurvivesEvenWhenOthersEarnPartialPoints() {
+    ObjectNode r = start(lobby(5, List.of(1), 4));
+    String id = r.path("id").asText();
+    for (int i = 0; i < 5; i++) {
+      call(coders.get(i), "SUBMIT", submitPayload(r));
+      gradeNext(i == 0);
+    }
+    closeRound(r);
+    r = rooms.load(id);
+    assertEquals("FINISHED", r.path("state").asText());
+    assertEquals(coders.getFirst().id(), r.path("winnerId").asText());
+  }
+
+  @Test
+  void singleDatasetBootstrapAddsMissingProblemsAndPreservesExistingWork() throws Exception {
+    ObjectNode edited = fixture.deepCopy();
+    ((ObjectNode) edited.path("general")).put("questionName", "Author's edited problem");
+    var saved = call(author, "QUESTION_SAVE", edited);
+    String id = saved.path("id").asText();
+    var receipt =
+        call(
+            coders.getFirst(),
+            "SUBMIT",
+            data("problemId", id, "language", "PY311", "source", "print(10)"));
+    String snapshot =
+        (String)
+            db.one("SELECT snapshot FROM submissions WHERE id=?", receipt.path("id").asText())
+                .get("snapshot");
+    var bootstrap =
+        new vn.codegrade.service.SeedService(
+            db, identity, catalog, problemRepository, submissionRepository, userRepository);
+    org.springframework.test.util.ReflectionTestUtils.setField(
+        bootstrap, "adminPassword", "test-password-123");
+    org.springframework.test.util.ReflectionTestUtils.setField(
+        bootstrap, "workerToken", "test-worker-token-01234567890123456789");
+    org.springframework.test.util.ReflectionTestUtils.setField(bootstrap, "demo", true);
+    org.springframework.test.util.ReflectionTestUtils.setField(
+        bootstrap, "demoPassword", "test-password-123");
+    var args = new org.springframework.boot.DefaultApplicationArguments(new String[0]);
+    bootstrap.run(args);
+    bootstrap.run(args);
+    assertEquals(320, db.sql.queryForObject("SELECT COUNT(*) FROM problems", Integer.class));
+    assertEquals(
+        319,
+        db.sql.queryForObject(
+            "SELECT COUNT(*) FROM submissions WHERE request_id LIKE 'seed:%'", Integer.class));
+    assertEquals(saved, catalog.document(id));
+    assertEquals(
+        snapshot,
+        db.one("SELECT snapshot FROM submissions WHERE id=?", receipt.path("id").asText())
+            .get("snapshot"));
+  }
+
+  @Test
+  void problemCodesStayStableAndAreSearchable() {
+    ObjectNode first = (ObjectNode) createProblem(1, false);
+    String code = first.path("publicId").asText();
+    assertTrue(code.matches("CG-[0-9]{4,}"));
+    ObjectNode edited = first.deepCopy();
+    edited.put("publicId", "CG-9999");
+    ((ObjectNode) edited.path("general")).put("questionName", "Renamed question");
+    var saved = call(author, "QUESTION_SAVE", edited);
+    assertEquals(code, saved.path("publicId").asText());
+    assertEquals(code, catalog.document(first.path("id").asText()).path("publicId").asText());
+    var results =
+        call(coders.getFirst(), "PROBLEMS", data("search", code.toLowerCase(Locale.ROOT)));
+    assertEquals(1, results.size());
+    assertEquals(first.path("id").asText(), results.get(0).path("id").asText());
+    var safe = call(coders.getFirst(), "QUESTION_GET", data("id", first.path("id").asText()));
+    assertEquals(code, safe.path("publicId").asText());
+    assertFalse(safe.has("answer"));
+    assertFalse(safe.has("testcases"));
+    assertNotEquals(code, createProblem(1, false).path("publicId").asText());
+    assertEquals("CG-10000", ProblemService.publicId(10000));
+  }
+
+  void moreCoders(int count) {
+    while (coders.size() < count) {
+      int i = coders.size();
+      coders.add(
+          identity.user(identity.create("extra" + i, "Extra " + i, "test-password-123", "CODER")));
+    }
+  }
+
+  ObjectNode matched(String mode) {
+    for (int i = 0; i < 4; i++) createProblem(1, true);
+    JsonNode found = null;
+    for (int i = 0; i < 5; i++) found = call(coders.get(i), "MATCH_QUEUE_JOIN", data("mode", mode));
+    String id = found.path("roomId").asText();
+    assertFalse(id.isBlank());
+    for (int i = 0; i < 5; i++) call(coders.get(i), "MATCH_ACCEPT", data("roomId", id));
+    ObjectNode r = rooms.load(id);
+    assertEquals("COUNTDOWN", r.path("state").asText());
+    return nextRound(r);
+  }
+
+  @Test
+  void practiceSupportsEverySizeFromTwoToTenWithoutExpOrRankChanges() {
+    moreCoders(10);
+    for (int i = 0; i < 6; i++) createProblem(1, true);
+    for (int n = 2; n <= 10; n++) {
+      ObjectNode r =
+          (ObjectNode)
+              call(coders.getFirst(), "ROOM_CREATE", data("capacity", n, "name", "Practice " + n));
+      for (int i = 1; i < n; i++)
+        r = (ObjectNode) call(coders.get(i), "ROOM_JOIN", data("roomId", r.path("code").asText()));
+      assertEquals(n, r.path("players").size());
+      r = start(r);
+      String rid = r.path("id").asText();
+      for (int rounds = 0; rounds < 6 && !r.path("state").asText().equals("FINISHED"); rounds++) {
+        everyoneAc(r);
+        r = rooms.load(rid);
+        if (!r.path("state").asText().equals("FINISHED")) r = nextRound(r);
+      }
+      assertEquals("FINISHED", r.path("state").asText());
+      assertEquals(n, r.path("results").size());
+      for (var result : r.path("results")) assertEquals(0, result.path("exp").asInt());
+      for (int i = 0; i < n; i++) {
+        assertEquals(1000, progression.get(coders.get(i).id()).path("rating").asInt());
+        assertEquals(0, progression.get(coders.get(i).id()).path("exp").asInt());
+      }
+    }
+    assertEquals(
+        0,
+        db.sql.queryForObject(
+            "SELECT COUNT(*) FROM reward_events WHERE kind='PRACTICE'", Integer.class));
+  }
+
+  @Test
+  void normalRequiresFiveAndLeavesSixthWaiting() {
+    for (int i = 0; i < 4; i++)
+      assertEquals(
+          "WAITING",
+          call(coders.get(i), "MATCH_QUEUE_JOIN", data("mode", "NORMAL")).path("state").asText());
+    assertEquals(0, db.sql.queryForObject("SELECT COUNT(*) FROM rooms", Integer.class));
+    var found = call(coders.get(4), "MATCH_QUEUE_JOIN", data("mode", "NORMAL"));
+    assertEquals("MATCH_FOUND", found.path("state").asText());
+    assertEquals(5, found.path("room").path("players").size());
+    assertEquals(
+        "WAITING",
+        call(coders.get(5), "MATCH_QUEUE_JOIN", data("mode", "NORMAL")).path("state").asText());
+    String rid = found.path("roomId").asText();
+    for (int i = 0; i < 4; i++) call(coders.get(i), "MATCH_ACCEPT", data("roomId", rid));
+    assertEquals("LOBBY", rooms.load(rid).path("state").asText());
+    assertThrows(
+        DomainException.class, () -> call(coders.getFirst(), "ROOM_START", data("roomId", rid)));
+    assertThrows(
+        DomainException.class, () -> call(coders.get(5), "ROOM_JOIN", data("roomId", rid)));
+    assertThrows(
+        DomainException.class,
+        () -> call(coders.getFirst(), "ROOM_CREATE", data("mode", "NORMAL")));
+    call(coders.get(4), "MATCH_DECLINE", data());
+    assertEquals("CLOSED", rooms.load(rid).path("state").asText());
+    assertEquals(
+        1, db.sql.queryForObject("SELECT COUNT(*) FROM rooms WHERE state='LOBBY'", Integer.class));
+  }
+
+  @Test
+  void tenAndFifteenQueueEntriesCreateOnlyDistinctFivePlayerRooms() throws Exception {
+    moreCoders(15);
+    var pool = Executors.newFixedThreadPool(8);
+    try {
+      var jobs = new ArrayList<Future<?>>();
+      for (var u : coders)
+        jobs.add(pool.submit(() -> call(u, "MATCH_QUEUE_JOIN", data("mode", "NORMAL"))));
+      for (var j : jobs) j.get(20, TimeUnit.SECONDS);
+    } finally {
+      pool.shutdownNow();
+    }
+    assertEquals(3, db.sql.queryForObject("SELECT COUNT(*) FROM rooms", Integer.class));
+    Set<String> seen = new HashSet<>();
+    for (var row : db.sql.queryForList("SELECT document FROM rooms")) {
+      var r = db.read((String) row.get("document"));
+      assertEquals(5, r.path("players").size());
+      for (var p : r.path("players")) assertTrue(seen.add(p.path("id").asText()));
+    }
+  }
+
+  @Test
+  void rankedChecksWholeGroupSpreadAtEveryTenSecondBoundaryAndCapsAt400() {
+    int[] ratings = {1200, 1300, 1400, 1450, 1580};
+    for (int i = 0; i < 5; i++) {
+      progression.get(coders.get(i).id());
+      db.sql.update(
+          "UPDATE progression SET rating=? WHERE user_id=?", ratings[i], coders.get(i).id());
+      call(coders.get(i), "MATCH_QUEUE_JOIN", data("mode", "RANKED"));
+    }
+    for (int seconds : new int[] {0, 10, 20}) {
+      db.sql.update(
+          "UPDATE match_queue SET joined_at=?,last_seen=?", db.now() - seconds * 1000L, db.now());
+      matchmaking.tick();
+      assertEquals(0, db.sql.queryForObject("SELECT COUNT(*) FROM rooms", Integer.class));
+    }
+    db.sql.update("UPDATE match_queue SET joined_at=?,last_seen=?", db.now() - 30_001, db.now());
+    matchmaking.tick();
+    assertEquals(1, db.sql.queryForObject("SELECT COUNT(*) FROM rooms", Integer.class));
+    String rid = call(coders.getFirst(), "MATCH_SNAPSHOT", data()).path("roomId").asText();
+    call(coders.getFirst(), "MATCH_DECLINE", data());
+    db.sql.update(
+        "UPDATE match_queue SET state='WAITING',room_id=NULL,rating=CASE WHEN user_id=? THEN 1701"
+            + " ELSE 1200 END,joined_at=?,last_seen=?",
+        coders.get(4).id(),
+        db.now() - 1_000_000,
+        db.now());
+    matchmaking.tick();
+    assertEquals(
+        0, db.sql.queryForObject("SELECT COUNT(*) FROM rooms WHERE state='LOBBY'", Integer.class));
+    assertEquals(
+        400, call(coders.getFirst(), "MATCH_QUEUE_STATUS", data()).path("ratingRange").asInt());
+  }
+
+  @Test
+  void rankedCompatibleFiveMatchImmediatelyAndReplayDoesNotDuplicate() {
+    String rid = db.id();
+    JsonNode last = null;
+    for (int i = 0; i < 5; i++)
+      last =
+          db.tree(
+              commands.execute(
+                  coders.get(i),
+                  "MATCH_QUEUE_JOIN",
+                  data("mode", "RANKED"),
+                  i == 4 ? rid : db.id()));
+    assertEquals("MATCH_FOUND", last.path("state").asText());
+    assertEquals(
+        last.toString(),
+        db.tree(commands.execute(coders.get(4), "MATCH_QUEUE_JOIN", data("mode", "RANKED"), rid))
+            .toString());
+    assertEquals(1, db.sql.queryForObject("SELECT COUNT(*) FROM rooms", Integer.class));
+    assertThrows(
+        DomainException.class,
+        () -> call(coders.getFirst(), "MATCH_QUEUE_JOIN", data("mode", "NORMAL")));
+  }
+
+  @Test
+  void matchTimeoutRequeuesAcceptedPlayersAndKeepsQueueAcrossServiceRestart() {
+    JsonNode last = null;
+    for (int i = 0; i < 5; i++)
+      last = call(coders.get(i), "MATCH_QUEUE_JOIN", data("mode", "NORMAL"));
+    String rid = last.path("roomId").asText();
+    for (int i = 0; i < 4; i++) call(coders.get(i), "MATCH_ACCEPT", data("roomId", rid));
+    ObjectNode r = rooms.load(rid);
+    r.put("acceptDeadline", 0);
+    writeRoom(r);
+    new vn.codegrade.service.MatchmakingService(
+            db, rooms, progression, identity, matchQueueRepository, roomRepository)
+        .tick();
+    assertEquals("CLOSED", rooms.load(rid).path("state").asText());
+    assertEquals(
+        4,
+        db.sql.queryForObject(
+            "SELECT COUNT(*) FROM match_queue WHERE state='WAITING'", Integer.class));
+    assertEquals(
+        "WAITING", call(coders.getFirst(), "MATCH_SNAPSHOT", data()).path("state").asText());
+    assertEquals(0, db.sql.queryForObject("SELECT COUNT(*) FROM reward_events", Integer.class));
+  }
+
+  @Test
+  void normalAndRankedSettlementAwardsExpExactlyOnceAndPreservesContestElo() {
+    for (String mode : List.of("NORMAL", "RANKED")) {
+      ObjectNode r = matched(mode);
+      String rid = r.path("id").asText();
+      for (int round = 0; round < 5 && !r.path("state").asText().equals("FINISHED"); round++) {
+        everyoneAc(r);
+        r = rooms.load(rid);
+        if (!r.path("state").asText().equals("FINISHED")) r = nextRound(r);
+      }
+      assertEquals("FINISHED", r.path("state").asText());
+      assertEquals(5, r.path("results").size());
+      assertEquals(
+          280,
+          db.sql.queryForObject(
+              "SELECT SUM(exp) FROM match_results WHERE room_id=?", Integer.class, rid));
+      db.atomic(
+          () -> {
+            progression.settle(rooms.load(rid));
+            return null;
+          });
+      assertEquals(
+          5,
+          db.sql.queryForObject(
+              "SELECT COUNT(*) FROM reward_events WHERE event_key=?",
+              Integer.class,
+              "match:" + rid));
+      assertEquals(1200, identity.user(coders.getFirst().id()).elo());
+      int rating = progression.get(coders.getFirst().id()).path("rating").asInt();
+      assertEquals(mode.equals("RANKED") ? 1048 : 1000, rating);
+    }
+  }
+
+  @Test
+  void rankMetadataUsesConfiguredThresholdsAndHandlesEveryPromotionBoundary() {
+    String uid = coders.getFirst().id();
+    var initial = call(coders.getFirst(), "PROGRESSION_GET", data());
+    assertEquals(6, initial.path("rankTiers").size());
+    assertEquals(100, initial.path("ratingToNextRank").asInt());
+    assertEquals(3, initial.path("ratingGainMultiplier").asDouble());
+    assertTrue(initial.path("rankTiers").get(0).path("minRating").isNull());
+    assertEquals(1099, initial.path("rankTiers").get(0).path("maxRating").asInt());
+    assertEquals(1900, initial.path("rankTiers").get(5).path("minRating").asInt());
+    assertTrue(initial.path("rankTiers").get(5).path("maxRating").isNull());
+    int[] starts = {1100, 1300, 1500, 1700, 1900};
+    for (int i = 0; i < starts.length; i++) {
+      db.sql.update("UPDATE progression SET rating=? WHERE user_id=?", starts[i] - 1, uid);
+      var before = progression.get(uid);
+      assertEquals(1, before.path("ratingToNextRank").asInt());
+      assertEquals(starts[i], before.path("nextRankRating").asInt());
+      db.sql.update("UPDATE progression SET rating=? WHERE user_id=?", starts[i], uid);
+      var after = progression.get(uid);
+      assertEquals(before.path("nextRank").asText(), after.path("rank").asText());
+      assertEquals(starts[i], after.path("rankMinRating").asInt());
+      if (i == 4) {
+        assertTrue(after.path("nextRank").isNull());
+        assertTrue(after.path("nextRankRating").isNull());
+        assertEquals(0, after.path("ratingToNextRank").asInt());
+      } else assertEquals(starts[i + 1] - starts[i], after.path("ratingToNextRank").asInt());
+    }
+    db.sql.update("UPDATE progression SET rating=1000 WHERE user_id=?", uid);
+    var custom = new vn.codegrade.service.ProgressionService(db, progressionRepository);
+    org.springframework.test.util.ReflectionTestUtils.setField(
+        custom, "thresholds", new int[] {1050, 1200, 1400, 1700, 2000});
+    custom.validateConfiguration();
+    var configured = custom.get(uid);
+    assertEquals(50, configured.path("ratingToNextRank").asInt());
+    assertEquals(1050, configured.path("nextRankRating").asInt());
+    assertEquals(1049, configured.path("rankTiers").get(0).path("maxRating").asInt());
+  }
+
+  @Test
+  void independentPracticeNeverAwardsExpIncludingFirstAcAndReplay() {
+    progression.get(coders.getFirst().id());
+    db.sql.update(
+        "UPDATE progression SET exp=123,rating=1750 WHERE user_id=?", coders.getFirst().id());
+    var q = createProblem(6, false);
+    var p = data("problemId", q.path("id").asText(), "source", "pass", "language", "PY311");
+    call(coders.getFirst(), "RUN_EXAMPLES", p);
+    gradeNext(true);
+    assertEquals(123, progression.get(coders.getFirst().id()).path("exp").asInt());
+    String rid = db.id();
+    commands.execute(coders.getFirst(), "SUBMIT", p, rid);
+    gradeNext(true);
+    commands.execute(coders.getFirst(), "SUBMIT", p, rid);
+    call(coders.getFirst(), "SUBMIT", p);
+    gradeNext(true);
+    assertEquals(123, progression.get(coders.getFirst().id()).path("exp").asInt());
+    assertEquals(1750, progression.get(coders.getFirst().id()).path("rating").asInt());
+    assertEquals(
+        1,
+        db.sql.queryForObject(
+            "SELECT COUNT(*) FROM solved WHERE user_id=? AND problem_id=?",
+            Integer.class,
+            coders.getFirst().id(),
+            q.path("id").asText()));
+    assertEquals(
+        0,
+        db.sql.queryForObject(
+            "SELECT COUNT(*) FROM reward_events WHERE user_id=?",
+            Integer.class,
+            coders.getFirst().id()));
+  }
+
+  @Test
+  void competitiveSubmissionClearsLegacyDraftAndNeverReturnsProofs() {
+    ObjectNode r = start(lobby(2, List.of(1), 3));
+    String pid = r.path("current").path("problemId").asText();
+    call(
+        coders.getFirst(),
+        "DRAFT_SAVE",
+        data("problemId", pid, "language", "PY311", "source", "old code"));
+    var ack = call(coders.getFirst(), "SUBMIT", submitPayload(r));
+    assertFalse(ack.has("receipt"));
+    assertEquals(0, call(coders.getFirst(), "DRAFT_GET", data("problemId", pid)).size());
+    assertEquals(
+        0,
+        db.sql.queryForObject(
+            "SELECT COUNT(*) FROM information_schema.tables WHERE table_name='receipts'",
+            Integer.class));
+    assertThrows(
+        DomainException.class,
+        () -> call(coders.getFirst(), "RECEIPT_GET", data("id", ack.path("id").asText())));
+    assertThrows(
+        DomainException.class,
+        () ->
+            call(
+                coders.getFirst(),
+                "DRAFT_SAVE",
+                data(
+                    "roomId",
+                    r.path("id").asText(),
+                    "problemId",
+                    pid,
+                    "language",
+                    "PY311",
+                    "source",
+                    "late code")));
+    assertEquals(
+        "print(sum(map(int,input().split())))",
+        db.one("SELECT source_code FROM submissions WHERE id=?", ack.path("id").asText())
+            .get("source_code"));
+  }
+
+  @Test
+  void rankedWindowsIncludeTheirBoundaryAndExcludeTheNextPoint() {
+    for (int[] c :
+        List.of(
+            new int[] {0, 150, 1},
+            new int[] {0, 151, 0},
+            new int[] {10, 250, 1},
+            new int[] {10, 251, 0},
+            new int[] {20, 350, 1},
+            new int[] {20, 351, 0},
+            new int[] {30, 400, 1},
+            new int[] {30, 401, 0})) {
+      db.sql.update("DELETE FROM match_queue");
+      db.sql.update("DELETE FROM rooms");
+      for (int i = 0; i < 5; i++) {
+        progression.get(coders.get(i).id());
+        db.sql.update(
+            "UPDATE progression SET rating=? WHERE user_id=?",
+            1000 + (i == 4 ? c[1] : 0),
+            coders.get(i).id());
+        call(coders.get(i), "MATCH_QUEUE_JOIN", data("mode", "RANKED"));
+      }
+      db.sql.update("UPDATE match_queue SET joined_at=?", db.now() - c[0] * 1000L);
+      matchmaking.tick();
+      assertEquals(
+          c[2],
+          db.sql.queryForObject("SELECT COUNT(*) FROM rooms WHERE state='LOBBY'", Integer.class),
+          Arrays.toString(c));
+    }
+  }
+
+  @Test
+  void tiesUseLowestOccupiedRewardInBothModesAndCancelledMatchesNeverReward() {
+    var ids = coders.subList(0, 5).stream().map(User::id).toList();
+    for (String mode : List.of("NORMAL", "RANKED")) {
+      var r =
+          data(
+              "id",
+              db.id(),
+              "state",
+              "UNRESOLVED",
+              "mode",
+              mode,
+              "participants",
+              ids,
+              "winnerId",
+              ids.getFirst());
+      String rid = r.path("id").asText();
+      db.atomic(
+          () -> {
+            progression.settle(r);
+            return null;
+          });
+      assertEquals(
+          0,
+          db.sql.queryForObject(
+              "SELECT COUNT(*) FROM match_results WHERE room_id=?", Integer.class, rid));
+      r.put("state", "FINISHED");
+      db.atomic(
+          () -> {
+            progression.settle(r);
+            progression.settle(r);
+            return null;
+          });
+      assertEquals(
+          180,
+          db.sql.queryForObject(
+              "SELECT SUM(exp) FROM match_results WHERE room_id=?", Integer.class, rid));
+      assertEquals(
+          100,
+          ((Number)
+                  db.one(
+                          "SELECT exp FROM match_results WHERE room_id=? AND user_id=?",
+                          rid,
+                          ids.getFirst())
+                      .get("exp"))
+              .intValue());
+      assertEquals(
+          5,
+          db.sql.queryForObject(
+              "SELECT COUNT(*) FROM reward_events WHERE event_key=?",
+              Integer.class,
+              "match:" + rid));
+      for (int i = 1; i < 5; i++) {
+        var result =
+            db.one("SELECT * FROM match_results WHERE room_id=? AND user_id=?", rid, ids.get(i));
+        assertEquals(2, ((Number) result.get("placement")).intValue());
+        assertEquals(20, ((Number) result.get("exp")).intValue());
+        assertEquals(
+            mode.equals("RANKED") ? 996 : 1000, ((Number) result.get("rating_after")).intValue());
+      }
+    }
+  }
+
+  @Test
+  void multipleConnectionsAndAcceptCancelRaceCannotDuplicateMembership() throws Exception {
+    var pool = Executors.newFixedThreadPool(2);
+    try {
+      var joins = new ArrayList<Future<Boolean>>();
+      for (int i = 0; i < 2; i++)
+        joins.add(
+            pool.submit(
+                () -> {
+                  try {
+                    call(coders.getFirst(), "MATCH_QUEUE_JOIN", data("mode", "NORMAL"));
+                    return true;
+                  } catch (DomainException e) {
+                    return false;
+                  }
+                }));
+      int count = 0;
+      for (var f : joins) if (f.get()) count++;
+      assertEquals(1, count);
+      JsonNode found = null;
+      for (int i = 1; i < 5; i++)
+        found = call(coders.get(i), "MATCH_QUEUE_JOIN", data("mode", "NORMAL"));
+      String rid = found.path("roomId").asText();
+      for (int i = 0; i < 3; i++) call(coders.get(i), "MATCH_ACCEPT", data("roomId", rid));
+      var accept =
+          pool.submit(
+              () -> {
+                try {
+                  call(coders.get(3), "MATCH_ACCEPT", data("roomId", rid));
+                } catch (DomainException ignored) {
+                }
+              });
+      var cancel = pool.submit(() -> call(coders.get(4), "MATCH_DECLINE", data()));
+      accept.get();
+      cancel.get();
+      assertEquals("CLOSED", rooms.load(rid).path("state").asText());
+      assertEquals(
+          4,
+          db.sql.queryForObject(
+              "SELECT COUNT(*) FROM match_queue WHERE state='WAITING'", Integer.class));
+    } finally {
+      pool.shutdownNow();
+    }
+  }
+
+  @Test
+  void placementExpHandlesDistinctMiddleAndBottomTieGroups() {
+    int[][] stages = {{5, 4, 3, 2, 1}, {5, 4, 4, 3, 2}, {5, 4, 3, 2, 2}, {5, 4, 4, 3, 3}};
+    int[][] awards = {
+      {100, 80, 60, 40, 20}, {100, 60, 60, 40, 20}, {100, 80, 60, 20, 20}, {100, 60, 60, 20, 20}
+    };
+    var ids = coders.subList(0, 5).stream().map(User::id).toList();
+    for (String mode : List.of("NORMAL", "RANKED"))
+      for (int scenario = 0; scenario < stages.length; scenario++) {
+        var r =
+            data(
+                "id",
+                db.id(),
+                "state",
+                "FINISHED",
+                "mode",
+                mode,
+                "participants",
+                ids,
+                "winnerId",
+                ids.getFirst());
+        var players = r.putArray("players");
+        for (int i = 0; i < 5; i++)
+          players.add(data("id", ids.get(i), "eliminatedStage", stages[scenario][i]));
+        db.atomic(
+            () -> {
+              progression.settle(r);
+              return null;
+            });
+        for (int i = 0; i < 5; i++)
+          assertEquals(
+              awards[scenario][i],
+              r.path("results").get(i).path("exp").asInt(),
+              mode + " scenario " + scenario + " player " + i);
+      }
+  }
+
+  @Test
+  void validationBacklogCannotStarveRealCompetitiveSubmissions() {
+    ObjectNode r = start(lobby(2, List.of(1), 3));
+    var extra = createProblem(1, false);
+    call(author, "QUESTION_VALIDATE", data("id", extra.path("id").asText()));
+    db.sql.update("UPDATE submissions SET received_at=0 WHERE status='QUEUED'");
+    var ack = call(coders.getFirst(), "SUBMIT", submitPayload(r));
+    var job = db.tree(judge.claim("test-worker"));
+    assertEquals(ack.path("id").asText(), job.path("id").asText());
+  }
+
+  @Test
+  void legacySolvedProblemCannotBeFarmedAfterInstallingProgression() {
+    var q = createProblem(1, false);
+    String pid = q.path("id").asText();
+    db.sql.update("INSERT INTO solved VALUES(?,?)", coders.getFirst().id(), pid);
+    call(
+        coders.getFirst(), "SUBMIT", data("problemId", pid, "language", "PY311", "source", "pass"));
+    gradeNext(true);
+    assertEquals(0, progression.get(coders.getFirst().id()).path("exp").asInt());
+  }
+
+  @Test
+  void leavingAfterEliminationCannotImprovePlacement() {
+    ObjectNode r = start(lobby(5, List.of(1), 4));
+    String rid = r.path("id").asText();
+    everyoneAc(r);
+    r = nextRound(rooms.load(rid));
+    call(coders.get(4), "ROOM_LEAVE", data("roomId", rid));
+    everyoneAc(r);
+    r = nextRound(rooms.load(rid));
+    everyoneAc(r);
+    r = rooms.load(rid);
+    assertEquals("FINISHED", r.path("state").asText());
+    assertEquals(
+        4,
+        db.one(
+                "SELECT placement FROM match_results WHERE room_id=? AND user_id=?",
+                rid,
+                coders.get(4).id())
+            .get("placement"));
+  }
+
+  @Test
+  void retiredProofCommandCannotReplayLegacySignedResponse() {
+    String rid = db.id();
+    var p = data("id", "legacy");
+    String fingerprint = ServiceContext.hash("RECEIPT_GET" + commands.canonical(p));
+    db.sql.update(
+        "INSERT INTO commands VALUES(?,?,?,?,?)",
+        coders.getFirst().id(),
+        rid,
+        fingerprint,
+        "{\"signature\":\"old\",\"payload\":\"old\"}",
+        db.now());
+    assertThrows(
+        DomainException.class, () -> commands.execute(coders.getFirst(), "RECEIPT_GET", p, rid));
+    var stripped =
+        CommandService.withoutProofs(
+            data(
+                "receipt",
+                data("signature", "old"),
+                "nested",
+                data("certificate", data("signature", "old"))));
+    assertFalse(stripped.has("receipt"));
+    assertFalse(stripped.path("nested").has("certificate"));
+  }
+
+  @Test
+  void earlierInfrastructureFailureVoidsFinalRatherThanChargingRankLoss() {
+    ObjectNode r = start(lobby(2, List.of(1), 3));
+    call(coders.getFirst(), "SUBMIT", submitPayload(r));
+    var first = db.tree(judge.claim("test-worker"));
+    call(coders.get(1), "SUBMIT", submitPayload(r));
+    var second = db.tree(judge.claim("test-worker"));
+    grade(second, true);
+    for (int i = 0; i < 3; i++) {
+      judge.complete(
+          "test-worker",
+          data(
+              "id",
+              first.path("id").asText(),
+              "leaseToken",
+              first.path("leaseToken").asText(),
+              "systemError",
+              true));
+      if (i < 2) first = db.tree(judge.claim("test-worker"));
+    }
+    var current = rooms.load(r.path("id").asText());
+    assertEquals("RESCUE", current.path("nextKind").asText());
+    assertFalse(current.has("winnerId"));
+    assertEquals(0, db.sql.queryForObject("SELECT COUNT(*) FROM reward_events", Integer.class));
+  }
+
+  @Test
+  void frozenRoomKeepsItsTestsUntilTheMatchEnds() throws Exception {
+    ObjectNode r = start(lobby(2, List.of(1), 3));
+    ObjectNode original = fixture.deepCopy();
+    ((ArrayNode) original.path("testcases")).add(original.path("testcases").get(0).deepCopy());
+    ((ObjectNode) r.path("frozenProblem")).set("testcases", original.path("testcases"));
+    writeRoom(r);
+    var ack = call(coders.getFirst(), "SUBMIT", submitPayload(r));
+    var frozen =
+        db.read(
+            (String)
+                db.one("SELECT snapshot FROM submissions WHERE id=?", ack.path("id").asText())
+                    .get("snapshot"));
+    assertEquals(original.path("testcases").size(), frozen.path("testcases").size());
+    assertTrue(frozen.path("testcases").size() > 5);
+  }
+
+  @Test
+  void contestProblemStillWorksInIndependentPractice() throws Exception {
+    ObjectNode q = (ObjectNode) createProblem(1, false);
+    String pid = q.path("id").asText();
+    ObjectNode baseline = fixture.deepCopy();
+    ((ArrayNode) baseline.path("testcases")).add(baseline.path("testcases").get(0).deepCopy());
+    q.set("testcases", baseline.path("testcases"));
+    db.sql.update("UPDATE problems SET document=? WHERE id=?", db.write(q), pid);
+    var c =
+        data("startsAt", db.now() - 1000, "endsAt", db.now() + 60000, "problemIds", List.of(pid));
+    contestRepository.insertContest(db.id(), author.id(), db.write(c));
+    var ack =
+        call(
+            coders.getFirst(),
+            "SUBMIT",
+            data("problemId", pid, "source", "pass", "language", "PY311"));
+    var snapshot =
+        db.read(
+            (String)
+                db.one("SELECT snapshot FROM submissions WHERE id=?", ack.path("id").asText())
+                    .get("snapshot"));
+    assertEquals(baseline.path("testcases").size(), snapshot.path("testcases").size());
+  }
+
+  @Test
+  void auditSummaryOmitsLargePayloadWithoutChangingLegacyResponseOrPermissions() throws Exception {
+    db.audit(
+        admin.id(),
+        "LARGE_EVENT",
+        "entity",
+        data("details", "x".repeat(1_100_000), "receipt", data("signature", "legacy")));
+    var summary = call(admin, "AUDIT", data("summaryOnly", true));
+    assertEquals(1, summary.size());
+    assertEquals("LARGE_EVENT", summary.get(0).path("action").asText());
+    assertEquals(admin.id(), summary.get(0).path("actor_id").asText());
+    assertTrue(summary.get(0).has("created_at"));
+    assertFalse(summary.get(0).has("payload"));
+    assertTrue(db.write(summary).length() < 1000);
+    var legacy = call(admin, "AUDIT", data());
+    var payload = db.read(legacy.get(0).path("payload").asText());
+    assertEquals(1_100_000, payload.path("details").asText().length());
+    assertFalse(payload.has("receipt"));
+    assertThrows(DomainException.class, () -> call(author, "AUDIT", data("summaryOnly", true)));
+  }
 }
