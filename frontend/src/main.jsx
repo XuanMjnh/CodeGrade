@@ -46,7 +46,11 @@ function App(){
   case 'profile':content=<Profile user={user} revision={revision} onUserChange={setUser} onNotice={onNotice}/>;break;
   case 'announcements':content=<Announcements user={user} revision={revision} onNotice={onNotice}/>;break;
   case 'practice':content=<Practice user={user} revision={revision}/>;break;
-  case 'solve':content=<Workspace key={id} id={id} user={user} revision={revision} contestId={new URLSearchParams(query).get('contest')} onNotice={onNotice}/>;break;
+  case 'solve': {
+   const cId = new URLSearchParams(query).get('contest');
+   content = <Workspace key={(cId ? 'contest-' + cId : 'practice') + '-' + id} id={id} user={user} revision={revision} contestId={cId} onNotice={onNotice}/>;
+   break;
+  }
   case 'edit':content=author?<QuestionEditor key={id||'new'} id={id} revision={revision} onNotice={onNotice}/>:<ErrorBox error={trUI("Bạn không có quyền tạo/sửa đề.")}/>;break;
   case 'survival':content=<Rooms user={user} revision={revision}/>;break;
   case 'room':content=<Room key={id} id={id} user={user} revision={revision} onNotice={onNotice}/>;break;
@@ -54,7 +58,7 @@ function App(){
   case 'leaderboard':content=<Leaderboard revision={revision} user={user}/>;break;
   case 'categories':content=author?<Categories revision={revision} onNotice={onNotice}/>:<ErrorBox error={trUI("Bạn không có quyền quản lý category.")}/>;break;
   case 'admin':content=user.role==='ADMIN'?<Admin revision={revision} onNotice={onNotice}/>:<ErrorBox error={trUI("Bạn không có quyền Admin.")}/>;break;
-  case 'contests':content=<Contests user={user} revision={revision} onNotice={onNotice}/>;break;
+  case 'contests':content=<Contests user={user} revision={revision} onNotice={onNotice} contestId={id}/>;break;
   default:content=<div className="empty">Trang không tồn tại. <a href="#/practice">Về Practice</a></div>;
  }
  const arena=['survival','room'].includes(name),focused=arena||['edit','solve'].includes(name);

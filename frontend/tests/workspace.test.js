@@ -1,16 +1,22 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 import {build} from 'esbuild';
 import {JSDOM} from 'jsdom';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const frontendDir = join(__dirname, '..');
+
 // Render the real Workspace state/effects with a textarea editor and controlled ACKs.
-const bundle=await build({stdin:{contents:`import React,{act} from 'react';import {createRoot} from 'react-dom/client';import Workspace from './src/pages/Workspace.jsx';const root=createRoot(document.getElementById('root'));window.harness={act,render:p=>root.render(React.createElement(Workspace,p)),unmount:()=>root.unmount()};`,resolveDir:process.cwd(),loader:'jsx'},bundle:true,write:false,format:'iife',define:{'process.env.NODE_ENV':'"development"'},plugins:[{name:'workspace-adapters',setup(b){
+const bundle=await build({stdin:{contents:`import React,{act} from 'react';import {createRoot} from 'react-dom/client';import Workspace from './src/pages/Workspace.jsx';const root=createRoot(document.getElementById('root'));window.harness={act,render:p=>root.render(React.createElement(Workspace,p)),unmount:()=>root.unmount()};`,resolveDir:frontendDir,loader:'jsx'},bundle:true,write:false,format:'iife',define:{'process.env.NODE_ENV':'"development"'},plugins:[{name:'workspace-adapters',setup(b){
  b.onResolve({filter:/lib\/live$/},()=>({path:'live',namespace:'stub'}));
  b.onResolve({filter:/lib\/locale$/},()=>({path:'locale',namespace:'stub'}));
  b.onResolve({filter:/components\/CodeEditor$/},()=>({path:'editor',namespace:'stub'}));
  b.onResolve({filter:/(^|\/)ui$/},()=>({path:'ui',namespace:'stub'}));
  b.onResolve({filter:/components\/(SubmissionHistory|ProblemRanking)$|\.\/Community$/},()=>({path:'empty',namespace:'stub'}));
- b.onLoad({filter:/.*/,namespace:'stub'},a=>({loader:'jsx',resolveDir:process.cwd(),contents:a.path==='live'?'export const live=window.client;':a.path==='locale'?'export const t=s=>s;':a.path==='empty'?'export default function Empty(){return null;}export const Discussion=()=>null;':a.path==='editor'?`import React from 'react';export default p=><textarea aria-label="code" value={p.value} onChange={e=>p.onChange(e.target.value)}/>;`:`import React from 'react';export const Heading=()=>null,Badge=p=><span>{p.children}</span>,ErrorBox=p=>p.error?<p role="alert">{p.error.message}</p>:null,Loading=()=>null,TimeLeft=()=>null,go=()=>{};export const useResource=()=>[[],null];` }));
+ b.onLoad({filter:/.*/,namespace:'stub'},a=>({loader:'jsx',resolveDir:frontendDir,contents:a.path==='live'?'export const live=window.client;':a.path==='locale'?'export const t=s=>s;':a.path==='empty'?'export default function Empty(){return null;}export const Discussion=()=>null;':a.path==='editor'?`import React from 'react';export default p=><textarea aria-label="code" value={p.value} onChange={e=>p.onChange(e.target.value)}/>;`:`import React from 'react';export const Heading=()=>null,Badge=p=><span>{p.children}</span>,ErrorBox=p=>p.error?<p role="alert">{p.error.message}</p>:null,Loading=()=>null,TimeLeft=()=>null,go=()=>{};export const useResource=()=>[[],null];` }));
 }}]});
 const code=bundle.outputFiles[0].text;
 const q={languages:['PY311','CPP17'],general:{questionName:'Sum',questionText:'Read two numbers'},difficulty:1,examples:[],precheck:2};
@@ -48,4 +54,44 @@ test('contest is isolated from practice drafts; precheck keeps code',async()=>{
 });
 test('independent practice still restores and retains its draft after submit',async()=>{
  const h=await mount({room:null});try{assert.equal(h.source(),'local old code');assert.equal(h.calls.some(c=>c.type==='DRAFT_GET'),true);await h.edit('practice code');await h.click('Nộp bài');await h.finish();assert.equal(h.source(),'practice code');assert.equal(JSON.parse(h.w.localStorage.getItem('cg-code-u-p')).source,'practice code');}finally{await h.close();}
+});
+test('contest drafts persist locally per contest problem and never leak into practice drafts',async()=>{
+ const dom=new JSDOM('<div id="root"></div>',{url:'http://localhost',runScripts:'outside-only'}),w=dom.window;
+ w.IS_REACT_ACT_ENVIRONMENT=true;
+ w.MessageChannel=class {constructor(){this.port1={onmessage:null};this.port2={postMessage:()=>setTimeout(()=>this.port1.onmessage?.(),0)};}};
+ w.client={call:()=>Promise.resolve({})};
+ // Practice has its own draft
+ w.localStorage.setItem('cg-code-u-p',JSON.stringify({source:'practice draft original',language:'PY311'}));
+ w.eval(code);
+ const act=w.harness.act;
+ // 1. Mount problem p inside contest c1
+ await act(async()=>{
+  w.harness.render({id:'p',user:{id:'u',role:'CODER'},problem:q,contestId:'c1',room:null,onNotice:()=>{}});
+ });
+ const editor=w.document.querySelector('[aria-label=code]');
+ assert.equal(editor.value.includes('practice draft original'),false,'Contest editor should not load practice draft');
+ // Type new code in contest
+ await act(async()=>{
+  Object.getOwnPropertyDescriptor(w.HTMLTextAreaElement.prototype,'value').set.call(editor,'contest draft code');
+  editor.dispatchEvent(new w.Event('input',{bubbles:true}));
+ });
+ await new Promise(r=>setTimeout(r,350));
+ // Verify contest key stored separately
+ const contestSaved=JSON.parse(w.localStorage.getItem('cg-code-contest-c1-u-p')||'{}');
+ assert.equal(contestSaved.source,'contest draft code','Contest draft should be saved under contest-scoped key');
+ // Verify practice key untouched
+ const practiceSaved=JSON.parse(w.localStorage.getItem('cg-code-u-p')||'{}');
+ assert.equal(practiceSaved.source,'practice draft original','Practice draft should remain untouched');
+ // 2. Re-render problem p in contest c1 -> should restore contest draft
+ await act(async()=>{
+  w.harness.render({id:'p',user:{id:'u',role:'CODER'},problem:q,contestId:'c1',room:null,onNotice:()=>{}});
+ });
+ assert.equal(w.document.querySelector('[aria-label=code]').value,'contest draft code','Contest draft should be restored in contest');
+ // 3. Re-render problem p in practice -> should restore practice draft
+ await act(async()=>{
+  w.harness.render({id:'p',user:{id:'u',role:'CODER'},problem:q,contestId:null,room:null,onNotice:()=>{}});
+ });
+ assert.equal(w.document.querySelector('[aria-label=code]').value,'practice draft original','Practice draft should be restored in practice');
+ await act(async()=>{w.harness.unmount();});
+ w.close();
 });
