@@ -20,7 +20,7 @@
 .cm-editor .cm-searchMatch { background:var(--color-warning-soft); outline:1px solid var(--color-warning); }
 .panel-title h2,.rail-title h3,.subheading h2 { color:var(--color-secondary-ink); }
 .editor-panel{min-width:0;overflow:hidden;background:var(--color-surface-code);box-shadow:var(--shadow-panel)}
-.editor-panel .panel-title{background:var(--color-surface-inverse);color:var(--color-inverse-ink);border-color:var(--color-border)}
+.editor-panel .panel-title{background:var(--color-surface-strong);color:var(--color-secondary-ink);border-color:var(--color-border)}
 .editor-panel .panel-title select{font-size:12px}
 .import-code{display:flex;align-items:center;flex-wrap:wrap;gap:8px;font-size:11px;cursor:pointer}
 .import-code input{max-width:180px;font-size:11px}

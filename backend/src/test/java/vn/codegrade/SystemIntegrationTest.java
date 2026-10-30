@@ -219,6 +219,40 @@ class SystemIntegrationTest {
   assertEquals(db.write(first),db.write(again));assertEquals(1,db.sql.queryForObject("SELECT COUNT(*) FROM submissions",Integer.class));
   p.put("source","print(6)");assertThrows(Store.Fault.class,()->commands.execute(coders.getFirst(),"SUBMIT",p,key));
  }
+ @Test void leaderboardsSeparateContestEloRankExpAndCompletedMatchCounts() {
+  for(User u:List.of(coders.get(0),coders.get(1),coders.get(3),admin))progression.get(u.id());
+  db.sql.update("UPDATE users SET elo=1800 WHERE id=?",coders.get(0).id());
+  db.sql.update("UPDATE progression SET exp=900,rating=1050 WHERE user_id=?",coders.get(0).id());
+  db.sql.update("UPDATE progression SET exp=300,rating=1750 WHERE user_id=?",coders.get(1).id());
+  db.sql.update("UPDATE progression SET exp=9999,rating=2500 WHERE user_id IN (?,?)",coders.get(3).id(),admin.id());
+  db.sql.update("UPDATE users SET enabled=FALSE WHERE id=?",coders.get(3).id());
+  var completed=List.of(List.of("NORMAL","NORMAL","RANKED"),List.of("NORMAL","RANKED","RANKED"),List.of("PRACTICE","PRACTICE","PRACTICE"));
+  for(int i=0;i<completed.size();i++)for(String mode:completed.get(i))
+   db.sql.update("INSERT INTO match_results VALUES(?,?,?,?,?,?,?,?)",db.id(),coders.get(i).id(),mode,1,0,1000,1000,db.now());
+  for(int i=0;i<2;i++) {
+   JsonNode q=createProblem(1,false);
+   db.sql.update("INSERT INTO solved(user_id,problem_id) VALUES(?,?)",coders.get(0).id(),q.path("id").asText());
+  }
+  for(String metric:List.of("elo","ac","exp","rank","normal_games","ranked_games")) {
+   JsonNode board=db.tree(catalog.leaderboard(metric));
+   assertEquals(5,board.size());
+   String expected=List.of("rank","ranked_games").contains(metric)?coders.get(1).id():coders.get(0).id();
+   assertEquals(expected,board.get(0).path("id").asText(),metric);
+   for(JsonNode row:board) {
+    assertNotEquals(admin.id(),row.path("id").asText());
+    assertNotEquals(coders.get(3).id(),row.path("id").asText());
+    if(row.path("id").asText().equals(coders.get(0).id())) {
+     assertEquals(2,row.path("ac").asInt());assertEquals(2,row.path("normal_games").asInt());assertEquals(1,row.path("ranked_games").asInt());
+     assertEquals(1800,row.path("elo").asInt());assertEquals(900,row.path("exp").asInt());assertEquals(1050,row.path("rating").asInt());
+    }
+    if(row.path("id").asText().equals(coders.get(2).id())) {
+     assertEquals(0,row.path("normal_games").asInt());assertEquals(0,row.path("ranked_games").asInt());
+     assertEquals(0,row.path("exp").asInt());assertEquals(1000,row.path("rating").asInt());
+    }
+    assertEquals(progression.tier(row.path("rating").asInt()),row.path("rank").asText());
+   }
+  }
+ }
  @Test void adminAcNeverEntersAnyLeaderboard() {
   JsonNode q=createProblem(1,false);
   call(admin,"SUBMIT",data("problemId",q.path("id").asText(),"source","pass","language","PY311"));gradeNext(true);

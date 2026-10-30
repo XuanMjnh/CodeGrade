@@ -1,7 +1,7 @@
 
 * { box-sizing: border-box; }
-html { color: var(--color-text-primary); font-family: var(--font-family-primary); font-size: var(--font-size-sm); font-weight: var(--font-weight-base); line-height: var(--line-height-base); font-synthesis: none; background: var(--color-surface-muted); }
-body { margin: 0; background: var(--color-surface-muted); }
+html { color: var(--color-text-primary); font-family: var(--font-family-primary); font-size: var(--font-size-sm); font-weight: var(--font-weight-base); line-height: var(--line-height-base); font-synthesis: none; background: var(--color-surface-page); }
+body { margin: 0; background: var(--color-surface-page); }
 [hidden] { display: none !important; }
 button, input, select, textarea { font: inherit; }
 a { color: var(--color-accent-text); text-underline-offset: var(--space-1); text-decoration-thickness: 1px; }

@@ -5,13 +5,15 @@ import com.fasterxml.jackson.databind.node.*;
 import org.springframework.stereotype.Service;
 import vn.codegrade.db.Store;
 import vn.codegrade.auth.Identity.User;
+import vn.codegrade.room.Progression;
 import static vn.codegrade.db.Store.require;
 import java.util.*;
 
 @Service
 public class Catalog {
     private final Store db;
-    public Catalog(Store db) { this.db=db; }
+    private final Progression progression;
+    public Catalog(Store db,Progression progression) { this.db=db; this.progression=progression; }
     public List<Map<String,Object>> categories() { return db.sql.queryForList("SELECT * FROM categories ORDER BY name"); }
     public Object categorySave(User u,JsonNode p) {
         require(u.author(),"Cần role Admin hoặc Người tạo đề");
@@ -98,8 +100,37 @@ public class Catalog {
         return q;
     }
     public Object leaderboard(String metric) {
-        String field=switch(metric) { case "ac" -> "ac"; case "wins" -> "wins"; default -> "elo"; };
-        // ADMIN is excluded in SQL even if old solved/rating records exist.
-        return db.sql.queryForList("SELECT u.id,u.username,u.display_name,u.elo,u.wins,COUNT(s.problem_id) AS ac FROM users u LEFT JOIN solved s ON s.user_id=u.id WHERE u.role='CODER' AND u.enabled=TRUE GROUP BY u.id,u.username,u.display_name,u.elo,u.wins ORDER BY "+field+" DESC,u.username LIMIT 200");
+        String field=switch(metric) {
+            case "ac" -> "ac";
+            case "exp" -> "exp";
+            case "rank" -> "rating";
+            case "normal_games" -> "normal_games";
+            case "ranked_games" -> "ranked_games";
+            default -> "elo";
+        };
+        // Aggregate each source before joining so solved problems cannot multiply match counts.
+        // Contest Elo belongs to users; Survival rank points and EXP belong to progression.
+        var rows=db.sql.queryForList("""
+            SELECT u.id,u.username,u.display_name,u.elo,
+                   COALESCE(s.ac,0) AS ac,COALESCE(p.exp,0) AS exp,
+                   COALESCE(p.rating,1000) AS rating,
+                   COALESCE(m.normal_games,0) AS normal_games,
+                   COALESCE(m.ranked_games,0) AS ranked_games
+            FROM users u
+            LEFT JOIN (SELECT user_id,COUNT(*) AS ac FROM solved GROUP BY user_id) s ON s.user_id=u.id
+            LEFT JOIN progression p ON p.user_id=u.id
+            LEFT JOIN (
+                SELECT user_id,
+                       SUM(CASE WHEN mode='NORMAL' THEN 1 ELSE 0 END) AS normal_games,
+                       SUM(CASE WHEN mode='RANKED' THEN 1 ELSE 0 END) AS ranked_games
+                FROM match_results WHERE mode IN ('NORMAL','RANKED') GROUP BY user_id
+            ) m ON m.user_id=u.id
+            WHERE u.role='CODER' AND u.enabled=TRUE
+            """+" ORDER BY "+field+" DESC,u.username LIMIT 200");
+        for(var row:rows) {
+            row.put("rank",progression.tier(((Number)row.get("rating")).intValue()));
+            row.put("level",Progression.level(((Number)row.get("exp")).longValue()));
+        }
+        return rows;
     }
 }

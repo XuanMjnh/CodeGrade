@@ -14,8 +14,8 @@
 .studio-nav [aria-selected=true] .studio-step-number { background:var(--color-primary); color:var(--color-primary-ink); border-color:var(--color-primary); }
 .studio-nav-note { padding:20px 12px; color:var(--color-text-secondary); font-size:12px; }
 .studio-content { min-width:0; }
-.studio-panel-heading { display:flex; justify-content:space-between; align-items:center; gap:16px; padding:24px; background:var(--color-surface-inverse); color:var(--color-inverse-ink); border-radius:var(--radius-sm) var(--radius-sm) 0 0; }
-.studio-panel-heading .eyebrow,.studio-panel-heading p { color:var(--color-inverse-muted); margin:0; }
+.studio-panel-heading { display:flex; justify-content:space-between; align-items:center; gap:16px; padding:24px; background:var(--color-surface-strong); color:var(--color-secondary-ink); border-radius:var(--radius-sm) var(--radius-sm) 0 0; }
+.studio-panel-heading .eyebrow,.studio-panel-heading p { color:var(--color-text-secondary); margin:0; }
 .studio-panel-heading h2 { font-size:22px; margin:8px 0; }
 .studio-panel-heading button { flex-shrink:0; }
 .studio-fields { border:0; margin:0; padding:24px; background:var(--color-surface-base); border:1px solid var(--color-border); border-top:0; border-radius:0 0 var(--radius-sm) var(--radius-sm); min-width:0; }
