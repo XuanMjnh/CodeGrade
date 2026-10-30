@@ -9,6 +9,7 @@ import {
   TableRow as UiTableRow,
 } from '../components/ui/table';
 import React, { useState, useRef } from 'react';
+import { cn } from '../lib/utils';
 import { t as trUI } from '../lib/locale';
 import { Heading, ErrorBox, Loading, useResource } from '../components/ui';
 import RankEmblem from '../components/RankEmblem';

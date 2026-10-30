@@ -14,6 +14,7 @@ import {
 import { Textarea as UiTextarea } from '../components/ui/textarea';
 import { t as trUI } from '../lib/locale';
 import React, { useState } from 'react';
+import { cn } from '../lib/utils';
 import { Heading, ErrorBox, Loading, useResource, Check } from '../components/ui';
 import { StatGrid, InsightPanel, ProgressRows } from '../components/Insights';
 import { submissionInsights } from '../lib/insights';
@@ -40,10 +41,12 @@ export function SubmissionsPage({ revision }) {
   const ready = history?.filter === filter && history?.pageSize === pageSize,
     rows = ready ? history.items : [];
   return (
-    <>
+    <div className="submissions-page space-y-4">
       <ErrorBox error={error || historyError} />
+
+      {/* Top Stat Cards */}
       <StatGrid
-        className="submissions-stats-grid grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+        className="submissions-stats-grid grid gap-3 sm:grid-cols-2 xl:grid-cols-4"
         label="Tổng quan bài nộp"
         items={[
           {
@@ -91,11 +94,20 @@ export function SubmissionsPage({ revision }) {
           },
         ]}
       />
-      <p className="scope-note text-sm leading-relaxed text-muted-foreground">
-        <Icon name="fa-solid fa-circle-info" aria-hidden="true" />{' '}
-        {trUI('Thống kê trong tối đa 100 bài nộp gần nhất; không tính lượt chạy thử.')}
+
+      <p className="scope-note flex items-center gap-1.5 text-xs text-muted-foreground px-1">
+        <Icon
+          name="fa-solid fa-circle-info"
+          className="size-3 text-muted-foreground/70 shrink-0"
+          aria-hidden="true"
+        />
+        <span>
+          {trUI('Thống kê trong tối đa 100 bài nộp gần nhất; không tính lượt chạy thử.')}
+        </span>
       </p>
-      <div className="insight-grid grid min-w-0 gap-4 sm:grid-cols-2 submissions-insights">
+
+      {/* Middle Insight Panels */}
+      <div className="insight-grid grid min-w-0 gap-3.5 sm:grid-cols-2 submissions-insights">
         <InsightPanel title="Phân bố kết quả">
           {!data ? (
             <Loading />
@@ -129,152 +141,228 @@ export function SubmissionsPage({ revision }) {
           )}
         </InsightPanel>
       </div>
-      <div className="subheading flex flex-wrap items-center justify-between gap-3">
-        <h2>Chi tiết bài nộp</h2>
-        <small>
-          {ready ? history.total : '—'} {trUI('kết quả')}
-        </small>
-      </div>
-      <div className="tabs" aria-label={trUI('Lọc bài nộp')}>
-        {[
-          ['all', 'Tất cả'],
-          ['pending', 'Đang chờ chấm'],
-          ['ac', 'Đã AC'],
-          ['other', 'Cần cải thiện'],
-        ].map(([k, label]) => (
-          <UiButton
-            key={k}
-            className={
-              filter === k
-                ? 'active border-primary/40 bg-accent text-accent-foreground ring-1 ring-primary/15'
-                : ''
-            }
-            aria-pressed={filter === k}
-            onClick={() => {
-              F(k);
-              P(1);
-            }}
-            variant="default"
-          >
-            {trUI(label)}
-          </UiButton>
-        ))}
-      </div>
-      {!ready ? (
-        <Loading />
-      ) : (
-        <div
-          className="paper text-card-foreground shadow-xs table-wrap min-w-0 overflow-x-auto rounded-[14px] border bg-card"
-          data-pagination="manual"
-          role="region"
-          aria-label={trUI('Bảng dữ liệu')}
-          tabIndex={0}
-        >
-          <UiTable paginate={false}>
-            <UiTableHeader>
-              <UiTableRow>
-                <UiTableHead>Bài tập</UiTableHead>
-                <UiTableHead>Ngôn ngữ</UiTableHead>
-                <UiTableHead>Chế độ</UiTableHead>
-                <UiTableHead>Nhận lúc</UiTableHead>
-                <UiTableHead>Kết quả</UiTableHead>
-                <UiTableHead>Điểm</UiTableHead>
-              </UiTableRow>
-            </UiTableHeader>
-            <UiTableBody>
-              {rows.map((s) => (
-                <UiTableRow key={s.id}>
-                  <UiTableCell>
-                    <UiButton
-                      className="link inline-flex items-center gap-1 text-primary underline-offset-4 hover:underline"
-                      data-user-content
-                      onClick={() => setSelected(s.id)}
-                      variant="ghost"
-                    >
-                      {s.title}
-                    </UiButton>
-                  </UiTableCell>
-                  <UiTableCell>{languageNames[s.language]}</UiTableCell>
-                  <UiTableCell>
-                    {s.room_id ? 'SURVIVAL · ' : s.contest_id ? 'CONTEST · ' : ''}
-                    {trUI(s.mode)}
-                  </UiTableCell>
-                  <UiTableCell>
-                    {new Date(s.received_at).toLocaleString(
-                      document.documentElement.lang === 'en' ? 'en-US' : 'vi-VN',
-                    )}
-                  </UiTableCell>
-                  <UiTableCell>
-                    <SubmissionStatus submission={s} />
-                  </UiTableCell>
-                  <UiTableCell>{s.score}</UiTableCell>
-                </UiTableRow>
-              ))}
-            </UiTableBody>
-          </UiTable>
-          {!rows.length && (
-            <div className="empty rounded-[14px] border border-dashed p-8 text-center text-muted-foreground">
-              Chưa có bài nộp phù hợp.
-            </div>
-          )}
-          <nav
-            className="table-footer history-pagination mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground"
-            aria-label={trUI('Phân trang lịch sử bài nộp')}
-          >
-            <UiLabel className="grid gap-2 text-sm font-medium">
-              {trUI('Số bài mỗi trang')}
-              <UiNativeSelect
-                value={pageSize}
-                onChange={(e) => {
-                  S(Number(e.target.value));
-                  P(1);
-                }}
-              >
-                {[10, 20, 50].map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </UiNativeSelect>
-            </UiLabel>
-            <UiButton
-              className="ghost bg-transparent text-muted-foreground shadow-none hover:bg-muted hover:text-foreground"
-              disabled={history.page <= 1}
-              onClick={() => P(history.page - 1)}
-              variant="ghost"
-            >
-              {trUI('Trang trước')}
-            </UiButton>
-            <span>
-              {history.page} / {history.totalPages}
-            </span>
-            <UiButton
-              className="ghost bg-transparent text-muted-foreground shadow-none hover:bg-muted hover:text-foreground"
-              disabled={history.page >= history.totalPages}
-              onClick={() => P(history.page + 1)}
-              variant="ghost"
-            >
-              {trUI('Trang sau')}
-            </UiButton>
-          </nav>
+
+      {/* Submissions Section */}
+      <div className="space-y-3 pt-1">
+        <div className="subheading flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Icon
+              name="fa-solid fa-file-code"
+              className="size-4 text-primary"
+              aria-hidden="true"
+            />
+            <h2 className="font-heading text-sm sm:text-base font-bold text-foreground">
+              {trUI('Chi tiết bài nộp')}
+            </h2>
+          </div>
+          <span className="text-xs font-semibold text-muted-foreground bg-muted/60 px-2.5 py-0.5 rounded-full border border-border/50">
+            {ready ? history.total : '—'} {trUI('kết quả')}
+          </span>
         </div>
-      )}
-      {selected && (
-        <section className="paper text-card-foreground shadow-xs pad sm:p-6 submission-detail space-y-4 rounded-[14px] border bg-card p-5">
-          <div className="inline-group between flex flex-wrap items-center justify-between gap-3">
-            <h2>Chi tiết bài nộp</h2>
+
+        {/* Filter Tabs */}
+        <div
+          className="tabs flex flex-wrap gap-1 rounded-xl bg-muted/60 p-1 border border-border/50 w-fit"
+          aria-label={trUI('Lọc bài nộp')}
+        >
+          {[
+            ['all', 'Tất cả'],
+            ['pending', 'Đang chờ chấm'],
+            ['ac', 'Đã AC'],
+            ['other', 'Cần cải thiện'],
+          ].map(([k, label]) => (
             <UiButton
-              className="ghost bg-transparent text-muted-foreground shadow-none hover:bg-muted hover:text-foreground"
+              key={k}
+              className={cn(
+                'h-8 px-3 text-xs font-semibold rounded-lg transition-all border-0 shadow-none',
+                filter === k
+                  ? 'active bg-card text-foreground shadow-2xs border border-border/60 font-bold'
+                  : 'bg-transparent text-muted-foreground hover:bg-card/50 hover:text-foreground',
+              )}
+              aria-pressed={filter === k}
+              onClick={() => {
+                F(k);
+                P(1);
+              }}
+              variant="ghost"
+            >
+              {trUI(label)}
+            </UiButton>
+          ))}
+        </div>
+
+        {/* Table Card */}
+        {!ready ? (
+          <Loading />
+        ) : (
+          <div
+            className="paper text-card-foreground shadow-2xs table-wrap min-w-0 overflow-hidden rounded-2xl border border-border/80 bg-card"
+            data-pagination="manual"
+            role="region"
+            aria-label={trUI('Bảng dữ liệu')}
+            tabIndex={0}
+          >
+            <UiTable paginate={false}>
+              <UiTableHeader className="bg-muted/30 border-b border-border/60">
+                <UiTableRow>
+                  <UiTableHead className="text-xs font-bold text-muted-foreground">
+                    {trUI('Bài tập')}
+                  </UiTableHead>
+                  <UiTableHead className="text-xs font-bold text-muted-foreground">
+                    {trUI('Ngôn ngữ')}
+                  </UiTableHead>
+                  <UiTableHead className="text-xs font-bold text-muted-foreground">
+                    {trUI('Chế độ')}
+                  </UiTableHead>
+                  <UiTableHead className="text-xs font-bold text-muted-foreground">
+                    {trUI('Nhận lúc')}
+                  </UiTableHead>
+                  <UiTableHead className="text-xs font-bold text-muted-foreground">
+                    {trUI('Kết quả')}
+                  </UiTableHead>
+                  <UiTableHead className="text-xs font-bold text-muted-foreground text-right">
+                    {trUI('Điểm')}
+                  </UiTableHead>
+                </UiTableRow>
+              </UiTableHeader>
+              <UiTableBody>
+                {rows.map((s) => (
+                  <UiTableRow key={s.id} className="hover:bg-muted/30 transition-colors">
+                    <UiTableCell className="font-medium">
+                      <UiButton
+                        className="link inline-flex items-center gap-1.5 font-semibold text-primary hover:text-primary-hover p-0 h-auto"
+                        data-user-content
+                        onClick={() => setSelected(s.id)}
+                        variant="ghost"
+                      >
+                        <Icon
+                          name="fa-regular fa-file-code"
+                          className="size-3 opacity-70"
+                          aria-hidden="true"
+                        />
+                        <span>{s.title}</span>
+                      </UiButton>
+                    </UiTableCell>
+                    <UiTableCell className="text-xs font-mono text-muted-foreground">
+                      {languageNames[s.language]}
+                    </UiTableCell>
+                    <UiTableCell className="text-xs text-muted-foreground">
+                      {s.room_id ? (
+                        <span className="font-semibold text-orange-600 dark:text-orange-400">
+                          SURVIVAL ·{' '}
+                        </span>
+                      ) : s.contest_id ? (
+                        <span className="font-semibold text-amber-600 dark:text-amber-400">
+                          CONTEST ·{' '}
+                        </span>
+                      ) : null}
+                      <span>{trUI(s.mode)}</span>
+                    </UiTableCell>
+                    <UiTableCell className="text-xs text-muted-foreground font-mono">
+                      {new Date(s.received_at).toLocaleString(
+                        document.documentElement.lang === 'en' ? 'en-US' : 'vi-VN',
+                      )}
+                    </UiTableCell>
+                    <UiTableCell>
+                      <SubmissionStatus submission={s} />
+                    </UiTableCell>
+                    <UiTableCell className="text-right font-bold text-foreground">
+                      {s.score}
+                    </UiTableCell>
+                  </UiTableRow>
+                ))}
+              </UiTableBody>
+            </UiTable>
+
+            {!rows.length && (
+              <div className="py-12 px-4 text-center space-y-2">
+                <Icon
+                  name="fa-regular fa-file-code"
+                  className="mx-auto size-8 text-muted-foreground/30"
+                  aria-hidden="true"
+                />
+                <p className="text-sm font-semibold text-foreground">
+                  {trUI('Chưa có bài nộp phù hợp.')}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {trUI('Thử chọn bộ lọc khác hoặc bắt đầu giải bài tập mới.')}
+                </p>
+              </div>
+            )}
+
+            <nav
+              className="table-footer history-pagination flex flex-wrap items-center justify-between gap-3 border-t border-border/50 px-4 py-2.5 text-xs text-muted-foreground bg-muted/15"
+              aria-label={trUI('Phân trang lịch sử bài nộp')}
+            >
+              <div className="flex items-center gap-2">
+                <span className="font-medium text-muted-foreground">
+                  {trUI('Số bài mỗi trang')}:
+                </span>
+                <UiNativeSelect
+                  value={pageSize}
+                  onChange={(e) => {
+                    S(Number(e.target.value));
+                    P(1);
+                  }}
+                  className="h-7 text-xs font-semibold rounded-md bg-card border-border/70 py-0 px-2 shadow-2xs"
+                >
+                  {[10, 20, 50].map((n) => (
+                    <option key={n} value={n}>
+                      {n}
+                    </option>
+                  ))}
+                </UiNativeSelect>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <UiButton
+                  className="h-7 px-2.5 text-xs font-semibold rounded-md border border-border/60 bg-card text-foreground hover:bg-muted disabled:opacity-40 disabled:hover:bg-card shadow-2xs"
+                  disabled={history.page <= 1}
+                  onClick={() => P(history.page - 1)}
+                  variant="outline"
+                >
+                  <Icon name="fa-solid fa-chevron-left" className="size-2.5" aria-hidden="true" />
+                  <span>{trUI('Trang trước')}</span>
+                </UiButton>
+
+                <span className="px-2 py-0.5 font-mono text-xs font-semibold text-foreground bg-card border border-border/50 rounded-md">
+                  {history.page} / {history.totalPages || 1}
+                </span>
+
+                <UiButton
+                  className="h-7 px-2.5 text-xs font-semibold rounded-md border border-border/60 bg-card text-foreground hover:bg-muted disabled:opacity-40 disabled:hover:bg-card shadow-2xs"
+                  disabled={history.page >= history.totalPages}
+                  onClick={() => P(history.page + 1)}
+                  variant="outline"
+                >
+                  <span>{trUI('Trang sau')}</span>
+                  <Icon name="fa-solid fa-chevron-right" className="size-2.5" aria-hidden="true" />
+                </UiButton>
+              </div>
+            </nav>
+          </div>
+        )}
+      </div>
+
+      {selected && (
+        <section className="paper text-card-foreground shadow-2xs pad sm:p-6 submission-detail space-y-4 rounded-2xl border border-border/80 bg-card p-5">
+          <div className="inline-group between flex flex-wrap items-center justify-between gap-3 border-b border-border/50 pb-3">
+            <h2 className="font-heading text-base font-bold text-foreground">
+              {trUI('Chi tiết bài nộp')}
+            </h2>
+            <UiButton
+              className="ghost h-7 px-2.5 text-xs font-semibold rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
               onClick={() => setSelected(null)}
               variant="ghost"
             >
-              Đóng
+              <Icon name="fa-solid fa-xmark" className="size-3" aria-hidden="true" />
+              <span>{trUI('Đóng')}</span>
             </UiButton>
           </div>
           <Result id={selected} revision={revision} />
         </section>
       )}
-    </>
+    </div>
   );
 }
 export { default as Leaderboard } from './Leaderboards';
