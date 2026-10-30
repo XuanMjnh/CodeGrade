@@ -1,14 +1,228 @@
 import extra from './translations.json';
 import React from 'react';
-export let locale=localStorage.getItem('cg-locale')||'vi';
-const pairs={"Luyện tập":"Practice","Code Survival":"Code Survival","Xếp hạng":"Leaderboard","Bài nộp":"Submissions","Quản trị":"Administration","Đăng xuất":"Sign out","Đăng nhập →":"Sign in →","Đăng ký Coder":"Create account","Mật khẩu":"Password","Họ tên":"Full name","Tên contest":"Contest name","Bắt đầu (giờ máy của bạn)":"Start time (local)","Kết thúc":"End time","Đăng ký tham gia":"Register","Bảng điểm":"Standings","Chọn bài đã công bố":"Select problems","Tạo contest":"Create contest","+ Tạo contest":"+ Create contest","Tạo câu hỏi":"Create question","+ Tạo câu hỏi":"+ Create question","Bài tập":"Problem","Độ khó":"Difficulty","Trạng thái":"Status","Tất cả category":"All categories","Tất cả độ khó":"All difficulties","Mọi trạng thái":"All statuses","Đã AC":"Accepted","Chưa AC":"Not solved","Giải bài →":"Solve →","Sửa đề ↗":"Edit ↗","Mỗi bài giải, một bước tiến.":"Make progress with every solution.","Thử thách hôm nay":"Today's challenge","Vào Code Survival ↗":"Enter Code Survival ↗","Lời giải của bạn":"Your solution","Nộp bài →":"Submit →","Chạy ví dụ":"Run examples","Đang gửi…":"Sending…","Quay lại":"Back","← Quay lại":"← Back","Lịch sử bài nộp":"Submission history","Ngôn ngữ":"Language","Chế độ":"Mode","Kết quả":"Result","Điểm":"Score","Hạng":"Rank","Coder":"Coder","Những người dẫn đầu":"Top coders","Số bài AC":"Problems solved","Thắng Code Survival":"Survival wins","Tạo phòng mới":"Create room","+ Tạo phòng":"+ Create room","Tham gia bằng mã":"Join with a code","Mã phòng":"Room code","Vào phòng →":"Join room →","Bắt đầu trận →":"Start match →","Danh sách phòng":"Rooms","Phòng đấu & lịch sử":"Rooms and history","Đang tải dữ liệu…":"Loading…","Đang kết nối…":"Connecting…","Bỏ cuộc":"Forfeit","Lưu":"Save","Gửi":"Post","Bình luận":"Comments","Đánh dấu":"Bookmark","Thông báo":"Announcements","Thông tin cá nhân":"Profile","Công khai":"Public entry","Cần phê duyệt":"Approval required","Duyệt":"Approve","Từ chối":"Reject","Chờ duyệt":"Pending approval","Đếm ngược":"Countdown","Thời gian vòng":"Round duration","Thời gian chung kết":"Final duration","Luật chơi":"Rules","Save changes":"Lưu thay đổi","Save changes and continue editing":"Lưu và tiếp tục sửa","Cancel":"Hủy","Question name":"Tên câu hỏi","Question text":"Nội dung đề","General":"Thông tin chung","Answer":"Đáp án","Test cases":"Bộ kiểm thử","Standard Input":"Đầu vào chuẩn","Expected output":"Kết quả mong đợi","Test properties":"Thuộc tính test","Use as example":"Dùng làm ví dụ","Blanks for 3 more choices":"Thêm 3 test","Customisation":"Tùy chỉnh","Advanced customisation":"Tùy chỉnh nâng cao"};
-Object.assign(pairs,extra,{'Trang trước':'Previous','Trang sau':'Next','Đã đăng':'Published','Tiêu đề':'Title','Nội dung':'Content','Số dòng ô trả lời của coder, không phải số dòng testcase.':'Number of lines in the solution editor.','Tổng điểm câu hỏi, khác trọng số Mark của từng test.':'Total problem score.','1–10 giây mỗi test.':'1–10 seconds per test.','64–512 MB; trống/0 dùng tối thiểu 64 MB.':'64–512 MB; zero uses the minimum.','Lưu penalty Moodle; Code Survival dùng cố định 10 giây/lần sai.':'Penalty settings.'});
-Object.assign(pairs,{"Question type": "Loại câu hỏi", "Question type details": "Chi tiết loại câu hỏi", "Feedback": "Phản hồi", "Marking": "Chấm điểm", "Template params": "Tham số mẫu", "Template param controls": "Điều khiển tham số", "Rows": "Số dòng", "Submit buttons": "Nút nộp bài", "Stop button": "Nút dừng", "Precheck": "Kiểm tra trước", "Disabled": "Tắt", "Empty": "Rỗng", "Examples": "Ví dụ", "Selected": "Được chọn", "All": "Tất cả", "Hide check": "Ẩn nút kiểm tra", "Never available": "Không khả dụng", "Always available": "Luôn khả dụng", "After maximum marks": "Sau khi đạt điểm tối đa", "Force show": "Luôn hiển thị", "Force hide": "Luôn ẩn", "Use quiz settings": "Theo cài đặt", "All-or-nothing grading": "Chấm toàn bộ hoặc không có điểm", "Default mark": "Điểm mặc định", "General feedback": "Phản hồi chung", "Question status": "Trạng thái câu hỏi", "Sample answer": "Lời giải mẫu", "Sample answer language": "Ngôn ngữ lời giải mẫu", "Validate on Save": "Kiểm tra khi lưu", "Validate sample answer on save": "Kiểm tra lời giải mẫu khi lưu", "Answer box preload": "Mã khởi đầu", "Global extra": "Mã bổ sung chung", "Extra template data": "Dữ liệu bổ sung", "Show": "Hiện", "Hide": "Ẩn", "Hide if fail": "Ẩn nếu sai", "Hide if succeed": "Ẩn nếu đúng", "Mark": "Trọng số", "Ordering": "Thứ tự", "Hide rest if fail": "Ẩn phần sau nếu sai", "Tags": "Nhãn", "Support files": "Tệp hỗ trợ", "Attachment options": "Tùy chọn đính kèm"});
-const viToEn={},enToVi={};
-for(const [a,b] of Object.entries(pairs)){if(/[À-ỹ]/.test(a)&&!/[À-ỹ]/.test(b)){viToEn[a.trim()]=b.trim();enToVi[b.trim()]=a.trim();}else if(!/[À-ỹ]/.test(a)&&/[À-ỹ]/.test(b)){viToEn[b.trim()]=a.trim();enToVi[a.trim()]=b.trim();}}
-const enumLabels={ALIVE:["Đang thi đấu","Playing"],LEFT:["Đã rời phòng","Left"],FORFEIT:["Đã bỏ cuộc","Forfeited"],ELIMINATED:["Bị loại","Eliminated"],SPECTATOR:["Khán giả","Spectator"],OFFICIAL:["Chính thức","Official"],VALIDATE:["Chấm lời giải mẫu","Sample validation"],RUN_EXAMPLES:["Chạy ví dụ","Run examples"]};
-export function t(s){if(typeof s!=='string')return s;const trimmed=s.trim(),pad=s.slice(0,s.indexOf(trimmed)),tail=s.slice(s.indexOf(trimmed)+trimmed.length);if(!trimmed)return s;if(enumLabels[trimmed])return pad+enumLabels[trimmed][locale==='en'?1:0]+tail;return pad+(locale==='en'?(viToEn[trimmed]||trimmed.replace(/Mức (\d)/g,'Level $1')):(enToVi[trimmed]||trimmed.replace(/Level (\d)/g,'Mức $1')))+tail;}
-const create=React.createElement;
-React.createElement=function(type,props,...children){if(props){props={...props};for(const k of ['title','placeholder','aria-label'])if(typeof props[k]==='string')props[k]=t(props[k]);}return create(type,props,...children.map(c=>typeof c==='string'&&type!=='pre'&&type!=='code'&&!props?.['data-user-content']?t(c):c));};
-document.documentElement.lang=locale;
-export function LanguageButton(){return create('button',{className:'secondary language-button',onClick:()=>{locale=locale==='vi'?'en':'vi';localStorage.setItem('cg-locale',locale);location.reload();},'aria-label':locale==='vi'?'Switch to English':'Chuyển sang tiếng Việt'},locale==='vi'?'EN':'VI');}
+import { Button } from '../components/ui/button';
+export let locale = localStorage.getItem('cg-locale') || 'vi';
+const pairs = {
+  'Luyện tập': 'Practice',
+  'Code Survival': 'Code Survival',
+  'Xếp hạng': 'Leaderboard',
+  'Bài nộp': 'Submissions',
+  'Quản trị': 'Administration',
+  'Đăng xuất': 'Sign out',
+  'Đăng nhập →': 'Sign in →',
+  'Đăng ký Coder': 'Create account',
+  'Mật khẩu': 'Password',
+  'Họ tên': 'Full name',
+  'Tên contest': 'Contest name',
+  'Bắt đầu (giờ máy của bạn)': 'Start time (local)',
+  'Kết thúc': 'End time',
+  'Đăng ký tham gia': 'Register',
+  'Bảng điểm': 'Standings',
+  'Chọn bài đã công bố': 'Select problems',
+  'Tạo contest': 'Create contest',
+  '+ Tạo contest': '+ Create contest',
+  'Tạo câu hỏi': 'Create question',
+  '+ Tạo câu hỏi': '+ Create question',
+  'Bài tập': 'Problem',
+  'Độ khó': 'Difficulty',
+  'Trạng thái': 'Status',
+  'Tất cả category': 'All categories',
+  'Tất cả độ khó': 'All difficulties',
+  'Mọi trạng thái': 'All statuses',
+  'Đã AC': 'Accepted',
+  'Chưa AC': 'Not solved',
+  'Giải bài →': 'Solve →',
+  'Sửa đề ↗': 'Edit ↗',
+  'Mỗi bài giải, một bước tiến.': 'Make progress with every solution.',
+  'Thử thách hôm nay': "Today's challenge",
+  'Vào Code Survival ↗': 'Enter Code Survival ↗',
+  'Lời giải của bạn': 'Your solution',
+  'Nộp bài →': 'Submit →',
+  'Chạy ví dụ': 'Run examples',
+  'Đang gửi…': 'Sending…',
+  'Quay lại': 'Back',
+  '← Quay lại': '← Back',
+  'Lịch sử bài nộp': 'Submission history',
+  'Ngôn ngữ': 'Language',
+  'Chế độ': 'Mode',
+  'Kết quả': 'Result',
+  Điểm: 'Score',
+  Hạng: 'Rank',
+  Coder: 'Coder',
+  'Những người dẫn đầu': 'Top coders',
+  'Số bài AC': 'Problems solved',
+  'Thắng Code Survival': 'Survival wins',
+  'Tạo phòng mới': 'Create room',
+  '+ Tạo phòng': '+ Create room',
+  'Tham gia bằng mã': 'Join with a code',
+  'Mã phòng': 'Room code',
+  'Vào phòng →': 'Join room →',
+  'Bắt đầu trận →': 'Start match →',
+  'Danh sách phòng': 'Rooms',
+  'Phòng đấu & lịch sử': 'Rooms and history',
+  'Đang tải dữ liệu…': 'Loading…',
+  'Đang kết nối…': 'Connecting…',
+  'Bỏ cuộc': 'Forfeit',
+  Lưu: 'Save',
+  Gửi: 'Post',
+  'Bình luận': 'Comments',
+  'Đánh dấu': 'Bookmark',
+  'Thông báo': 'Announcements',
+  'Thông tin cá nhân': 'Profile',
+  'Công khai': 'Public entry',
+  'Cần phê duyệt': 'Approval required',
+  Duyệt: 'Approve',
+  'Từ chối': 'Reject',
+  'Chờ duyệt': 'Pending approval',
+  'Đếm ngược': 'Countdown',
+  'Thời gian vòng': 'Round duration',
+  'Thời gian chung kết': 'Final duration',
+  'Luật chơi': 'Rules',
+  'Save changes': 'Lưu thay đổi',
+  'Save changes and continue editing': 'Lưu và tiếp tục sửa',
+  Cancel: 'Hủy',
+  'Question name': 'Tên câu hỏi',
+  'Question text': 'Nội dung đề',
+  General: 'Thông tin chung',
+  Answer: 'Đáp án',
+  'Test cases': 'Bộ kiểm thử',
+  'Standard Input': 'Đầu vào chuẩn',
+  'Expected output': 'Kết quả mong đợi',
+  'Test properties': 'Thuộc tính test',
+  'Use as example': 'Dùng làm ví dụ',
+  'Blanks for 3 more choices': 'Thêm 3 test',
+  Customisation: 'Tùy chỉnh',
+  'Advanced customisation': 'Tùy chỉnh nâng cao',
+};
+Object.assign(pairs, extra, {
+  'Trang trước': 'Previous',
+  'Trang sau': 'Next',
+  'Đã đăng': 'Published',
+  'Tiêu đề': 'Title',
+  'Nội dung': 'Content',
+  'Số dòng ô trả lời của coder, không phải số dòng testcase.':
+    'Number of lines in the solution editor.',
+  'Tổng điểm câu hỏi, khác trọng số Mark của từng test.': 'Total problem score.',
+  '1–10 giây mỗi test.': '1–10 seconds per test.',
+  '64–512 MB; trống/0 dùng tối thiểu 64 MB.': '64–512 MB; zero uses the minimum.',
+  'Lưu penalty Moodle; Code Survival dùng cố định 10 giây/lần sai.': 'Penalty settings.',
+});
+Object.assign(pairs, {
+  'Question type': 'Loại câu hỏi',
+  'Question type details': 'Chi tiết loại câu hỏi',
+  Feedback: 'Phản hồi',
+  Marking: 'Chấm điểm',
+  'Template params': 'Tham số mẫu',
+  'Template param controls': 'Điều khiển tham số',
+  Rows: 'Số dòng',
+  'Submit buttons': 'Nút nộp bài',
+  'Stop button': 'Nút dừng',
+  Precheck: 'Kiểm tra trước',
+  Disabled: 'Tắt',
+  Empty: 'Rỗng',
+  Examples: 'Ví dụ',
+  Selected: 'Được chọn',
+  All: 'Tất cả',
+  'Hide check': 'Ẩn nút kiểm tra',
+  'Never available': 'Không khả dụng',
+  'Always available': 'Luôn khả dụng',
+  'After maximum marks': 'Sau khi đạt điểm tối đa',
+  'Force show': 'Luôn hiển thị',
+  'Force hide': 'Luôn ẩn',
+  'Use quiz settings': 'Theo cài đặt',
+  'All-or-nothing grading': 'Chấm toàn bộ hoặc không có điểm',
+  'Default mark': 'Điểm mặc định',
+  'General feedback': 'Phản hồi chung',
+  'Question status': 'Trạng thái câu hỏi',
+  'Sample answer': 'Lời giải mẫu',
+  'Sample answer language': 'Ngôn ngữ lời giải mẫu',
+  'Validate on Save': 'Kiểm tra khi lưu',
+  'Validate sample answer on save': 'Kiểm tra lời giải mẫu khi lưu',
+  'Answer box preload': 'Mã khởi đầu',
+  'Global extra': 'Mã bổ sung chung',
+  'Extra template data': 'Dữ liệu bổ sung',
+  Show: 'Hiện',
+  Hide: 'Ẩn',
+  'Hide if fail': 'Ẩn nếu sai',
+  'Hide if succeed': 'Ẩn nếu đúng',
+  Mark: 'Trọng số',
+  Ordering: 'Thứ tự',
+  'Hide rest if fail': 'Ẩn phần sau nếu sai',
+  Tags: 'Nhãn',
+  'Support files': 'Tệp hỗ trợ',
+  'Attachment options': 'Tùy chọn đính kèm',
+});
+const viToEn = {},
+  enToVi = {};
+for (const [a, b] of Object.entries(pairs)) {
+  if (/[À-ỹ]/.test(a) && !/[À-ỹ]/.test(b)) {
+    viToEn[a.trim()] = b.trim();
+    enToVi[b.trim()] = a.trim();
+  } else if (!/[À-ỹ]/.test(a) && /[À-ỹ]/.test(b)) {
+    viToEn[b.trim()] = a.trim();
+    enToVi[a.trim()] = b.trim();
+  }
+}
+const enumLabels = {
+  ALIVE: ['Đang thi đấu', 'Playing'],
+  LEFT: ['Đã rời phòng', 'Left'],
+  FORFEIT: ['Đã bỏ cuộc', 'Forfeited'],
+  ELIMINATED: ['Bị loại', 'Eliminated'],
+  SPECTATOR: ['Khán giả', 'Spectator'],
+  OFFICIAL: ['Chính thức', 'Official'],
+  VALIDATE: ['Chấm lời giải mẫu', 'Sample validation'],
+  RUN_EXAMPLES: ['Chạy ví dụ', 'Run examples'],
+};
+export function t(s) {
+  if (typeof s !== 'string') return s;
+  const trimmed = s.trim(),
+    pad = s.slice(0, s.indexOf(trimmed)),
+    tail = s.slice(s.indexOf(trimmed) + trimmed.length);
+  if (!trimmed) return s;
+  if (enumLabels[trimmed]) return pad + enumLabels[trimmed][locale === 'en' ? 1 : 0] + tail;
+  return (
+    pad +
+    (locale === 'en'
+      ? viToEn[trimmed] || trimmed.replace(/Mức (\d)/g, 'Level $1')
+      : enToVi[trimmed] || trimmed.replace(/Level (\d)/g, 'Mức $1')) +
+    tail
+  );
+}
+const create = React.createElement;
+React.createElement = function (type, props, ...children) {
+  if (props) {
+    props = {
+      ...props,
+    };
+    for (const k of ['title', 'placeholder', 'aria-label'])
+      if (typeof props[k] === 'string') props[k] = t(props[k]);
+  }
+  return create(
+    type,
+    props,
+    ...children.map((c) =>
+      typeof c === 'string' && type !== 'pre' && type !== 'code' && !props?.['data-user-content']
+        ? t(c)
+        : c,
+    ),
+  );
+};
+document.documentElement.lang = locale;
+export function LanguageButton() {
+  return create(
+    Button,
+    {
+      variant: 'ghost',
+      size: 'sm',
+      className:
+        'language-button h-8 rounded-md border border-border bg-card px-2 font-mono text-xs font-medium text-success',
+      onClick: () => {
+        locale = locale === 'vi' ? 'en' : 'vi';
+        localStorage.setItem('cg-locale', locale);
+        location.reload();
+      },
+      'aria-label': locale === 'vi' ? 'Switch to English' : 'Chuyển sang tiếng Việt',
+    },
+    locale === 'vi' ? 'EN' : 'VI',
+  );
+}

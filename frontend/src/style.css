@@ -1,8 +1,0 @@
-/* Layer order: foundations, shared components, focused product experiences. */
-@import './styles/tokens.css';
-@import './styles/base.css';
-@import './styles/platform.css';
-@import './styles/shell.css';
-@import './styles/workspace.css';
-@import './styles/studio.css';
-@import './styles/arena.css';

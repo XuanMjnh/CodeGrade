@@ -1,8 +1,0 @@
-{
-  "kind": "Real server restart with MySQL-backed session and queue",
-  "problems": 320,
-  "same_ids_codes_versions": true,
-  "queue_restored": true,
-  "joined_at_preserved": true,
-  "bank_fingerprint": "4ec6dd402cef20c3af8d7750d18cddc3b9c074df2ef12e54827cc7466c6158e8"
-}

@@ -13,7 +13,8 @@ const frontendDir = join(__dirname, '..');
 test('bilingual translation covers all practice and submission terms in both VI and EN', () => {
   const extra = JSON.parse(readFileSync(join(frontendDir, 'src/lib/translations.json'), 'utf8'));
   const pairs = Object.assign({}, extra);
-  const viToEn = {}, enToVi = {};
+  const viToEn = {},
+    enToVi = {};
   for (const [a, b] of Object.entries(pairs)) {
     if (/[À-ỹ]/.test(a) && !/[À-ỹ]/.test(b)) {
       viToEn[a.trim()] = b.trim();
@@ -40,18 +41,6 @@ test('bilingual translation covers all practice and submission terms in both VI 
     assert.ok(viToEn[term], `Missing English translation for: "${term}"`);
     assert.ok(enToVi[viToEn[term]], `Missing Vietnamese reverse mapping for: "${viToEn[term]}"`);
   }
-});
-
-test('platform.css contains modern styling for practice and submissions banners and stat cards', () => {
-  const css = readFileSync(join(frontendDir, 'src/styles/platform.css'), 'utf8');
-
-  assert.ok(css.includes('.rich-banner.banner-practice'), 'Missing .rich-banner.banner-practice');
-  assert.ok(css.includes('.rich-banner.banner-submissions'), 'Missing .rich-banner.banner-submissions');
-  assert.ok(css.includes('.stat-grid.practice-stats-grid'), 'Missing .stat-grid.practice-stats-grid');
-  assert.ok(css.includes('.stat-grid.submissions-stats-grid'), 'Missing .stat-grid.submissions-stats-grid');
-  assert.ok(css.includes('[data-verdict="AC"]'), 'Missing AC verdict progress styling');
-  assert.ok(css.includes('[data-verdict="WA"]'), 'Missing WA verdict progress styling');
-  assert.ok(css.includes('.pick-number'), 'Missing pick-number chip styling');
 });
 
 test('practice component renders modern stats grid with interactive filtering', async () => {
@@ -155,7 +144,7 @@ test('practice component renders modern stats grid with interactive filtering', 
   });
 
   const doc = w.document;
-  const banner = doc.querySelector('.rich-banner.banner-practice');
+  const banner = doc.querySelector('.page-banner.practice-banner');
   assert.ok(banner, 'Practice banner should be rendered with banner-practice class');
 
   const statGrid = doc.querySelector('.stat-grid.practice-stats-grid');
@@ -165,21 +154,25 @@ test('practice component renders modern stats grid with interactive filtering', 
   assert.equal(statCards.length, 4, 'Should render 4 stat cards');
 
   // Verify labels
-  const labels = statCards.map(c => c.querySelector('.stat-card-label')?.textContent?.trim());
+  const labels = statCards.map((c) => c.querySelector('.stat-card-label')?.textContent?.trim());
   assert.ok(labels.includes('Bài có thể luyện'));
   assert.ok(labels.includes('Bài đã AC'));
   assert.ok(labels.includes('Đã đánh dấu'));
   assert.ok(labels.includes('Danh mục'));
 
   // Verify icons
-  const icons = statCards.map(c => c.querySelector('.stat-card-icon i')?.className);
-  assert.ok(icons.some(c => c?.includes('fa-book-open')));
-  assert.ok(icons.some(c => c?.includes('fa-circle-check')));
-  assert.ok(icons.some(c => c?.includes('fa-star')));
-  assert.ok(icons.some(c => c?.includes('fa-layer-group')));
+  const icons = statCards.map((c) =>
+    c.querySelector('.stat-card-icon svg')?.getAttribute('data-icon'),
+  );
+  assert.ok(icons.some((c) => c?.includes('book-open')));
+  assert.ok(icons.some((c) => c?.includes('circle-check')));
+  assert.ok(icons.some((c) => c?.includes('star')));
+  assert.ok(icons.some((c) => c?.includes('layer-group')));
 
   // Test interactive filter clicking: click AC card
-  const acCard = statCards.find(c => c.querySelector('.stat-card-label')?.textContent?.trim() === 'Bài đã AC');
+  const acCard = statCards.find(
+    (c) => c.querySelector('.stat-card-label')?.textContent?.trim() === 'Bài đã AC',
+  );
   assert.ok(acCard.classList.contains('is-clickable'));
 
   await w.harness.act(async () => {
@@ -221,8 +214,14 @@ test('submissions component renders modern stats grid with filter actions', asyn
           b.onResolve({ filter: /lib\/live$/ }, () => ({ path: 'live', namespace: 'stub' }));
           b.onResolve({ filter: /lib\/locale$/ }, () => ({ path: 'locale', namespace: 'stub' }));
           b.onResolve({ filter: /components\/ui$/ }, () => ({ path: 'ui', namespace: 'stub' }));
-          b.onResolve({ filter: /components\/SubmissionStatus$/ }, () => ({ path: 'status', namespace: 'stub' }));
-          b.onResolve({ filter: /components\/SubmissionResult$/ }, () => ({ path: 'result', namespace: 'stub' }));
+          b.onResolve({ filter: /components\/SubmissionStatus$/ }, () => ({
+            path: 'status',
+            namespace: 'stub',
+          }));
+          b.onResolve({ filter: /components\/SubmissionResult$/ }, () => ({
+            path: 'result',
+            namespace: 'stub',
+          }));
           b.onLoad({ filter: /.*/, namespace: 'stub' }, (a) => {
             if (a.path === 'live') {
               return {
@@ -308,7 +307,7 @@ test('submissions component renders modern stats grid with filter actions', asyn
   });
 
   const doc = w.document;
-  const banner = doc.querySelector('.rich-banner.banner-submissions');
+  const banner = doc.querySelector('.page-banner.submissions-banner');
   assert.ok(banner, 'Submissions banner should be rendered with banner-submissions class');
 
   const statGrid = doc.querySelector('.stat-grid.submissions-stats-grid');
@@ -318,21 +317,23 @@ test('submissions component renders modern stats grid with filter actions', asyn
   assert.equal(statCards.length, 4, 'Should render 4 stat cards');
 
   // Verify labels
-  const labels = statCards.map(c => c.querySelector('.stat-card-label')?.textContent?.trim());
+  const labels = statCards.map((c) => c.querySelector('.stat-card-label')?.textContent?.trim());
   assert.ok(labels.includes('Lượt nộp chính thức'));
   assert.ok(labels.includes('Lượt đạt AC'));
   assert.ok(labels.includes('Đang chờ chấm'));
   assert.ok(labels.includes('Điểm cao nhất'));
 
   // Verify notes
-  const notes = statCards.map(c => c.querySelector('.stat-card-note')?.textContent?.trim());
+  const notes = statCards.map((c) => c.querySelector('.stat-card-note')?.textContent?.trim());
   assert.ok(notes.includes('Tổng bài đã gửi'));
   assert.ok(notes.includes('Lời giải chính xác'));
   assert.ok(notes.includes('Đang xử lý'));
   assert.ok(notes.includes('Thành tích tối đa'));
 
   // Test interactive click on AC card
-  const acCard = statCards.find(c => c.querySelector('.stat-card-label')?.textContent?.trim() === 'Lượt đạt AC');
+  const acCard = statCards.find(
+    (c) => c.querySelector('.stat-card-label')?.textContent?.trim() === 'Lượt đạt AC',
+  );
   assert.ok(acCard.classList.contains('is-clickable'));
 
   await w.harness.act(async () => {

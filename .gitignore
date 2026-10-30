@@ -2,8 +2,11 @@
 node_modules/
 backend/target/
 frontend/dist/
+frontend/test-results/
+frontend/playwright-report/
 __pycache__/
 *.pyc
 *.log
 .venv/
 *.zip
+/statics/results/

@@ -13,7 +13,8 @@ const frontendDir = join(__dirname, '..');
 test('bilingual translation covers all contest terms in both VI and EN', () => {
   const extra = JSON.parse(readFileSync(join(frontendDir, 'src/lib/translations.json'), 'utf8'));
   const pairs = Object.assign({}, extra);
-  const viToEn = {}, enToVi = {};
+  const viToEn = {},
+    enToVi = {};
   for (const [a, b] of Object.entries(pairs)) {
     if (/[À-ỹ]/.test(a) && !/[À-ỹ]/.test(b)) {
       viToEn[a.trim()] = b.trim();
@@ -52,7 +53,7 @@ test('bilingual translation covers all contest terms in both VI and EN', () => {
     'Điểm xếp hạng',
     'Tự lưu nháp thi đấu',
     'Đã AC',
-    'Làm lại →'
+    'Làm lại →',
   ];
 
   for (const key of contestKeys) {
@@ -89,7 +90,10 @@ test('contest component toggles between list view and dedicated arena space', as
         setup(b) {
           b.onResolve({ filter: /lib\/live$/ }, () => ({ path: 'live', namespace: 'stub' }));
           b.onResolve({ filter: /lib\/locale$/ }, () => ({ path: 'locale', namespace: 'stub' }));
-          b.onResolve({ filter: /components\/Insights$/ }, () => ({ path: 'insights', namespace: 'stub' }));
+          b.onResolve({ filter: /components\/Insights$/ }, () => ({
+            path: 'insights',
+            namespace: 'stub',
+          }));
           b.onResolve({ filter: /components\/ui$/ }, () => ({ path: 'ui', namespace: 'stub' }));
           b.onLoad({ filter: /.*/, namespace: 'stub' }, (a) => {
             if (a.path === 'live') {
@@ -177,7 +181,10 @@ test('contest component toggles between list view and dedicated arena space', as
     ],
   });
 
-  const dom = new JSDOM('<div id="root"></div>', { url: 'http://localhost', runScripts: 'outside-only' });
+  const dom = new JSDOM('<div id="root"></div>', {
+    url: 'http://localhost',
+    runScripts: 'outside-only',
+  });
   const w = dom.window;
   w.IS_REACT_ACT_ENVIRONMENT = true;
   w.MessageChannel = class {
@@ -201,9 +208,20 @@ test('contest component toggles between list view and dedicated arena space', as
   });
 
   // Verify list view elements are present and arena is absent
-  assert.ok(w.document.querySelector('.contest-cards'), 'Contest cards grid should be visible in list view');
-  assert.equal(w.document.querySelectorAll('.contest-card').length, 2, 'Should display 2 contest cards');
-  assert.equal(w.document.querySelector('#contest-space'), null, 'Dedicated arena should NOT be rendered in list view');
+  assert.ok(
+    w.document.querySelector('.contest-cards'),
+    'Contest cards grid should be visible in list view',
+  );
+  assert.equal(
+    w.document.querySelectorAll('.contest-card').length,
+    2,
+    'Should display 2 contest cards',
+  );
+  assert.equal(
+    w.document.querySelector('#contest-space'),
+    null,
+    'Dedicated arena should NOT be rendered in list view',
+  );
 
   // Verify interactive stat cards filtering
   const liveStatCard = w.document.querySelector('.stat-card-mock.live');
@@ -211,12 +229,20 @@ test('contest component toggles between list view and dedicated arena space', as
   await act(async () => {
     liveStatCard.click();
   });
-  assert.equal(w.document.querySelectorAll('.contest-card').length, 1, 'Should filter to 1 live contest');
+  assert.equal(
+    w.document.querySelectorAll('.contest-card').length,
+    1,
+    'Should filter to 1 live contest',
+  );
   assert.ok(w.document.body.textContent.includes('Contest 1 Alpha'), 'Should show Contest 1 Alpha');
   await act(async () => {
     liveStatCard.click();
   });
-  assert.equal(w.document.querySelectorAll('.contest-card').length, 2, 'Clicking active stat card again should reset filter to all 2 contests');
+  assert.equal(
+    w.document.querySelectorAll('.contest-card').length,
+    2,
+    'Clicking active stat card again should reset filter to all 2 contests',
+  );
 
   // 2. Click the first contest card
   const firstCard = w.document.querySelectorAll('.contest-card')[0];
@@ -225,10 +251,24 @@ test('contest component toggles between list view and dedicated arena space', as
   });
 
   // Verify dedicated arena is now visible and list is hidden
-  assert.ok(w.document.querySelector('#contest-space'), 'Dedicated contest space should be visible');
-  assert.equal(w.document.querySelector('.contest-cards'), null, 'Contest cards list should be hidden in dedicated space');
-  assert.equal(w.document.querySelector('.tabs'), null, 'Filter tabs should be hidden in dedicated space');
-  assert.ok(w.document.body.textContent.includes('Contest 2 Beta'), 'Contest title should be shown in dedicated space');
+  assert.ok(
+    w.document.querySelector('#contest-space'),
+    'Dedicated contest space should be visible',
+  );
+  assert.equal(
+    w.document.querySelector('.contest-cards'),
+    null,
+    'Contest cards list should be hidden in dedicated space',
+  );
+  assert.equal(
+    w.document.querySelector('.tabs'),
+    null,
+    'Filter tabs should be hidden in dedicated space',
+  );
+  assert.ok(
+    w.document.body.textContent.includes('Contest 2 Beta'),
+    'Contest title should be shown in dedicated space',
+  );
 
   // 3. Click back button
   const backBtn = w.document.querySelector('.contest-back-btn');
@@ -238,8 +278,15 @@ test('contest component toggles between list view and dedicated arena space', as
   });
 
   // Verify it returns to contest list view
-  assert.ok(w.document.querySelector('.contest-cards'), 'Contest cards grid should be restored after back click');
-  assert.equal(w.document.querySelector('#contest-space'), null, 'Dedicated arena should be hidden after back click');
+  assert.ok(
+    w.document.querySelector('.contest-cards'),
+    'Contest cards grid should be restored after back click',
+  );
+  assert.equal(
+    w.document.querySelector('#contest-space'),
+    null,
+    'Dedicated arena should be hidden after back click',
+  );
 
   await act(async () => {
     w.harness.unmount();
@@ -275,7 +322,10 @@ test('contest problems that are AC are styled with green color, check badge, and
         setup(b) {
           b.onResolve({ filter: /lib\/live$/ }, () => ({ path: 'live', namespace: 'stub' }));
           b.onResolve({ filter: /lib\/locale$/ }, () => ({ path: 'locale', namespace: 'stub' }));
-          b.onResolve({ filter: /components\/Insights$/ }, () => ({ path: 'insights', namespace: 'stub' }));
+          b.onResolve({ filter: /components\/Insights$/ }, () => ({
+            path: 'insights',
+            namespace: 'stub',
+          }));
           b.onResolve({ filter: /components\/ui$/ }, () => ({ path: 'ui', namespace: 'stub' }));
           b.onLoad({ filter: /.*/, namespace: 'stub' }, (a) => {
             if (a.path === 'live') {
@@ -363,7 +413,10 @@ test('contest problems that are AC are styled with green color, check badge, and
     ],
   });
 
-  const dom = new JSDOM('<div id="root"></div>', { url: 'http://localhost', runScripts: 'outside-only' });
+  const dom = new JSDOM('<div id="root"></div>', {
+    url: 'http://localhost',
+    runScripts: 'outside-only',
+  });
   const w = dom.window;
   w.IS_REACT_ACT_ENVIRONMENT = true;
   w.MessageChannel = class {
@@ -400,10 +453,22 @@ test('contest problems that are AC are styled with green color, check badge, and
 
   // Problem 2: WA in contest 'c1'
   const waCard = cards[1];
-  assert.equal(waCard.classList.contains('is-ac'), false, 'Second problem should NOT have is-ac class');
+  assert.equal(
+    waCard.classList.contains('is-ac'),
+    false,
+    'Second problem should NOT have is-ac class',
+  );
   const waBadge = waCard.querySelector('.contest-letter-badge');
-  assert.equal(waBadge.classList.contains('is-ac'), false, 'Letter badge should NOT have is-ac class');
-  assert.equal(waCard.textContent.includes('Đã AC'), false, 'Unsolved problem should NOT display "Đã AC"');
+  assert.equal(
+    waBadge.classList.contains('is-ac'),
+    false,
+    'Letter badge should NOT have is-ac class',
+  );
+  assert.equal(
+    waCard.textContent.includes('Đã AC'),
+    false,
+    'Unsolved problem should NOT display "Đã AC"',
+  );
   assert.ok(waCard.textContent.includes('Làm bài →'), 'Card button should show "Làm bài →"');
 
   // Verify contest AC progress chip

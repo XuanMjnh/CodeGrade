@@ -81,25 +81,11 @@ Project thống nhất ở phiên bản 6.0.0, chỉ đóng gói dataset.json: 3
 
 Bootstrap thêm bài chưa có khi bật DEMO_DATA và tạo yêu cầu VALIDATE qua worker. Không còn baseline dataset, bộ dịch hoặc luồng nâng cấp nội dung tự động. Database mới dùng V1__initial_schema.sql và dataset hiện tại. Database đã áp dụng V1–V6 cần đối chiếu schema và chuyển tiếp lịch sử Flyway riêng; source không tự sửa lịch sử hoặc reset dữ liệu.
 
-## Experimental setup và kết quả lịch sử
+## Kiểm thử lại
 
-Các số liệu bên dưới được đo trước khi hợp nhất dataset; chúng không thay thế kết quả kiểm thử của source hiện tại.
+Toàn bộ báo cáo JSON cũ trong `statics` đã được xóa theo yêu cầu để kiểm thử lại. Chưa có kết quả mới thay thế trong thư mục này. Xem [hướng dẫn kiểm thử](../README.md#kiểm-thử); khi chạy lại cần ghi rõ phiên bản source, môi trường, thời điểm và phạm vi đo.
 
-Windows host, Docker Linux VM 12 CPU / 8 GiB; Java 21, MySQL 8.4, Python 3.11, g++ hỗ trợ 11/17/20. H2 MySQL mode cho unit/integration backend, MySQL thật cho Compose. JSDOM chạy bundle React thực và mở WebSocket thật; không dùng nó để đánh giá CSS hay kích thước hiển thị native.
-
-| Nhóm | Kết quả thực tế | Nguồn |
-|---|---|---|
-| Backend | 91 test, 0 failure/error/skip | verification-v6.json / Surefire |
-| Frontend | 68 test và Vite build đạt | verification-v6.json |
-| UI/server | 7 hành trình DOM đạt | survival-v6-ui.json |
-| Reference | 1.000 test Python + 1.800 C++ + 125 kiểm tra độc lập | dataset-v6-verification.json |
-| Judge thật | AC CPP11/17/20/PY311; WA,CE,TLE | judge-v6-smoke.json |
-| Ba mode thật | Practice 2 không EXP; Normal/Ranked: 100 + 4×20 EXP | exp-policy-smoke.json |
-| Restart | Session/queue/joinedAt và mã/version giữ nguyên | restart-v6.json |
-| PING | 820 ACK, 1/10/30 kết nối | network-v6.json |
-| Fairness | 10.000 mô phỏng: baseline sai 6.151, proposed sai 0 | fairness-v6.json |
-
-Các file nằm ở [statics/results](../statics/results). PING p95 tương ứng 14,362 / 18,084 / 200,664 ms chỉ đo round trip protocol trong môi trường đang chạy các tác vụ Docker khác. Không suy ra tải judge/matcher hoặc độ trễ Internet từ kết quả này. Fairness dùng production ranking function nhưng là mô phỏng seeded, không phải đo trên người chơi thật. Native Edge automation bị môi trường chặn, không có kết quả PASS/screenshot cho phần đó.
+Kết quả PING chỉ phản ánh round trip protocol trong môi trường đo, không đại diện cho thông lượng judge hoặc tải matchmaking. Fairness là mô phỏng seeded, không phải phép đo mạng hoặc thử nghiệm trên người chơi thật.
 
 ## Novelty / Contributions
 
@@ -122,6 +108,6 @@ Hướng tiếp theo: benchmark matcher/judge có kiểm soát tải; lease ph�
 
 ## Files và tài liệu tái lập
 
-[changes-v6.json](../statics/results/changes-v6.json) liệt kê toàn bộ file thêm/sửa/xóa, gồm 320 source lời giải; không tính hai file architecture.png/svg đã bị xóa trước phiên làm việc. Các entry chính là Matchmaking.java, Progression.java, Bootstrap.java, V1__initial_schema.sql, Survival/Commands/Submissions/QuestionRules/Catalog, SurvivalLobby/Survival/Workspace/Community/QuestionEditor, script generate/verify/smoke và tests.
+Manifest `changes-v6.json` cũ đã được bỏ khi dọn `statics`; lịch sử thêm/sửa/xóa có trong Git (`git log --stat`). Các entry chính ở thời điểm đo là Matchmaking.java, Progression.java, Bootstrap.java, V1__initial_schema.sql, Survival/Commands/Submissions/QuestionRules/Catalog, SurvivalLobby/Survival/Workspace/Community/QuestionEditor, script generate/verify/smoke và tests.
 
 [README](../README.md) có lệnh chạy Compose, biến cấu hình, demo và cách tái lập. [solutions/index.json](../solutions/index.json) là mục lục thuật toán. Việc nộp/kiểm tra học thuật và cập nhật Word chính thức do nhóm xác nhận theo [INSTRUCTION](../INSTRUCTION.md).

@@ -142,7 +142,8 @@ async def main(args):
             assert status['status']=='AC'
         assert (await p.call('PROGRESSION_GET'))['exp']==before;checks.append('First and repeated independent AC do not award EXP')
         report=dict(kind='Real WebSocket + MySQL 8.4 + Java workers + Docker sandbox',checks=checks,matches=results,elapsed_seconds=round(time.monotonic()-started,2))
-        Path(args.output).write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+        output=Path(args.output);output.parent.mkdir(parents=True,exist_ok=True)
+        output.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
         print(json.dumps(dict(checks=checks,matches=len(results),elapsed_seconds=report['elapsed_seconds']),ensure_ascii=False,indent=2))
     finally:
         beat.cancel()

@@ -16,7 +16,8 @@ async def main(args):
         assert before==after and queue['state']=='WAITING' and queue['joinedAt']==queued['joinedAt']
         await p.call('MATCH_QUEUE_CANCEL')
         report=dict(kind='Real server restart with MySQL-backed session and queue',problems=len(before),same_ids_codes_versions=True,queue_restored=True,joined_at_preserved=True,bank_fingerprint=hashlib.sha256(json.dumps(before).encode()).hexdigest())
-        Path(args.output).write_text(json.dumps(report,indent=2)+'\n');print('Restart verification passed',flush=True)
+        output=Path(args.output);output.parent.mkdir(parents=True,exist_ok=True)
+        output.write_text(json.dumps(report,indent=2)+'\n');print('Restart verification passed',flush=True)
     finally:await p.ws.close()
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--url',default='ws://server:8080/ws');p.add_argument('--env-file',default='.env');p.add_argument('--output',default='statics/results/restart-v6.json');asyncio.run(main(p.parse_args()))

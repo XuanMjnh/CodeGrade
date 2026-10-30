@@ -1,12 +1,12 @@
 # CodeGrade Network 6.0.0
 
-Ứng dụng luyện tập và thi đấu lập trình qua WebSocket. Java 21 / Spring Boot / JDBC, MySQL 8.4 / Flyway, React 18 / Vite / CodeMirror, Java worker và Docker sandbox.
+Ứng dụng luyện tập và thi đấu lập trình qua WebSocket. Java 21 / Spring Boot / JDBC, MySQL 8.4 / Flyway, React 19 / Vite / shadcn/ui / Tailwind CSS 4 / CodeMirror, Java worker và Docker sandbox.
 
 Học phần Lập trình mạng, năm học 2026–2027. Thông tin nhóm nằm trong [báo cáo Word gốc](report/Bao_cao_CodeGrade_Network.docx). [Phụ lục kỹ thuật v6](report/CodeSurvival-v6.md) mô tả thay đổi, giao thức, kiểm thử và nội dung để nhóm đồng bộ vào báo cáo nộp chính thức.
 
 ## Chức năng
 
-Giao diện đã được tổ chức lại thành Question Studio năm bước và đấu trường Code Survival với HUD, chọn mode, tìm trận và kết quả theo dữ liệu server. Xem [bàn giao UI/UX](report/UI-Redesign.md) để biết các file thay đổi, kiểm thử và giới hạn xác minh hiển thị. Kết quả mới nằm trong [redesign-verification.json](statics/results/redesign-verification.json) và [redesign-ui-live.json](statics/results/redesign-ui-live.json); các báo cáo v6 bên dưới là mốc trước redesign.
+Toàn bộ giao diện dùng shadcn/ui và Tailwind CSS 4, giữ bố cục và bảng màu gốc: thanh điều hướng ngang, hai cột tiện ích, nền xám, điểm nhấn cam và xanh lá. Menu mobile mở dưới header; Question Studio giữ năm bước cấu hình và ba cột; Code Survival giữ ba thẻ chọn mode ngang, tiến trình và kết quả theo dữ liệu server. CSS giao diện cũ và Font Awesome đã được thay bằng component shadcn/ui, Lucide và utility Tailwind. Xem [hướng dẫn frontend](frontend/README.md) về cấu trúc, theme và kiểm thử; các báo cáo v6 bên dưới là kết quả lịch sử trước lần chuyển sang shadcn/ui.
 
 Practice cá nhân, Contest, ngân hàng đề, chấm bài và lịch sử, bảng xếp hạng, hồ sơ, bookmark, bình luận và quản trị ADMIN / AUTHOR / CODER được giữ. Một engine Code Survival dùng chung cho ba mode; không tạo game PvP riêng.
 
@@ -145,6 +145,7 @@ cd frontend
 npm ci
 npm test
 npm run build
+npm run test:e2e
 cd ../backend
 mvn test
 cd ..
@@ -158,26 +159,14 @@ Các script `survival_smoke.py`, `judge_smoke.py`, `restart_smoke.py`, `benchmar
 ```powershell
 $env:CG_ENV_FILE='đường dẫn file env kiểm thử'
 $env:CG_UI_URL='http://localhost:18080'
-node frontend/tests/survival-ui.cjs
+npm --prefix frontend run test:e2e
 ```
+
+Kiểm tra frontend sau khi chuyển sang shadcn/ui và khôi phục bố cục/màu gốc ngày 30/10/2026: **82/82 kiểm thử đơn vị**, **6/6 kiểm thử trình duyệt thật trên bản build Docker tại cổng 8080**, Vite build và kiểm tra định dạng đều đạt. Bộ trình duyệt kiểm tra các trang chính trên desktop/mobile, bố cục và bảng màu gốc, Question Studio, focus của menu, nộp bài giữ mã nguồn và khôi phục bản nháp trong phòng đấu hai người. `npm audit` không phát hiện lỗ hổng tại thời điểm kiểm tra. CSS build khoảng 109 KB; các route và CodeMirror được tải khi cần.
 
 Kiểm tra backend sau refactor Layered Architecture ngày 30/10/2026: `mvn clean verify` đạt **105/105 test** và đóng gói JAR; bộ backend trên MySQL 8.0.46 riêng đạt **104/104 test**, cùng các kiểm tra bổ sung HTTP/WebSocket, lịch sử và leaderboard. Schema cuối tạo đủ 27 bảng trên MySQL. Compose với MySQL 8.4.13 đã khởi tạo thành công, MySQL/server healthy và hai worker kết nối; chấm Docker thật đạt **7/7 kiểm tra** (AC bốn ngôn ngữ, WA/CE/TLE). Xem [chi tiết xác minh backend](backend/README.md). Chưa benchmark tải.
 
 Các kiểm tra trước bước refactor backend trong ngày 30/10/2026: frontend 122/122 test và Vite build đạt; 3/3 test đóng gói đạt. Script tạo dữ liệu tái tạo đúng nguyên dataset 320 bài / 1.600 testcase. Verifier chạy 1.000 testcase Python, 125 kiểm tra độc lập và đối chiếu 600 testcase C++ bằng Python oracle; chưa chạy lại binary C++.
 
-Kết quả lịch sử ngày 29/10/2026, trước lần hợp nhất phiên bản:
-
-| Kiểm tra | Kết quả | Bằng chứng |
-|---|---|---|
-| Backend | 91/91, không failure/error/skip | [verification-v6.json](statics/results/verification-v6.json) |
-| Frontend | 68/68; Vite build đạt | [verification-v6.json](statics/results/verification-v6.json) |
-| UI/server thật | 7 kiểm tra DOM đạt | [survival-v6-ui.json](statics/results/survival-v6-ui.json) |
-| Tham chiếu | 1.000 lượt Python, 1.800 lượt C++, 125 kiểm tra độc lập | [dataset-v6-verification.json](statics/results/dataset-v6-verification.json) |
-| Ba mode thật | Practice 2 không EXP; Normal/Ranked: 100 + 4×20 EXP | [exp-policy-smoke.json](statics/results/exp-policy-smoke.json) |
-| Docker judge | AC bốn ngôn ngữ; WA/CE/TLE | [judge-v6-smoke.json](statics/results/judge-v6-smoke.json) |
-| Restart thật | Queue/session/joinedAt và UUID/mã/version giữ nguyên | [restart-v6.json](statics/results/restart-v6.json) |
-| Fairness | 10.000 mô phỏng: baseline sai cutoff 6.151, proposed 0 | [fairness-v6.json](statics/results/fairness-v6.json) |
-| PING RTT | 1/10/30 client, tổng 820 ACK | [network-v6.json](statics/results/network-v6.json) |
-
-PING p95 lần này: 14,362 / 18,084 / 200,664 ms. Đây không phải thông lượng judge hay tải matchmaking. Fairness là mô phỏng, không đo mạng. Baseline frontend đạt 70 test sau cài dependency; một lần backend đạt 65/66 với lỗi nạp resource dataset, bộ cuối 91/91 đạt. Báo cáo v5.5 trong thư mục results giữ như lịch sử, không dùng thay kết quả v6.
+Toàn bộ báo cáo cũ trong `statics` đã được xóa để kiểm thử lại. Kết quả mới sẽ được sinh vào `statics/results/` và được bỏ qua trong Git. Các số liệu xác minh ở trên ghi nhận lần kiểm tra trước; hãy cập nhật theo kết quả chạy lại.
 

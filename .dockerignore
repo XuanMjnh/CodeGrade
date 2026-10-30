@@ -12,6 +12,9 @@
 !frontend/package-lock.json
 !frontend/index.html
 !frontend/vite.config.js
+!frontend/components.json
+!frontend/jsconfig.json
+!frontend/playwright.config.js
 !frontend/src/
 !frontend/src/**
 !frontend/public/
