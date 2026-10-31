@@ -66,7 +66,7 @@ export default function RankAmbientBackground({ tone = 'arcane' }) {
         0.33,
       );
 
-      // A visible energy front travels behind the entire row, including the current tier.
+      // Sweep energy across this rank's own surface.
       const sweepWidth = compact ? 70 : 160;
       const sweepX = ((time * (compact ? 48 : 150)) % (width + sweepWidth * 4)) - sweepWidth * 2;
       const sweep = context.createLinearGradient(sweepX - sweepWidth, 0, sweepX + sweepWidth, 0);
@@ -129,7 +129,7 @@ export default function RankAmbientBackground({ tone = 'arcane' }) {
         context.stroke();
       }
 
-      const particleCount = compact ? 14 : 30;
+      const particleCount = compact ? 14 : width < 400 ? 10 : 30;
       for (let index = 0; index < particleCount; index++) {
         const x = ((index * 97.37 + time * (8 + (index % 7))) % (width + 20)) - 10;
         const y = height - ((index * 37.71 + time * (12 + (index % 9))) % (height + 18));

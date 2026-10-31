@@ -80,7 +80,7 @@ export default function QuestionEditor({ id, revision, onNotice }) {
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
   const [dirty, setDirty] = useState(false);
-  const [step, setStep] = useState(0);
+  const [activeSection, setActiveSection] = useState('sec-1-info');
   const [preview, setPreview] = useState(false);
   const [loading, setLoading] = useState(!!id);
   const [loadFailed, setLoadFailed] = useState(false);
@@ -210,17 +210,46 @@ export default function QuestionEditor({ id, revision, onNotice }) {
       return null;
     }
   }
-  function scrollToSection(secId) {
+  function scrollToSection(secId, fieldFocus) {
+    setActiveSection(secId);
     const el = document.getElementById(secId);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (fieldFocus) {
+        setTimeout(() => {
+          const inputEl =
+            document.querySelector(`[aria-label="${fieldFocus}"]`) ||
+            el.querySelector('input, textarea, select');
+          inputEl?.focus();
+        }, 350);
+      }
     }
   }
-  function changeStep(next) {
-    setStep(next);
+
+  useEffect(() => {
+    if (loading) return;
     const secIds = ['sec-1-info', 'sec-2-grading', 'sec-3-answer', 'sec-4-testcases', 'sec-5-advanced'];
-    if (secIds[next]) scrollToSection(secIds[next]);
-  }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        }
+      },
+      {
+        rootMargin: '-80px 0px -60% 0px',
+        threshold: 0,
+      }
+    );
+
+    secIds.forEach((secId) => {
+      const el = document.getElementById(secId);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [loading]);
   function update(path, value) {
     setQ((prev) => {
       const next = structuredClone(prev);
@@ -397,20 +426,55 @@ export default function QuestionEditor({ id, revision, onNotice }) {
   const issues = validate(q);
   const exampleCount = q.testcases.filter((t) => t.useasexample).length;
   const verified = Boolean(q.version && q.validatedVersion === q.version && !dirty);
-  const steps = [
-    ['Thông tin', 'Tên, nội dung & ngôn ngữ', 'fa-file-lines'],
-    ['Cấu hình chấm', 'Loại câu hỏi & cách tính điểm', 'fa-sliders'],
-    ['Đáp án mẫu', 'Lời giải tham chiếu & preload', 'fa-code'],
-    ['Bộ kiểm thử', 'Input, output & thuộc tính', 'fa-vials'],
-    ['Nâng cao & xuất bản', 'Sandbox, tệp đính kèm & tags', 'fa-rocket'],
+  const sections = [
+    {
+      id: 'sec-1-info',
+      num: '01',
+      title: 'Thông tin cơ bản',
+      subtitle: 'Tên, nội dung & ngôn ngữ',
+      icon: 'fa-file-lines',
+      check: Boolean(q.general.questionName.trim() && q.general.questionText.trim() && q.languages.length > 0),
+    },
+    {
+      id: 'sec-2-grading',
+      num: '02',
+      title: 'Cấu hình chấm',
+      subtitle: 'Loại câu hỏi & tính điểm',
+      icon: 'fa-sliders',
+      check: issues.length === 0,
+    },
+    {
+      id: 'sec-3-answer',
+      num: '03',
+      title: 'Đáp án mẫu',
+      subtitle: 'Lời giải tham chiếu & preload',
+      icon: 'fa-code',
+      check: Boolean(q.answer.sampleAnswer.trim()),
+    },
+    {
+      id: 'sec-4-testcases',
+      num: '04',
+      title: 'Bộ kiểm thử',
+      subtitle: '5 testcases & thuộc tính',
+      icon: 'fa-vials',
+      check: q.testcases.length === 5,
+    },
+    {
+      id: 'sec-5-advanced',
+      num: '05',
+      title: 'Nâng cao & xuất bản',
+      subtitle: 'Trạng thái, tags & tệp đính kèm',
+      icon: 'fa-rocket',
+      check: true,
+    },
   ];
   const checklistItems = [
-    [!!q.general.questionName.trim(), 'Tên câu hỏi', 0, 'general.questionName'],
-    [!!q.general.questionText.trim(), 'Nội dung đề', 0, 'general.questionText'],
-    [q.languages.length > 0, 'Ngôn ngữ lập trình', 0, 'languages'],
-    [q.testcases.length === 5, 'Đủ 5 testcase', 3, 'testcases'],
-    [issues.length === 0, 'Cấu hình hợp lệ', 1, 'coderunnertype'],
-    [verified, 'Đáp án mẫu xác thực phiên bản hiện tại', 2, 'answer.sampleAnswer'],
+    [!!q.general.questionName.trim(), 'Tên câu hỏi', 'sec-1-info', 'general.questionName'],
+    [!!q.general.questionText.trim(), 'Nội dung đề', 'sec-1-info', 'general.questionText'],
+    [q.languages.length > 0, 'Ngôn ngữ lập trình', 'sec-1-info', 'languages'],
+    [q.testcases.length === 5, 'Đủ 5 testcase', 'sec-4-testcases', 'testcases'],
+    [issues.length === 0, 'Cấu hình hợp lệ', 'sec-2-grading', 'coderunnertype'],
+    [verified, 'Đáp án mẫu xác thực phiên bản hiện tại', 'sec-3-answer', 'answer.sampleAnswer'],
   ];
   const completedCount = checklistItems.filter(([ok]) => ok).length;
   const progressPercent = Math.round((completedCount / checklistItems.length) * 100);
@@ -453,13 +517,18 @@ export default function QuestionEditor({ id, revision, onNotice }) {
               <Icon name="fa-solid fa-hashtag" aria-hidden="true" /> {q.publicId || 'Chưa cấp mã'}
             </span>
             <span
-              className={`badge inline-flex items-center gap-1.5 rounded-full border bg-secondary px-2.5 py-1 text-xs font-medium studio-status-badge ${q.general.status === 'ready' ? 'status-ready' : 'status-draft'}`}
+              className={cn(
+                "badge inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium studio-status-badge",
+                q.general.status === 'ready'
+                  ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                  : 'border-amber-200 bg-amber-50 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+              )}
             >
               <span
-                className={`status-dot ${q.general.status === 'ready' ? 'is-ready border-primary/40 bg-accent text-accent-foreground ring-1 ring-primary/15' : 'is-draft'}`}
+                className={cn("size-2 rounded-full", q.general.status === 'ready' ? 'bg-emerald-500' : 'bg-amber-500')}
                 aria-hidden="true"
               />
-              {q.general.status === 'ready' ? 'Ready' : 'Draft'}
+              {q.general.status === 'ready' ? 'Ready / Công bố' : 'Bản nháp'}
             </span>
             <span
               className={`badge inline-flex items-center gap-1.5 rounded-full border bg-secondary px-2.5 py-1 text-xs font-medium level-pill level-${q.difficulty}`}
@@ -488,7 +557,7 @@ export default function QuestionEditor({ id, revision, onNotice }) {
             className="button secondary border border-input bg-card text-foreground shadow-xs hover:bg-accent hover:text-accent-foreground studio-import-btn"
             title="Nhập file JSON đề"
           >
-            <Icon name="fa-solid fa-file-import" aria-hidden="true" /> Import JSON
+            <Icon name="fa-solid fa-file-import" aria-hidden="true" /> Nhập JSON
             <UiInput
               type="file"
               accept=".json,application/json"
@@ -505,7 +574,7 @@ export default function QuestionEditor({ id, revision, onNotice }) {
             title="Xuất file JSON đề"
             variant="outline"
           >
-            <Icon name="fa-solid fa-file-export" aria-hidden="true" /> Export JSON
+            <Icon name="fa-solid fa-file-export" aria-hidden="true" /> Xuất JSON
           </UiButton>
           <UiButton
             type="button"
@@ -536,109 +605,88 @@ export default function QuestionEditor({ id, revision, onNotice }) {
       )}
 
       {/* Main Studio 3-Column Layout */}
-      <div className="studio-layout grid min-w-0 items-start gap-7 min-[961px]:grid-cols-[250px_minmax(0,1fr)] min-[1361px]:grid-cols-[250px_minmax(0,1fr)_280px]">
-        {/* Left Column: Navigation Stepper */}
+      <div className="studio-layout grid min-w-0 items-start gap-6 min-[961px]:grid-cols-[260px_minmax(0,1fr)] min-[1361px]:grid-cols-[260px_minmax(0,1fr)_290px]">
+        {/* Left Column: Table of Contents */}
         <nav
-          className="studio-nav grid gap-1 rounded-[14px] border bg-card p-4 shadow-subtle min-[961px]:sticky min-[961px]:top-24 [&_button]:h-auto [&_button]:min-h-14 [&_button]:justify-start [&_button]:whitespace-normal [&_button]:py-3"
-          aria-label="Các bước soạn đề"
+          className="studio-nav rounded-2xl border bg-card p-4 shadow-sm min-[961px]:sticky min-[961px]:top-20 space-y-3"
+          aria-label="Mục lục bài tập"
         >
-          <div className="studio-nav-header border-b px-2 pb-3 text-xs font-medium text-muted-foreground flex items-center justify-between gap-2">
-            <span className="eyebrow text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              NỘI DUNG ĐỀ
-            </span>
-            <span className="studio-step-counter inline-flex size-7 shrink-0 items-center justify-center rounded-md bg-muted text-xs font-semibold">
-              {step + 1} / 5
+          <div className="flex items-center justify-between border-b border-border/80 pb-3 px-1">
+            <div className="flex items-center gap-2">
+              <Icon name="fa-solid fa-list-check" className="text-primary size-4" />
+              <span className="text-xs font-bold uppercase tracking-wider text-foreground">
+                MỤC LỤC ĐIỀU HƯỚNG
+              </span>
+            </div>
+            <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-secondary text-muted-foreground">
+              5 mục
             </span>
           </div>
 
-          <div role="tablist" aria-label="Các bước soạn đề">
-            {steps.map(([title, note, icon], i) => (
-              <UiButton
-                type="button"
-                role="tab"
-                id={'studio-tab-' + i}
-                aria-controls={'studio-panel-' + i}
-                aria-selected={step === i}
-                tabIndex={step === i ? 0 : -1}
-                key={title}
-                className={`studio-tab-item relative my-1 w-full rounded-[10px] border-transparent bg-transparent text-muted-foreground shadow-none hover:bg-muted/60 hover:text-foreground [&>svg]:ml-auto [&>svg]:size-3.5 aria-selected:[&_.studio-step-number]:border-success aria-selected:[&_.studio-step-number]:bg-success aria-selected:[&_.studio-step-number]:text-white ${step === i ? 'is-active border-primary/40 bg-accent text-accent-foreground ring-1 ring-primary/15' : ''}`}
-                onClick={() => changeStep(i)}
-                onKeyDown={(e) => {
-                  const n = ['ArrowDown', 'ArrowRight'].includes(e.key)
-                    ? (i + 1) % 5
-                    : ['ArrowUp', 'ArrowLeft'].includes(e.key)
-                      ? (i + 4) % 5
-                      : e.key === 'Home'
-                        ? 0
-                        : e.key === 'End'
-                          ? 4
-                          : null;
-                  if (n !== null) {
-                    e.preventDefault();
-                    changeStep(n);
-                  }
-                }}
-                variant="ghost"
-              >
-                <span className="studio-step-number grid size-7 shrink-0 place-items-center rounded-full border bg-muted font-mono text-[11px] font-semibold">
-                  {i + 1}
-                </span>
-                <span className="studio-tab-text grid gap-1 text-left [&>small]:text-xs [&>small]:font-normal [&>small]:text-muted-foreground">
-                  <b>{title}</b>
-                  <small>{note}</small>
-                </span>
-                <Icon name={'fa-solid ' + icon} aria-hidden="true" />
-              </UiButton>
-            ))}
+          <div className="space-y-1">
+            {sections.map((sec) => {
+              const isActive = activeSection === sec.id;
+              return (
+                <button
+                  key={sec.id}
+                  type="button"
+                  onClick={() => scrollToSection(sec.id)}
+                  className={cn(
+                    "w-full text-left flex items-center justify-between gap-2.5 px-3 py-2.5 rounded-xl transition-all cursor-pointer group text-xs",
+                    isActive
+                      ? "bg-primary/10 text-primary font-semibold border border-primary/25 shadow-xs"
+                      : "text-muted-foreground hover:bg-muted/70 hover:text-foreground border border-transparent"
+                  )}
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span
+                      className={cn(
+                        "flex size-6 shrink-0 items-center justify-center rounded-lg text-[11px] font-bold transition-colors",
+                        isActive
+                          ? "bg-primary text-primary-foreground"
+                          : sec.check
+                            ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                            : "bg-muted text-muted-foreground group-hover:bg-muted-foreground/20 group-hover:text-foreground"
+                      )}
+                    >
+                      {sec.num}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate font-medium">{sec.title}</div>
+                      <div className="text-[10px] text-muted-foreground truncate">{sec.subtitle}</div>
+                    </div>
+                  </div>
+                  <Icon
+                    name={'fa-solid ' + (sec.check ? 'fa-circle-check text-emerald-600 dark:text-emerald-400' : sec.icon)}
+                    className={cn("size-3.5 shrink-0 opacity-70 group-hover:opacity-100", isActive && "opacity-100")}
+                  />
+                </button>
+              );
+            })}
           </div>
 
-          <p className="studio-nav-note mt-5 flex items-start gap-2 rounded-lg border-t bg-muted p-3 text-[11px] leading-[1.6] text-muted-foreground [&_svg]:mt-1 [&_svg]:text-action-text">
-            <Icon name="fa-solid fa-circle-info" aria-hidden="true" />
-            <span>
-              Đề công bố cần đúng 5 testcase hợp lệ. Mỗi cấu hình được giữ nguyên khi chuyển bước.
-            </span>
-          </p>
+          <div className="mt-4 rounded-xl border border-border/60 bg-muted/40 p-3 text-[11px] leading-relaxed text-muted-foreground space-y-1.5">
+            <div className="flex items-center gap-1.5 font-semibold text-foreground">
+              <Icon name="fa-solid fa-circle-info" className="text-primary size-3.5" />
+              <span>Soạn đề liền mạch</span>
+            </div>
+            <p>Toàn bộ 5 phần được hiển thị liên tục không phân trang. Bấm mục lục hoặc checklist để cuộn nhanh đến phần cần xem.</p>
+          </div>
         </nav>
 
         {/* Center Column: Form Panels & Content */}
-        <div className="studio-content min-w-0 space-y-6 overflow-hidden rounded-[14px] border bg-card p-0 shadow-panel [&>section]:mx-7 [&>form]:space-y-6 [&>div.step-nav]:px-7">
-          <div className="studio-panel-heading mb-0 flex items-center justify-between gap-4 border-b bg-surface-strong p-7 [&_h2]:text-xl [&_.eyebrow]:font-semibold [&_.eyebrow]:text-success">
-            <div className="studio-panel-info space-y-1 [&>p]:text-sm [&>p]:text-muted-foreground">
-              <div className="inline-group flex flex-wrap items-center gap-2">
-                <span className="eyebrow text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  BƯỚC {step + 1} / 5
-                </span>
-                <span className="studio-step-pill inline-flex size-7 shrink-0 items-center justify-center rounded-md bg-muted text-xs font-semibold h-auto w-auto px-2 py-1">
-                  {steps[step][0]}
-                </span>
-              </div>
-              <h2>{steps[step][0]}</h2>
-              <p>{steps[step][1]}</p>
-            </div>
-            <UiButton
-              type="button"
-              className={`secondary border border-input bg-card text-foreground shadow-xs hover:bg-accent hover:text-accent-foreground ${preview ? 'is-active border-primary/40 bg-accent text-accent-foreground ring-1 ring-primary/15' : ''}`}
-              aria-pressed={preview}
-              onClick={() => setPreview(!preview)}
-              variant="outline"
-            >
-              <Icon name={`fa-solid ${preview ? 'fa-eye-slash' : 'fa-eye'}`} aria-hidden="true" />
-              {preview ? trUI('Đóng xem trước') : trUI('Xem nội dung đề')}
-            </UiButton>
-          </div>
-
+        <div className="studio-content min-w-0 space-y-6">
           {/* Live Preview Container */}
           {preview && (
-            <section className="paper text-card-foreground shadow-xs pad sm:p-6 studio-preview space-y-4 rounded-[14px] border bg-card p-5">
-              <div className="studio-preview-card space-y-4 rounded-[14px] border bg-card p-5">
+            <section className="paper text-card-foreground shadow-sm studio-preview space-y-4 rounded-2xl border bg-card p-6">
+              <div className="studio-preview-card space-y-4 rounded-xl border bg-card p-5">
                 <div className="studio-preview-header space-y-3">
                   <div className="inline-group between flex flex-wrap items-center justify-between gap-3">
                     <div>
-                      <span className="eyebrow text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                        <Icon name="fa-solid fa-eye" aria-hidden="true" /> BẢN XEM TRƯỚC GIAO DIỆN
-                        HỌC VIÊN
+                      <span className="eyebrow text-xs font-medium uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                        <Icon name="fa-solid fa-eye" aria-hidden="true" /> BẢN XEM TRƯỚC GIAO DIỆN HỌC VIÊN
                       </span>
-                      <h3 data-user-content>{q.general.questionName || 'Chưa có tên đề'}</h3>
+                      <h3 data-user-content className="text-xl font-bold mt-1">{q.general.questionName || 'Chưa có tên đề'}</h3>
                     </div>
                     <div className="inline-group flex flex-wrap items-center gap-2">
                       <span
@@ -663,7 +711,7 @@ export default function QuestionEditor({ id, revision, onNotice }) {
 
                   {exampleCount > 0 && (
                     <div className="studio-preview-examples space-y-3">
-                      <h4>
+                      <h4 className="font-semibold text-sm">
                         <Icon name="fa-solid fa-code" aria-hidden="true" />{' '}
                         {trUI('Ví dụ công khai')} ({exampleCount})
                       </h4>
@@ -673,23 +721,23 @@ export default function QuestionEditor({ id, revision, onNotice }) {
                           .map((t, idx) => (
                             <div
                               key={t.id}
-                              className="preview-example-box my-3 space-y-2 rounded-lg border p-4 [&_small]:text-xs [&_small]:font-medium [&_small]:text-muted-foreground"
+                              className="preview-example-box my-2 space-y-2 rounded-xl border p-4 bg-muted/20"
                             >
-                              <strong>Ví dụ {idx + 1}:</strong>
-                              <div className="test-io-grid grid min-w-0 gap-4 sm:grid-cols-2">
+                              <strong className="text-xs font-bold text-foreground">Ví dụ {idx + 1}:</strong>
+                              <div className="test-io-grid grid min-w-0 gap-3 sm:grid-cols-2">
                                 <div>
-                                  <small className="muted text-sm leading-relaxed text-muted-foreground">
+                                  <small className="muted text-xs text-muted-foreground block mb-1">
                                     Input (stdin):
                                   </small>
-                                  <pre className="code-box min-w-0 overflow-hidden rounded-lg border bg-card">
+                                  <pre className="code-box min-w-0 overflow-hidden rounded-lg border bg-card p-2 text-xs font-mono">
                                     {t.stdin || '(trống)'}
                                   </pre>
                                 </div>
                                 <div>
-                                  <small className="muted text-sm leading-relaxed text-muted-foreground">
+                                  <small className="muted text-xs text-muted-foreground block mb-1">
                                     Output mong đợi:
                                   </small>
-                                  <pre className="code-box min-w-0 overflow-hidden rounded-lg border bg-card">
+                                  <pre className="code-box min-w-0 overflow-hidden rounded-lg border bg-card p-2 text-xs font-mono">
                                     {t.expected || '(trống)'}
                                   </pre>
                                 </div>
@@ -701,24 +749,36 @@ export default function QuestionEditor({ id, revision, onNotice }) {
                   )}
                 </div>
 
-                <small className="muted text-sm leading-relaxed text-muted-foreground">
+                <small className="muted text-xs text-muted-foreground block pt-2 border-t">
                   Bản xem trước nội dung; bộ chấm sử dụng cấu hình đã lưu trên server.
                 </small>
               </div>
             </section>
           )}
 
-          {/* Controlled Panels Fieldset */}
-          <fieldset disabled={busy || loadFailed} className="studio-fields grid min-w-0 gap-6 p-7">
-            {/* Step 0: General Info */}
-            <section
-              role="tabpanel"
-              tabIndex={0}
-              id="studio-panel-0"
-              aria-labelledby="studio-tab-0"
-              hidden={step !== 0}
-            >
-              <Section title="Thông tin cơ bản & phân loại" open>
+          {/* Continuous Fieldset */}
+          <fieldset disabled={busy || loadFailed} className="space-y-6 border-0 p-0 m-0 min-w-0">
+            {/* Section 1: Thông tin cơ bản */}
+            <section id="sec-1-info" className="scroll-mt-24 rounded-2xl border bg-card p-6 shadow-sm space-y-6">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-4">
+                <div className="flex items-center gap-3">
+                  <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-sm">
+                    01
+                  </span>
+                  <div>
+                    <h2 className="text-lg font-bold tracking-tight text-foreground flex items-center gap-2">
+                      <Icon name="fa-solid fa-file-lines" className="text-primary size-4" />
+                      Thông tin cơ bản & Phân loại
+                    </h2>
+                    <p className="text-xs text-muted-foreground mt-0.5">Tên đề bài, danh mục, độ khó và nội dung chi tiết</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="badge inline-flex items-center gap-1.5 rounded-full border bg-secondary px-2.5 py-1 text-xs font-medium">
+                    Mức {q.difficulty}
+                  </span>
+                </div>
+              </div>
                 <div className="two-cols grid min-w-0 gap-4 sm:grid-cols-2">
                   <Field label="Category">
                     {select(
@@ -905,18 +965,27 @@ export default function QuestionEditor({ id, revision, onNotice }) {
                 </div>
 
                 <Field label="General feedback">{area('general.generalFeedback', 3)}</Field>
-              </Section>
             </section>
 
-            {/* Step 1: CodeRunner & Grading Config */}
-            <section
-              role="tabpanel"
-              tabIndex={0}
-              id="studio-panel-1"
-              aria-labelledby="studio-tab-1"
-              hidden={step !== 1}
-            >
-              <Section title="CodeRunner question type" open>
+            {/* Section 2: Cấu hình chấm */}
+            <section id="sec-2-grading" className="scroll-mt-24 rounded-2xl border bg-card p-6 shadow-sm space-y-6">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-4">
+                <div className="flex items-center gap-3">
+                  <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-sm">
+                    02
+                  </span>
+                  <div>
+                    <h2 className="text-lg font-bold tracking-tight text-foreground flex items-center gap-2">
+                      <Icon name="fa-solid fa-sliders" className="text-primary size-4" />
+                      Cấu hình chấm & Đánh giá
+                    </h2>
+                    <p className="text-xs text-muted-foreground mt-0.5">Loại câu hỏi CodeRunner, tính điểm, chế độ phạt và kiểm tra trước</p>
+                  </div>
+                </div>
+                <span className="badge inline-flex items-center gap-1.5 rounded-full border bg-secondary px-2.5 py-1 text-xs font-mono font-medium">
+                  {q.coderunnertype}
+                </span>
+              </div>
                 {/* Visual Type Picker Grid */}
                 <div className="coderunner-type-grid [&_button]:h-auto [&_button]:whitespace-normal [&_button]:p-4 grid min-w-0 gap-4 sm:grid-cols-2">
                   {Object.entries(questionTypeDescriptions).map(([typeKey, info]) => (
@@ -1035,63 +1104,75 @@ export default function QuestionEditor({ id, revision, onNotice }) {
                     {check('showsource', 'Template debugging')}
                   </div>
                 </Field>
-              </Section>
 
-              <Section title="Question type details">
-                <p>
-                  <strong>{q.coderunnertype}:</strong> {selectedHelp}
-                </p>
-                <p className="muted text-sm leading-relaxed text-muted-foreground">
-                  EqualityGrader so sánh chính xác, chỉ chuẩn hóa CRLF → LF. NearEqualityGrader dùng
-                  sai số tương đối 10⁻⁶. RegexGrader dùng RE2.
-                </p>
-              </Section>
-
-              {q.customise && (
-                <Section title="Customisation" open>
-                  <div className="alert my-3 rounded-lg border border-border bg-muted/60 px-4 py-3 text-sm leading-relaxed">
-                    Chỉ khả dụng với bản nháp.
-                  </div>
-                  <Field label="Template">{area('customisation.template', 8)}</Field>
-                  <Field label="Combinator">
-                    {check('customisation.iscombinatortemplate', 'Is combinator template')}
-                    {check('customisation.allowmultiplestdins', 'Allow multiple stdins')}
-                  </Field>
-                  <Field label="Test splitter regex">
-                    {input('customisation.testsplitterre', 'text', {
-                      disabled: !q.customisation.iscombinatortemplate,
-                    })}
-                  </Field>
-                  <Field label="Grader">
-                    {select(
-                      'customisation.grader',
-                      ['EqualityGrader', 'NearEqualityGrader', 'RegexGrader', 'TemplateGrader'].map(
-                        (v) => [v, v],
-                      ),
-                    )}
-                  </Field>
-                  <Field label="Result columns">{area('customisation.resultcolumns')}</Field>
-                  <Field label="UI plugin">
-                    {select('customisation.uiplugin', [
-                      ['textarea', 'Textarea'],
-                      ['ace', 'Ace (metadata)'],
-                    ])}
-                    {check('customisation.useace', 'Use Ace (metadata)')}
-                  </Field>
-                  <Field label="Prototype extra">{area('customisation.prototypeextra')}</Field>
+                <Section title="Chi tiết loại câu hỏi">
+                  <p>
+                    <strong>{q.coderunnertype}:</strong> {selectedHelp}
+                  </p>
+                  <p className="muted text-sm leading-relaxed text-muted-foreground">
+                    EqualityGrader so sánh chính xác, chỉ chuẩn hóa CRLF → LF. NearEqualityGrader dùng
+                    sai số tương đối 10⁻⁶. RegexGrader dùng RE2.
+                  </p>
                 </Section>
-              )}
+
+                {q.customise && (
+                  <Section title="Tùy biến nâng cao (Customisation)" open>
+                    <div className="alert my-3 rounded-lg border border-border bg-muted/60 px-4 py-3 text-sm leading-relaxed">
+                      Chỉ khả dụng với bản nháp.
+                    </div>
+                    <Field label="Template">{area('customisation.template', 8)}</Field>
+                    <Field label="Combinator">
+                      {check('customisation.iscombinatortemplate', 'Is combinator template')}
+                      {check('customisation.allowmultiplestdins', 'Allow multiple stdins')}
+                    </Field>
+                    <Field label="Test splitter regex">
+                      {input('customisation.testsplitterre', 'text', {
+                        disabled: !q.customisation.iscombinatortemplate,
+                      })}
+                    </Field>
+                    <Field label="Grader">
+                      {select(
+                        'customisation.grader',
+                        ['EqualityGrader', 'NearEqualityGrader', 'RegexGrader', 'TemplateGrader'].map(
+                          (v) => [v, v],
+                        ),
+                      )}
+                    </Field>
+                    <Field label="Result columns">{area('customisation.resultcolumns')}</Field>
+                    <Field label="UI plugin">
+                      {select('customisation.uiplugin', [
+                        ['textarea', 'Textarea'],
+                        ['ace', 'Ace (metadata)'],
+                      ])}
+                      {check('customisation.useace', 'Use Ace (metadata)')}
+                    </Field>
+                    <Field label="Prototype extra">{area('customisation.prototypeextra')}</Field>
+                  </Section>
+                )}
             </section>
 
-            {/* Step 2: Sample Answer & Preload */}
-            <section
-              role="tabpanel"
-              tabIndex={0}
-              id="studio-panel-2"
-              aria-labelledby="studio-tab-2"
-              hidden={step !== 2}
-            >
-              <Section title="Answer" open>
+            {/* Section 3: Đáp án mẫu & Khung khởi tạo */}
+            <section id="sec-3-answer" className="scroll-mt-24 rounded-2xl border bg-card p-6 shadow-sm space-y-6">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-4">
+                <div className="flex items-center gap-3">
+                  <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-sm">
+                    03
+                  </span>
+                  <div>
+                    <h2 className="text-lg font-bold tracking-tight text-foreground flex items-center gap-2">
+                      <Icon name="fa-solid fa-code" className="text-primary size-4" />
+                      Đáp án mẫu & Khung khởi tạo
+                    </h2>
+                    <p className="text-xs text-muted-foreground mt-0.5">Lời giải tham chiếu chuẩn xác và mã gợi ý ban đầu cho học viên</p>
+                  </div>
+                </div>
+                <span className={cn(
+                  "badge inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium",
+                  verified ? "bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300" : "bg-secondary text-muted-foreground"
+                )}>
+                  {verified ? '✓ Đã xác thực' : 'Chưa xác thực'}
+                </span>
+              </div>
                 <div className="two-cols grid min-w-0 gap-4 sm:grid-cols-2">
                   <Field label="Sample answer language">
                     {select(
@@ -1139,7 +1220,6 @@ export default function QuestionEditor({ id, revision, onNotice }) {
                     />
                   </Field>
                 </div>
-              </Section>
 
               <Section title="Answer box preload" open={!!q.answer.preloadAnswer}>
                 <div className="inline-group flex flex-wrap items-center gap-2 mb-2.5">
@@ -1175,15 +1255,33 @@ export default function QuestionEditor({ id, revision, onNotice }) {
               </Section>
             </section>
 
-            {/* Step 3: Test cases */}
-            <section
-              role="tabpanel"
-              tabIndex={0}
-              id="studio-panel-3"
-              aria-labelledby="studio-tab-3"
-              hidden={step !== 3}
-            >
-              <Section title="Test cases" open>
+            {/* Section 4: Bộ kiểm thử (Test cases) */}
+            <section id="sec-4-testcases" className="scroll-mt-24 rounded-2xl border bg-card p-6 shadow-sm space-y-6">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-4">
+                <div className="flex items-center gap-3">
+                  <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-sm">
+                    04
+                  </span>
+                  <div>
+                    <h2 className="text-lg font-bold tracking-tight text-foreground flex items-center gap-2">
+                      <Icon name="fa-solid fa-vials" className="text-primary size-4" />
+                      Bộ kiểm thử (Test Cases)
+                    </h2>
+                    <p className="text-xs text-muted-foreground mt-0.5">Đủ 5 testcase: ví dụ công khai, dữ liệu cơ bản, biên và nâng cao</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="badge inline-flex items-center gap-1.5 rounded-full border bg-secondary px-2.5 py-1 text-xs font-medium">
+                    {q.testcases.length} / 5 testcase
+                  </span>
+                  {exampleCount > 0 && (
+                    <span className="badge inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 text-amber-800 dark:bg-amber-950 dark:text-amber-300 px-2.5 py-1 text-xs font-medium">
+                      <Icon name="fa-solid fa-star" className="size-3 text-amber-500" />
+                      {exampleCount} Ví dụ công khai
+                    </span>
+                  )}
+                </div>
+              </div>
                 <div className="testcases-toolbar mb-4 flex flex-wrap items-center gap-2">
                   <div className="testcases-nav-strip mb-4 flex flex-wrap items-center gap-2">
                     {q.testcases.map((t, idx) => {
@@ -1320,18 +1418,33 @@ export default function QuestionEditor({ id, revision, onNotice }) {
                   <Icon name="fa-solid fa-lightbulb" aria-hidden="true" /> Mỗi đề công bố có đúng 5
                   testcase: ví dụ, cơ bản, biên, đặc biệt và phức tạp.
                 </p>
-              </Section>
             </section>
 
-            {/* Step 4: Advanced & Publish */}
-            <section
-              role="tabpanel"
-              tabIndex={0}
-              id="studio-panel-4"
-              aria-labelledby="studio-tab-4"
-              hidden={step !== 4}
-            >
-              <Section title="Xuất bản & phân phối" open>
+            {/* Section 5: Nâng cao & Xuất bản */}
+            <section id="sec-5-advanced" className="scroll-mt-24 rounded-2xl border bg-card p-6 shadow-sm space-y-6">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-4">
+                <div className="flex items-center gap-3">
+                  <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-sm">
+                    05
+                  </span>
+                  <div>
+                    <h2 className="text-lg font-bold tracking-tight text-foreground flex items-center gap-2">
+                      <Icon name="fa-solid fa-rocket" className="text-primary size-4" />
+                      Nâng cao & Xuất bản
+                    </h2>
+                    <p className="text-xs text-muted-foreground mt-0.5">Trạng thái xuất bản, tham gia Code Survival, thẻ tags và tệp đính kèm</p>
+                  </div>
+                </div>
+                <span className={cn(
+                  "badge inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium",
+                  q.general.status === 'ready'
+                    ? "border-emerald-200 bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                    : "border-amber-200 bg-amber-50 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
+                )}>
+                  <span className={cn("size-2 rounded-full", q.general.status === 'ready' ? "bg-emerald-500" : "bg-amber-500")} />
+                  {q.general.status === 'ready' ? 'Ready' : 'Draft'}
+                </span>
+              </div>
                 <div className="status-choice-grid [&_button]:h-auto [&_button]:whitespace-normal [&_button]:p-4 grid min-w-0 gap-4 sm:grid-cols-2">
                   <UiButton
                     role="button"
@@ -1402,7 +1515,6 @@ export default function QuestionEditor({ id, revision, onNotice }) {
                       : trUI('chưa xác thực phiên bản này')}
                   </small>
                 </Field>
-              </Section>
 
               <Section title="Tags & Phân loại chủ đề" open>
                 <Field label="Tags">
@@ -1567,98 +1679,77 @@ export default function QuestionEditor({ id, revision, onNotice }) {
               </Section>
             </section>
           </fieldset>
-
-          {/* Step Bottom Actions */}
-          <div className="studio-step-actions flex flex-wrap items-center justify-between gap-3">
-            <UiButton
-              type="button"
-              className="secondary border border-input bg-card text-foreground shadow-xs hover:bg-accent hover:text-accent-foreground"
-              disabled={step === 0}
-              onClick={() => changeStep(step - 1)}
-              variant="outline"
-            >
-              ← Bước trước
-            </UiButton>
-            <span>{step + 1} / 5</span>
-            <UiButton
-              type="button"
-              className="secondary border border-input bg-card text-foreground shadow-xs hover:bg-accent hover:text-accent-foreground"
-              disabled={step === 4}
-              onClick={() => changeStep(step + 1)}
-              variant="outline"
-            >
-              Bước tiếp →
-            </UiButton>
-          </div>
         </div>
 
         {/* Right Column: Support, Checklist & Fact List */}
         <aside
-          className="studio-support space-y-5 min-[961px]:col-span-2 min-[1361px]:sticky min-[1361px]:top-24 min-[1361px]:col-span-1 [&>section]:rounded-[14px] [&>section]:border [&>section]:bg-card [&>section]:p-5 [&>section]:shadow-subtle [&_h2]:my-4 [&_h2]:text-base [&_h3]:mb-3 [&_h3]:text-base [&_details]:mt-3 [&_details]:text-xs [&_details]:text-destructive [&_.studio-validation]:mt-4 [&_.studio-validation]:rounded-lg [&_.studio-validation]:bg-warning-soft [&_.studio-validation]:p-3 [&_.studio-validation]:text-xs [&_.studio-validation]:text-warning"
+          className="studio-support space-y-5 min-[961px]:col-span-2 min-[1361px]:sticky min-[1361px]:top-20 min-[1361px]:col-span-1 [&>section]:rounded-2xl [&>section]:border [&>section]:bg-card [&>section]:p-5 [&>section]:shadow-sm [&_h2]:my-3 [&_h2]:text-base [&_h3]:mb-3 [&_h3]:text-base"
           aria-label="Kiểm tra & tóm tắt đề"
         >
           <section>
-            <span className="eyebrow text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            <span className="eyebrow text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               PUBLISH CHECKLIST
             </span>
-            <h2>Trạng thái đề</h2>
+            <h2 className="text-base font-bold text-foreground">Trạng thái đề</h2>
 
-            <div className="checklist-progress-box mb-3 flex items-center justify-between gap-3 border-b pb-4 text-[11px] font-semibold text-success">
+            <div className="checklist-progress-box mb-3 flex items-center justify-between gap-3 border-b pb-3 text-xs font-semibold text-success">
               <span className="checklist-progress-text">
                 {completedCount} / {checklistItems.length} mục hoàn tất
               </span>
-              <span className="badge inline-flex items-center gap-1.5 rounded-full border bg-secondary px-2.5 py-1 text-xs font-medium">
+              <span className="badge inline-flex items-center gap-1.5 rounded-full border bg-secondary px-2.5 py-0.5 text-xs font-bold text-foreground">
                 {progressPercent}%
               </span>
             </div>
-            <div className="checklist-progress-bar-bg mb-5 [&_[role=progressbar]]:h-1.5">
+            <div className="checklist-progress-bar-bg mb-4 [&_[role=progressbar]]:h-2">
               <ProgressMeter className="checklist-progress-bar-fill" value={progressPercent} />
             </div>
 
-            <ul className="studio-checklist space-y-5 text-xs text-muted-foreground [&>li]:flex [&>li]:cursor-pointer [&>li]:items-start [&>li]:gap-2 [&_svg]:mt-0.5 [&_svg]:size-3.5">
-              {checklistItems.map(([ok, label, targetStep, fieldName]) => (
+            <ul className="studio-checklist space-y-2.5 text-xs text-muted-foreground">
+              {checklistItems.map(([ok, label, targetSec, fieldName]) => (
                 <li
                   key={label}
                   role="button"
                   tabIndex={0}
-                  onClick={() => {
-                    changeStep(targetStep);
-                    setTimeout(() => {
-                      document.querySelector(`[aria-label="${fieldName}"]`)?.focus();
-                    }, 50);
-                  }}
+                  className="flex cursor-pointer items-start gap-2.5 hover:text-foreground transition-colors p-1.5 rounded-lg hover:bg-muted/50"
+                  onClick={() => scrollToSection(targetSec, fieldName)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      changeStep(targetStep);
+                      scrollToSection(targetSec, fieldName);
                     }
                   }}
                 >
                   <Icon
                     aria-hidden="true"
-                    name={'fa-solid ' + (ok ? 'fa-circle-check' : 'fa-circle-minus')}
+                    name={'fa-solid ' + (ok ? 'fa-circle-check text-emerald-600 dark:text-emerald-400' : 'fa-circle-minus text-muted-foreground/60')}
+                    className="mt-0.5 size-3.5 shrink-0"
                   />
-                  <span>{label}</span>
+                  <span className={ok ? 'text-foreground font-medium' : ''}>{label}</span>
                   <span className="sr-only">{ok ? 'Đạt' : 'Chưa đạt'}</span>
                 </li>
               ))}
             </ul>
 
-            <p className={`studio-validation ${issues.length ? 'has-issues' : ''}`} role="status">
+            <div className={cn(
+              "studio-validation mt-4 rounded-xl p-3 text-xs flex items-center gap-2",
+              issues.length ? "bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20" : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20"
+            )} role="status">
               <Icon
                 name={`fa-solid ${issues.length ? 'fa-triangle-exclamation' : 'fa-check'}`}
                 aria-hidden="true"
-                className="mr-1.5"
+                className="size-4 shrink-0"
               />
-              {issues.length
-                ? issues.length + ' vấn đề cần kiểm tra'
-                : 'Cấu hình hợp lệ để gửi lưu'}
-            </p>
+              <span className="font-medium">
+                {issues.length
+                  ? issues.length + ' vấn đề cần kiểm tra'
+                  : 'Cấu hình hợp lệ để gửi lưu'}
+              </span>
+            </div>
 
             {issues.length > 0 && (
-              <details>
-                <summary>Xem vấn đề cấu hình ({issues.length})</summary>
-                <ul>
+              <details className="mt-3 text-xs text-destructive rounded-lg border border-destructive/20 bg-destructive/5 p-2.5">
+                <summary className="font-semibold cursor-pointer">Xem vấn đề cấu hình ({issues.length})</summary>
+                <ul className="list-disc pl-4 mt-2 space-y-1">
                   {issues.map((issue, i) => (
                     <li key={i}>{issue}</li>
                   ))}
@@ -1668,11 +1759,11 @@ export default function QuestionEditor({ id, revision, onNotice }) {
           </section>
 
           <section>
-            <h3>Tóm tắt cấu hình</h3>
-            <dl className="fact-list divide-y text-sm [&>div]:grid [&>div]:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] [&>div]:gap-3 [&>div]:py-3 [&_dt]:text-xs [&_dt]:text-muted-foreground [&_dd]:text-right [&_dd]:text-[13px] [&_dd]:font-medium">
+            <h3 className="font-bold text-sm text-foreground">Tóm tắt cấu hình</h3>
+            <dl className="fact-list divide-y text-xs [&>div]:grid [&>div]:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] [&>div]:gap-2 [&>div]:py-2.5 [&_dt]:text-muted-foreground [&_dd]:text-right [&_dd]:font-medium [&_dd]:text-foreground">
               <div>
                 <dt>Loại câu hỏi</dt>
-                <dd>{q.coderunnertype}</dd>
+                <dd className="font-mono">{q.coderunnertype}</dd>
               </div>
               <div>
                 <dt>Ngôn ngữ</dt>
@@ -1685,29 +1776,29 @@ export default function QuestionEditor({ id, revision, onNotice }) {
                 </dd>
               </div>
               <div>
-                <dt>Điểm</dt>
+                <dt>Điểm mặc định</dt>
                 <dd>{q.general.defaultMark}</dd>
               </div>
               <div>
-                <dt>Survival</dt>
+                <dt>Code Survival</dt>
                 <dd>{q.survivalEligible ? 'Cho phép' : 'Không dùng'}</dd>
               </div>
             </dl>
-            <p className="muted text-sm leading-relaxed text-muted-foreground mt-3">
+            <p className="text-[11px] leading-relaxed text-muted-foreground mt-3">
               Public Example và Display là hai thuộc tính độc lập. Ẩn hiển thị không thay đổi việc
               chấm test.
             </p>
           </section>
 
           {readDraft() && (
-            <section>
-              <h3>Nháp trên thiết bị</h3>
-              <p className="muted text-sm leading-relaxed text-muted-foreground">
+            <section className="space-y-3">
+              <h3 className="font-bold text-sm text-foreground">Nháp trên thiết bị</h3>
+              <p className="text-xs text-muted-foreground">
                 Thay đổi được giữ cục bộ; chỉ nút Lưu mới cập nhật server.
               </p>
               <UiButton
                 type="button"
-                className="secondary border border-input bg-card text-foreground shadow-xs hover:bg-accent hover:text-accent-foreground"
+                className="w-full secondary border border-input bg-card text-foreground shadow-xs hover:bg-accent hover:text-accent-foreground text-xs rounded-xl"
                 disabled={busy || loadFailed}
                 onClick={() => {
                   try {
@@ -1729,13 +1820,17 @@ export default function QuestionEditor({ id, revision, onNotice }) {
       </div>
 
       {/* Bottom Sticky Action Bar */}
-      <footer className="savebar studio-savebar sticky bottom-3 z-20 flex flex-wrap items-center justify-between gap-3 rounded-[14px] border bg-card/95 p-4 shadow-lg backdrop-blur-sm">
-        <div className="studio-savebar-status flex items-center gap-2 text-xs text-muted-foreground flex-wrap [&>small]:text-xs">
+      <footer className="savebar studio-savebar sticky bottom-3 z-30 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/80 bg-card/95 p-4 shadow-xl backdrop-blur-md">
+        <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
+          <span className={cn(
+            "size-2.5 rounded-full shrink-0",
+            busy ? "bg-amber-500 animate-ping" : dirty ? "bg-amber-500" : "bg-emerald-500"
+          )} />
           <div>
-            <b>
+            <b className="text-foreground">
               {busy ? (
-                <span>
-                  <Icon name="fa-solid fa-spinner fa-spin" aria-hidden="true" /> Đang lưu…
+                <span className="inline-flex items-center gap-1.5 text-primary">
+                  <Icon name="fa-solid fa-spinner fa-spin" aria-hidden="true" /> Đang lưu lên máy chủ…
                 </span>
               ) : dirty ? (
                 'Có thay đổi chưa lưu'
@@ -1743,17 +1838,17 @@ export default function QuestionEditor({ id, revision, onNotice }) {
                 'Không có thay đổi'
               )}
             </b>
-            <small>
+            <div className="text-[11px] text-muted-foreground">
               {dirty
                 ? 'Nháp cục bộ được giữ trên thiết bị'
                 : 'Cấu hình server là nguồn dữ liệu chính thức'}
-            </small>
+            </div>
           </div>
         </div>
-        <div className="inline-group flex flex-wrap items-center gap-2">
+        <div className="inline-group flex flex-wrap items-center gap-2.5">
           <UiButton
             type="button"
-            className="ghost bg-transparent text-muted-foreground shadow-none hover:bg-muted hover:text-foreground"
+            className="ghost bg-transparent text-muted-foreground shadow-none hover:bg-muted hover:text-foreground h-10 px-4 rounded-xl text-xs font-semibold"
             disabled={busy}
             onClick={cancel}
             variant="ghost"
@@ -1762,7 +1857,7 @@ export default function QuestionEditor({ id, revision, onNotice }) {
           </UiButton>
           <UiButton
             type="button"
-            className="secondary border border-input bg-card text-foreground shadow-xs hover:bg-accent hover:text-accent-foreground"
+            className="secondary border border-input bg-card text-foreground shadow-xs hover:bg-accent hover:text-accent-foreground h-10 px-4 rounded-xl text-xs font-semibold"
             aria-busy={busy}
             disabled={busy || loadFailed}
             onClick={() => save(true)}
@@ -1775,8 +1870,9 @@ export default function QuestionEditor({ id, revision, onNotice }) {
             aria-busy={busy}
             disabled={busy || loadFailed}
             onClick={() => save(false)}
-            variant="default"
+            className="h-10 px-5 rounded-xl text-xs font-bold gap-2 bg-action text-white hover:bg-action-hover active:bg-action-active shadow-xs transition-all disabled:opacity-50"
           >
+            <Icon name="fa-solid fa-floppy-disk" aria-hidden="true" className="size-3.5" />
             Lưu thay đổi →
           </UiButton>
         </div>

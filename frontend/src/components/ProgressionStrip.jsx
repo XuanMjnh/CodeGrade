@@ -78,11 +78,10 @@ export function RankTierStrip({ stats }) {
   const currentRank = getRankTier(stats.rank).id;
   return (
     <section
-      className="survival-rank-strip relative isolate min-w-0 overflow-hidden rounded-2xl border border-primary/40 bg-[#101e25] p-2 shadow-sm sm:p-2.5"
+      className="survival-rank-strip min-w-0 rounded-2xl border border-border/80 bg-card p-2 shadow-sm sm:p-2.5"
       aria-label={t('Các bậc Rank')}
     >
-      <RankAmbientBackground />
-      <ol className="relative grid grid-cols-2 gap-2 min-[640px]:grid-cols-3 min-[1080px]:grid-cols-6">
+      <ol className="grid grid-cols-2 gap-2 min-[640px]:grid-cols-3 min-[1080px]:grid-cols-6">
         {guide.map((item) => {
           const visual = getRankTier(item.name),
             current = visual.id === currentRank;
@@ -93,12 +92,13 @@ export function RankTierStrip({ stats }) {
               key={visual.id}
               aria-current={current ? 'step' : undefined}
               className={cn(
-                'group relative flex min-w-0 items-center gap-2.5 rounded-xl border p-2.5 transition-colors sm:px-3 sm:py-2.5',
+                'group relative isolate flex min-w-0 items-center gap-2.5 overflow-hidden rounded-xl border bg-[#14232b] p-2.5 transition-colors sm:px-3 sm:py-2.5',
                 current
                   ? theme?.active || 'border-primary bg-primary/5 ring-2 ring-primary/20 shadow-xs'
-                  : 'border-white/10 bg-white/5 hover:border-white/25 hover:bg-white/10',
+                  : 'border-white/15 hover:border-white/40',
               )}
             >
+              <RankAmbientBackground tone={visual.id} />
               <div className="relative shrink-0 flex items-center justify-center">
                 <RankEmblem
                   rank={item.name}
@@ -109,12 +109,12 @@ export function RankTierStrip({ stats }) {
                   )}
                 />
               </div>
-              <div className="min-w-0 flex-1 space-y-0.5">
+              <div className="relative min-w-0 flex-1 space-y-0.5">
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <b
                     className={cn(
                       'font-heading text-xs sm:text-sm font-extrabold tracking-tight truncate',
-                      current ? theme?.title : 'text-slate-100',
+                      theme?.title || 'text-slate-100',
                     )}
                   >
                     {item.name}
