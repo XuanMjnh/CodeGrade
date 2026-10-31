@@ -9,6 +9,12 @@ import {
   User,
   FolderOpen,
   ShieldCheck,
+  Code2,
+  Swords,
+  Trophy,
+  BarChart3,
+  History,
+  X,
 } from 'lucide-react';
 import { t, LanguageButton } from '../../lib/locale';
 import { live } from '../../lib/live';
@@ -26,23 +32,32 @@ import {
 import Utilities from '../Utilities';
 
 const navigation = [
-  ['practice', 'Luyện tập'],
-  ['survival', 'Code Survival'],
-  ['contests', 'Contest'],
-  ['leaderboard', 'Xếp hạng'],
-  ['submissions', 'Bài nộp'],
+  ['practice', 'Luyện tập', Code2],
+  ['survival', 'Code Survival', Swords],
+  ['contests', 'Contest', Trophy],
+  ['leaderboard', 'Xếp hạng', BarChart3],
+  ['submissions', 'Bài nộp', History],
 ];
 const roles = { ADMIN: 'Admin', AUTHOR: 'Người tạo đề', CODER: 'Coder' };
 export function Logo({ network = false }) {
   return (
     <a
       href="#/practice"
-      className="brand inline-flex shrink-0 items-center gap-2 font-heading text-base min-[561px]:gap-2.5 min-[561px]:text-lg font-bold tracking-[-.03em] text-foreground no-underline"
+      className="brand group inline-flex shrink-0 items-center gap-2.5 font-heading text-base min-[561px]:text-lg font-black tracking-tight text-foreground no-underline transition-opacity hover:opacity-90"
     >
-      <span className="brand-icon flex size-[30px] min-[561px]:size-9 items-center justify-center rounded-[10px] bg-action text-white">
-        <Terminal className="size-5" />
+      <span className="brand-icon flex size-8 min-[561px]:size-9 items-center justify-center rounded-xl bg-gradient-to-br from-action via-orange-600 to-amber-600 text-white shadow-xs shadow-orange-500/25 transition-transform duration-200 group-hover:scale-105">
+        <Terminal className="size-4.5 min-[561px]:size-5" />
       </span>
-      CodeGrade {network && <span className="font-normal text-muted-foreground">Network</span>}
+      <span className="flex items-center gap-1.5">
+        <span>CodeGrade</span>
+        {network ? (
+          <span className="rounded-md bg-muted px-1.5 py-0.2 font-mono text-[10px] font-bold text-muted-foreground">
+            NET
+          </span>
+        ) : (
+          <span className="size-1.5 rounded-full bg-action" />
+        )}
+      </span>
     </a>
   );
 }
@@ -52,11 +67,11 @@ function Navigation({ page, mobile = false, onNavigate }) {
       aria-label={t('Điều hướng chính')}
       className={
         mobile
-          ? 'grid gap-1'
-          : 'hidden flex-1 items-stretch gap-[22px] self-stretch min-[1081px]:flex'
+          ? 'grid gap-1 py-2'
+          : 'hidden flex-1 items-center gap-1 min-[1081px]:flex px-2'
       }
     >
-      {navigation.map(([key, label]) => {
+      {navigation.map(([key, label, IconComponent]) => {
         const selected =
           page === key ||
           (key === 'practice' && ['solve', 'edit'].includes(page)) ||
@@ -68,13 +83,21 @@ function Navigation({ page, mobile = false, onNavigate }) {
             aria-current={selected ? 'page' : undefined}
             onClick={onNavigate}
             className={cn(
-              'inline-flex min-h-11 items-center whitespace-nowrap text-xs font-semibold transition-colors hover:text-success',
-              mobile ? 'rounded-lg px-3 py-2' : 'border-b-2 border-transparent',
-              selected ? 'selected border-action-text text-action-text' : 'text-muted-foreground',
-              mobile && selected && 'bg-accent text-success',
+              'group inline-flex items-center gap-2 whitespace-nowrap text-xs font-bold transition-all duration-200 rounded-xl px-3 py-2',
+              selected
+                ? 'selected text-action bg-action/10 shadow-2xs font-extrabold'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
+              mobile && 'w-full px-3.5 py-2.5 text-sm',
+              mobile && selected && 'bg-action/10 text-action',
             )}
           >
-            {t(label)}
+            <IconComponent
+              className={cn(
+                'size-4 shrink-0 transition-transform duration-200 group-hover:scale-110',
+                selected ? 'text-action' : 'text-muted-foreground/70 group-hover:text-foreground',
+              )}
+            />
+            <span>{t(label)}</span>
           </a>
         );
       })}
@@ -82,69 +105,87 @@ function Navigation({ page, mobile = false, onNavigate }) {
   );
 }
 function AccountMenu({ user }) {
+  const roleBadgeColor = {
+    ADMIN: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
+    AUTHOR: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+    CODER: 'bg-action/10 text-action border-action/20',
+  }[user.role] || 'bg-muted text-muted-foreground';
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="h-11 gap-2 px-1 font-normal"
+          className="h-9.5 gap-2 px-2 rounded-xl hover:bg-muted/60 transition-all cursor-pointer font-normal"
           aria-label={t('Mở menu tài khoản')}
         >
-          <span className="avatar flex size-8 items-center justify-center rounded-full border bg-muted text-xs font-semibold">
-            {user.displayName.slice(0, 1)}
+          <span className="avatar flex size-7.5 items-center justify-center rounded-xl border border-action/30 bg-action/10 text-action font-heading text-xs font-black shadow-2xs">
+            {user.displayName?.slice(0, 1)?.toUpperCase() || 'U'}
           </span>
           <span
-            className="hidden max-w-[110px] truncate text-xs min-[561px]:block"
+            className="hidden max-w-[120px] truncate text-xs font-bold text-foreground min-[561px]:block"
             data-user-content
           >
             {user.displayName}
           </span>
-          <ChevronDown className="hidden size-3 text-muted-foreground min-[561px]:block" />
+          <ChevronDown className="hidden size-3.5 text-muted-foreground/80 min-[561px]:block transition-transform duration-200" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[260px] rounded-[14px] p-3 shadow-raised">
-        <DropdownMenuLabel className="grid gap-1">
-          <span data-user-content>{user.displayName}</span>
-          <span className="text-xs font-normal text-muted-foreground">
-            {t(roles[user.role])} · @{user.username}
+      <DropdownMenuContent align="end" className="w-[260px] rounded-2xl p-2.5 shadow-raised border-border/80">
+        <div className="flex items-center gap-3 p-2">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-action/30 bg-action/10 text-action font-heading text-base font-black shadow-2xs">
+            {user.displayName?.slice(0, 1)?.toUpperCase() || 'U'}
           </span>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <a href="#/profile">
-            <User />
-            {t('Thông tin cá nhân')}
+          <div className="min-w-0 flex-1">
+            <span className="block font-heading text-sm font-extrabold text-foreground truncate" data-user-content>
+              {user.displayName}
+            </span>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className={cn('rounded-md px-1.5 py-0.2 font-mono text-[9px] font-bold border', roleBadgeColor)}>
+                {t(roles[user.role])}
+              </span>
+              <span className="text-[11px] text-muted-foreground truncate font-mono">
+                @{user.username}
+              </span>
+            </div>
+          </div>
+        </div>
+        <DropdownMenuSeparator className="my-1.5" />
+        <DropdownMenuItem asChild className="rounded-xl cursor-pointer py-2">
+          <a href="#/profile" className="flex items-center gap-2.5 text-xs font-semibold">
+            <User className="size-4 text-action" />
+            <span>{t('Thông tin cá nhân')}</span>
           </a>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <a href="#/announcements">
-            <Bell />
-            {t('Thông báo')}
+        <DropdownMenuItem asChild className="rounded-xl cursor-pointer py-2">
+          <a href="#/announcements" className="flex items-center gap-2.5 text-xs font-semibold">
+            <Bell className="size-4 text-amber-500" />
+            <span>{t('Thông báo')}</span>
           </a>
         </DropdownMenuItem>
         {user.role !== 'CODER' && (
-          <DropdownMenuItem asChild>
-            <a href="#/categories">
-              <FolderOpen />
-              {t('Danh mục')}
+          <DropdownMenuItem asChild className="rounded-xl cursor-pointer py-2">
+            <a href="#/categories" className="flex items-center gap-2.5 text-xs font-semibold">
+              <FolderOpen className="size-4 text-blue-500" />
+              <span>{t('Danh mục')}</span>
             </a>
           </DropdownMenuItem>
         )}
         {user.role === 'ADMIN' && (
-          <DropdownMenuItem asChild>
-            <a href="#/admin">
-              <ShieldCheck />
-              {t('Quản trị')}
+          <DropdownMenuItem asChild className="rounded-xl cursor-pointer py-2">
+            <a href="#/admin" className="flex items-center gap-2.5 text-xs font-semibold">
+              <ShieldCheck className="size-4 text-purple-500" />
+              <span>{t('Quản trị')}</span>
             </a>
           </DropdownMenuItem>
         )}
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="my-1.5" />
         <DropdownMenuItem
-          className="text-destructive focus:text-destructive"
+          className="rounded-xl cursor-pointer py-2 text-destructive focus:text-destructive focus:bg-destructive/10"
           onSelect={() => live.logout().catch(() => {})}
         >
-          <LogOut />
-          {t('Đăng xuất')}
+          <LogOut className="size-4" />
+          <span className="font-semibold text-xs">{t('Đăng xuất')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -155,30 +196,27 @@ function SearchBox() {
   return (
     <form
       role="search"
-      className="header-search relative hidden w-[200px] shrink-0 min-[1440px]:block"
+      className="header-search relative hidden w-48 lg:w-56 xl:w-64 shrink-0 min-[1200px]:block"
       onSubmit={(event) => {
         event.preventDefault();
-        location.hash = '/practice?search=' + encodeURIComponent(query.trim());
+        if (query.trim()) {
+          location.hash = '/practice?search=' + encodeURIComponent(query.trim());
+        }
       }}
     >
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
       <Input
         type="search"
-        className="h-11 rounded-[10px] border-border bg-muted pr-11 text-xs shadow-none"
+        className="h-9 w-full rounded-xl border border-border/80 bg-slate-100/60 dark:bg-slate-900/50 pl-8.5 pr-8 text-xs font-medium shadow-2xs transition-all focus-visible:border-action focus-visible:bg-card focus-visible:ring-2 focus-visible:ring-action/20"
         aria-label={t('Tìm bài tập')}
         placeholder={t('Tìm bài tập…')}
         value={query}
         maxLength={100}
         onChange={(event) => setQuery(event.target.value)}
       />
-      <Button
-        type="submit"
-        variant="ghost"
-        size="icon"
-        className="absolute top-0 right-0 text-muted-foreground"
-        aria-label={t('Tìm kiếm')}
-      >
-        <Search className="size-4" />
-      </Button>
+      <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 hidden lg:inline-flex h-4.5 select-none items-center gap-0.5 rounded border border-border/60 bg-muted px-1.5 font-mono text-[9px] font-bold text-muted-foreground pointer-events-none">
+        /
+      </kbd>
     </form>
   );
 }
@@ -210,7 +248,7 @@ export default function AppShell({ user, status, page, revision, children }) {
         {t('Đến nội dung chính')}
       </a>
       <header
-        className="header sticky top-0 z-40 flex w-full flex-wrap items-center gap-3 border-b bg-card px-4 py-3 shadow-subtle min-[561px]:gap-6 min-[561px]:px-6 min-[561px]:py-3.5 min-[1081px]:flex-nowrap"
+        className="header sticky top-0 z-40 flex w-full flex-wrap items-center gap-3 border-b border-border/80 bg-card/95 backdrop-blur-md px-4 py-2.5 shadow-2xs min-[561px]:gap-5 min-[561px]:px-6 min-[1081px]:flex-nowrap"
         onKeyDown={(event) => {
           if (event.key === 'Escape' && mobile) {
             setMobile(false);
@@ -221,11 +259,11 @@ export default function AppShell({ user, status, page, revision, children }) {
         <Logo />
         <Navigation page={page} />
         <SearchBox />
-        <div className="user-menu ml-auto flex items-center gap-1 sm:gap-2">
+        <div className="user-menu ml-auto flex items-center gap-1.5 sm:gap-2">
           <Button
             variant="ghost"
             size="icon"
-            className="hidden text-muted-foreground min-[561px]:inline-flex"
+            className="size-9 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all cursor-pointer hidden min-[561px]:inline-flex"
             asChild
           >
             <a href="#/announcements" aria-label={t('Thông báo')}>
@@ -239,18 +277,18 @@ export default function AppShell({ user, status, page, revision, children }) {
           ref={navigationToggle}
           variant="outline"
           size="icon"
-          className="nav-toggle min-[1081px]:hidden"
+          className="nav-toggle size-9 rounded-xl border-border/80 hover:bg-muted/60 min-[1081px]:hidden cursor-pointer"
           aria-label={t('Mở điều hướng')}
           aria-controls="mobile-navigation"
           aria-expanded={mobile}
           onClick={() => setMobile((value) => !value)}
         >
-          <Menu className="size-5" />
+          {mobile ? <X className="size-5 text-action" /> : <Menu className="size-5" />}
         </Button>
         <div
           id="mobile-navigation"
           hidden={!mobile}
-          className="order-last basis-full py-2 min-[1081px]:hidden"
+          className="order-last basis-full py-2 min-[1081px]:hidden border-t border-border/60 mt-1"
         >
           <Navigation page={page} mobile onNavigate={() => setMobile(false)} />
         </div>

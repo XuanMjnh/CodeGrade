@@ -23,6 +23,12 @@ import {
   ArrowRight,
   Save,
   Sparkles,
+  MessageSquare,
+  MessageSquareQuote,
+  MessageSquareDashed,
+  Send,
+  Clock,
+  Loader2,
 } from 'lucide-react';
 const date = (value) =>
   new Date(value).toLocaleString(localStorage.getItem('cg-locale') === 'en' ? 'en-US' : 'vi-VN');
@@ -492,12 +498,13 @@ export function Discussion({ id, revision }) {
     [failure, E] = useState(null);
   async function post(e) {
     e.preventDefault();
+    if (!body.trim()) return;
     S(true);
     E(null);
     try {
       await live.call('COMMENT_ADD', {
         problemId: id,
-        body,
+        body: body.trim(),
       });
       B('');
       set(
@@ -514,38 +521,133 @@ export function Discussion({ id, revision }) {
   return (
     <section
       data-paginate
-      className="paper rounded-[14px] border bg-card text-card-foreground shadow-xs pad p-5 sm:p-6"
+      className="paper rounded-2xl border border-border/80 bg-card text-card-foreground shadow-xs p-5 sm:p-6 space-y-5"
     >
-      <h2>Bình luận</h2>
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="flex size-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 shadow-2xs">
+            <MessageSquareQuote className="size-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="font-heading text-lg font-black tracking-tight text-foreground m-0">
+                {trUI('Bình luận')}
+              </h2>
+              {items && items.length > 0 && (
+                <span className="rounded-full bg-muted border border-border/60 px-2.5 py-0.5 font-mono text-xs font-bold text-muted-foreground">
+                  {items.length}
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {trUI('Trao đổi giải pháp, chia sẻ gợi ý và thảo luận thuật toán cùng cộng đồng.')}
+            </p>
+          </div>
+        </div>
+      </div>
+
       <ErrorBox error={error || failure} />
-      <form onSubmit={post} aria-busy={busy}>
-        <UiLabel className="grid gap-2 text-sm font-medium">
-          Viết bình luận
-          <UiTextarea required maxLength={4000} value={body} onChange={(e) => B(e.target.value)} />
-        </UiLabel>
-        <UiButton disabled={busy} aria-busy={busy} variant="default">
-          Gửi bình luận
-        </UiButton>
+
+      {/* Editor Form */}
+      <form onSubmit={post} aria-busy={busy} className="space-y-3">
+        <div className="rounded-2xl border border-border/80 bg-muted/20 p-3 sm:p-4 transition-all focus-within:border-action/60 focus-within:bg-card focus-within:ring-2 focus-within:ring-action/15 shadow-2xs">
+          <div className="flex items-center justify-between pb-2 mb-2 border-b border-border/40 text-xs">
+            <span className="font-bold text-foreground flex items-center gap-1.5">
+              <Sparkles className="size-3.5 text-action" />
+              {trUI('Viết bình luận')}
+            </span>
+            <span className="font-mono text-[11px] text-muted-foreground">
+              {body.length} / 4000
+            </span>
+          </div>
+
+          <UiTextarea
+            required
+            maxLength={4000}
+            rows={3}
+            value={body}
+            onChange={(e) => B(e.target.value)}
+            placeholder={trUI('Chia sẻ cách tiếp cận, giải thích ý tưởng hoặc đặt câu hỏi...')}
+            className="w-full resize-y min-h-[85px] border-0 bg-transparent p-0 text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-0 focus-visible:outline-none shadow-none"
+          />
+
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-3 mt-2 border-t border-border/40">
+            <p className="text-[11px] text-muted-foreground/80 flex items-center gap-1.5">
+              <span>💡</span>
+              {trUI('Giữ thảo luận văn minh và tránh tiết lộ đáp án trực tiếp.')}
+            </p>
+            <UiButton
+              type="submit"
+              disabled={busy || !body.trim()}
+              aria-busy={busy}
+              className="h-9 rounded-xl bg-action hover:bg-action/90 text-white font-bold text-xs px-4 gap-2 shadow-xs transition-all cursor-pointer disabled:opacity-50"
+            >
+              {busy ? (
+                <>
+                  <Loader2 className="size-3.5 animate-spin" />
+                  <span>{trUI('Đang gửi…')}</span>
+                </>
+              ) : (
+                <>
+                  <Send className="size-3.5" />
+                  <span>{trUI('Gửi bình luận')}</span>
+                </>
+              )}
+            </UiButton>
+          </div>
+        </div>
       </form>
+
+      {/* List / Empty State */}
       {!items ? (
         <Loading />
       ) : items.length === 0 ? (
-        <p className="muted text-sm leading-relaxed text-muted-foreground">
-          Chưa có bình luận. Chia sẻ cách tiếp cận của bạn.
-        </p>
+        <div className="flex flex-col items-center justify-center py-10 px-4 text-center rounded-2xl border border-dashed border-border/80 bg-muted/15">
+          <div className="flex size-14 items-center justify-center rounded-2xl bg-card border border-border/80 shadow-2xs mb-3 text-muted-foreground/70">
+            <MessageSquareDashed className="size-7 text-action" />
+          </div>
+          <p className="font-heading font-bold text-sm text-foreground">
+            {trUI('Chưa có bình luận nào')}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1 max-w-sm leading-relaxed">
+            {trUI('Chưa có bình luận. Chia sẻ cách tiếp cận của bạn.')}
+          </p>
+        </div>
       ) : (
-        items.map((x) => (
-          <article key={x.id}>
-            <b data-user-content>{x.display_name}</b>
-            <small> {date(x.created_at)}</small>
-            <p
-              data-user-content
-              className="user-copy grid gap-1 [&>small]:text-xs [&>small]:text-muted-foreground"
+        <div className="space-y-3 pt-1">
+          {items.map((x) => (
+            <article
+              key={x.id}
+              className="group relative flex gap-3.5 rounded-2xl border border-border/70 bg-card/60 p-4 transition-all hover:bg-card hover:border-border hover:shadow-2xs"
             >
-              {x.body}
-            </p>
-          </article>
-        ))
+              <div className="flex size-9.5 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-action/20 to-orange-500/10 border border-action/25 text-action font-heading font-black text-sm shadow-2xs">
+                {x.display_name?.slice(0, 1)?.toUpperCase() || 'U'}
+              </div>
+
+              <div className="min-w-0 flex-1 space-y-1.5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span
+                    data-user-content
+                    className="font-heading font-bold text-sm text-foreground"
+                  >
+                    {x.display_name}
+                  </span>
+                  <span className="flex items-center gap-1 font-mono text-[11px] text-muted-foreground">
+                    <Clock className="size-3 text-muted-foreground/70" />
+                    {date(x.created_at)}
+                  </span>
+                </div>
+                <div
+                  data-user-content
+                  className="user-copy text-xs sm:text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed break-words"
+                >
+                  {x.body}
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
       )}
     </section>
   );

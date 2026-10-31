@@ -15,6 +15,7 @@ import { languageNames } from '../lib/coderunner';
 import { Badge, ErrorBox, Loading, useResource, go } from '../components/ui';
 import Icon from '../components/Icon';
 import { cn } from '../lib/utils';
+import { History, Trophy, MessageSquare } from 'lucide-react';
 const cpp =
   '#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    \n    return 0;\n}\n';
 export default function Workspace({
@@ -577,24 +578,24 @@ export default function Workspace({
       </div>
 
       {!room && (
-        <div className="workspace-bottom-section space-y-3 pt-3">
+        <div className="workspace-bottom-section space-y-3.5 pt-3">
           <div
-            className="workspace-tabs flex flex-wrap gap-1 rounded-xl bg-muted/60 p-1 border border-border/50 w-fit"
+            className="workspace-tabs flex flex-wrap items-center gap-1.5 rounded-2xl bg-muted/60 p-1.5 border border-border/60 shadow-2xs w-fit"
             role="tablist"
           >
             <UiButton
               role="tab"
               aria-selected={bottomTab === 'submissions'}
               className={cn(
-                'h-8 justify-center gap-1.5 rounded-lg border-0 px-3 text-xs font-semibold transition-all shadow-none',
+                'h-9 justify-center gap-2 rounded-xl border-0 px-3.5 text-xs font-bold transition-all shadow-none cursor-pointer',
                 bottomTab === 'submissions'
-                  ? 'active bg-card text-foreground shadow-2xs border border-border/60'
-                  : 'bg-transparent text-muted-foreground hover:bg-card/50 hover:text-foreground',
+                  ? 'active bg-card text-action shadow-2xs border border-border/80 font-black'
+                  : 'bg-transparent text-muted-foreground hover:bg-card/60 hover:text-foreground',
               )}
               onClick={() => setBottomTab('submissions')}
               variant="ghost"
             >
-              <Icon name="fa-solid fa-clock-rotate-left" className="size-3" aria-hidden="true" />
+              <History className="size-3.5 shrink-0" />
               <span>{trUI('Lịch sử nộp bài')}</span>
             </UiButton>
 
@@ -602,15 +603,15 @@ export default function Workspace({
               role="tab"
               aria-selected={bottomTab === 'ranking'}
               className={cn(
-                'h-8 justify-center gap-1.5 rounded-lg border-0 px-3 text-xs font-semibold transition-all shadow-none',
+                'h-9 justify-center gap-2 rounded-xl border-0 px-3.5 text-xs font-bold transition-all shadow-none cursor-pointer',
                 bottomTab === 'ranking'
-                  ? 'active bg-card text-foreground shadow-2xs border border-border/60'
-                  : 'bg-transparent text-muted-foreground hover:bg-card/50 hover:text-foreground',
+                  ? 'active bg-card text-action shadow-2xs border border-border/80 font-black'
+                  : 'bg-transparent text-muted-foreground hover:bg-card/60 hover:text-foreground',
               )}
               onClick={() => setBottomTab('ranking')}
               variant="ghost"
             >
-              <Icon name="fa-solid fa-trophy" className="size-3" aria-hidden="true" />
+              <Trophy className="size-3.5 shrink-0 text-amber-500" />
               <span>{trUI('Bảng xếp hạng bài này')}</span>
             </UiButton>
 
@@ -618,15 +619,15 @@ export default function Workspace({
               role="tab"
               aria-selected={bottomTab === 'discussion'}
               className={cn(
-                'h-8 justify-center gap-1.5 rounded-lg border-0 px-3 text-xs font-semibold transition-all shadow-none',
+                'h-9 justify-center gap-2 rounded-xl border-0 px-3.5 text-xs font-bold transition-all shadow-none cursor-pointer',
                 bottomTab === 'discussion'
-                  ? 'active bg-card text-foreground shadow-2xs border border-border/60'
-                  : 'bg-transparent text-muted-foreground hover:bg-card/50 hover:text-foreground',
+                  ? 'active bg-card text-action shadow-2xs border border-border/80 font-black'
+                  : 'bg-transparent text-muted-foreground hover:bg-card/60 hover:text-foreground',
               )}
               onClick={() => setBottomTab('discussion')}
               variant="ghost"
             >
-              <Icon name="fa-solid fa-comments" className="size-3" aria-hidden="true" />
+              <MessageSquare className="size-3.5 shrink-0 text-blue-500" />
               <span>{trUI('Thảo luận')}</span>
             </UiButton>
           </div>

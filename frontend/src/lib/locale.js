@@ -215,7 +215,7 @@ export function LanguageButton() {
       variant: 'ghost',
       size: 'sm',
       className:
-        'language-button h-8 rounded-md border border-border bg-card px-2 font-mono text-xs font-medium text-success',
+        'language-button h-8 rounded-xl border border-border/80 bg-card px-2.5 font-mono text-xs font-bold text-foreground hover:text-action hover:border-action/40 transition-all shadow-2xs cursor-pointer',
       onClick: () => {
         locale = locale === 'vi' ? 'en' : 'vi';
         localStorage.setItem('cg-locale', locale);
