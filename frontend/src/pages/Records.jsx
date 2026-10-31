@@ -22,6 +22,21 @@ import { live } from '../lib/live';
 import { languageNames } from '../lib/coderunner';
 import Result from '../components/SubmissionResult';
 import SubmissionStatus from '../components/SubmissionStatus';
+import {
+  FolderTree,
+  FileCode2,
+  CheckCircle2,
+  AlertCircle,
+  FolderPlus,
+  Pencil,
+  Tag,
+  Save,
+  X,
+  Search,
+  Folder,
+  ExternalLink,
+  FolderSearch,
+} from 'lucide-react';
 export function SubmissionsPage({ revision }) {
   const [data, error] = useResource('SUBMISSIONS', {}, revision),
     [selected, setSelected] = useState(null),
@@ -373,10 +388,13 @@ export function Categories({ revision, onNotice }) {
     [description, setDescription] = useState(''),
     [id, setId] = useState(null),
     [err, setErr] = useState(null),
-    [busy, B] = useState(false);
+    [busy, B] = useState(false),
+    [search, setSearch] = useState('');
+
   async function save(e) {
     e.preventDefault();
     B(true);
+    setErr(null);
     try {
       await live.call('CATEGORY_SAVE', {
         ...(id
@@ -397,115 +415,359 @@ export function Categories({ revision, onNotice }) {
       B(false);
     }
   }
+
+  const filteredCategories =
+    data?.filter((c) => {
+      if (!search.trim()) return true;
+      const q = search.toLowerCase();
+      return (
+        c.name?.toLowerCase().includes(q) ||
+        c.description?.toLowerCase().includes(q)
+      );
+    }) || [];
+
+  const statsList = [
+    {
+      label: trUI('Tổng danh mục'),
+      value: data ? data.length : '—',
+      icon: FolderTree,
+      note: trUI('Chủ đề bài tập trong hệ thống'),
+      color: 'text-action bg-action/10 border-action/20',
+      textColor: 'text-action',
+    },
+    {
+      label: trUI('Bài trong kho'),
+      value: problems ? problems.length : '—',
+      icon: FileCode2,
+      note: trUI('Tổng số bài tập lưu trữ'),
+      color: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
+      textColor: 'text-emerald-700 dark:text-emerald-300',
+    },
+    {
+      label: trUI('Danh mục đã có bài'),
+      value:
+        data && problems
+          ? data.filter((c) => problems.some((p) => p.category_id === c.id)).length
+          : '—',
+      icon: CheckCircle2,
+      note: trUI('Đã được phân bổ bài tập'),
+      color: 'text-blue-500 bg-blue-500/10 border-blue-500/20',
+      textColor: 'text-blue-700 dark:text-blue-300',
+    },
+    {
+      label: trUI('Chưa có bài tập'),
+      value:
+        data && problems
+          ? data.filter((c) => !problems.some((p) => p.category_id === c.id)).length
+          : '—',
+      icon: AlertCircle,
+      note: trUI('Cần bổ sung thêm bài'),
+      color: 'text-amber-500 bg-amber-500/10 border-amber-500/20',
+      textColor: 'text-amber-700 dark:text-amber-400',
+    },
+  ];
+
   return (
-    <>
+    <div className="space-y-6">
       <Heading
         kind="categories"
         title={trUI('Quản lý danh mục')}
         highlight={{
-          label: 'Danh mục hiện có',
+          label: trUI('Danh mục hiện có'),
           value: data?.length,
         }}
       >
-        Sắp xếp kho đề theo chủ đề để người học dễ khám phá và luyện tập.
+        {trUI('Sắp xếp kho đề theo chủ đề để người học dễ khám phá và luyện tập.')}
       </Heading>
-      <StatGrid
-        items={[
-          {
-            label: 'Danh mục',
-            value: data?.length,
-          },
-          {
-            label: 'Bài trong kho của bạn',
-            value: problems?.length,
-          },
-          {
-            label: 'Danh mục chưa có bài',
-            value:
-              data && problems
-                ? data.filter((c) => !problems.some((p) => p.category_id === c.id)).length
-                : null,
-          },
-        ]}
-      />
+
+      {/* 4 Stat Overview Cards */}
+      <section className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 xl:grid-cols-4" aria-label={trUI('Thống kê danh mục')}>
+        {statsList.map((s) => (
+          <div
+            key={s.label}
+            className="flex items-center gap-3.5 rounded-2xl border border-border/80 bg-card p-4 sm:p-5 shadow-2xs transition-all hover:border-action/30 hover:shadow-subtle"
+          >
+            <span className={cn('flex size-11 shrink-0 items-center justify-center rounded-xl border', s.color)}>
+              <s.icon className="size-5" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-muted-foreground truncate">
+                {s.label}
+              </div>
+              <div className={cn('mt-0.5 font-heading text-xl sm:text-2xl font-black tracking-tight leading-none', s.textColor)}>
+                {s.value}
+              </div>
+              <div className="mt-1 text-[11px] text-muted-foreground/80 truncate">
+                {s.note}
+              </div>
+            </div>
+          </div>
+        ))}
+      </section>
+
       <ErrorBox error={error || err || problemError} />
-      <div className="insight-grid grid min-w-0 gap-4 sm:grid-cols-2 category-workspace space-y-3">
+
+      {/* 2-Column Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Col 1: Form Tạo / Sửa danh mục */}
         <form
-          className="paper rounded-[14px] border bg-card text-card-foreground shadow-xs pad p-5 sm:p-6"
+          className="lg:col-span-5 rounded-2xl border border-border/80 bg-card p-5 sm:p-6 shadow-2xs space-y-4"
           onSubmit={save}
+          aria-busy={busy}
         >
-          <h2>{id ? trUI('Sửa danh mục') : trUI('Tạo danh mục')}</h2>
-          <UiLabel className="grid gap-2 text-sm font-medium">
-            Tên
-            <UiInput
-              required
-              maxLength={100}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </UiLabel>
-          <UiLabel className="grid gap-2 text-sm font-medium">
-            Mô tả
-            <UiTextarea
-              value={description}
-              maxLength={1000}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </UiLabel>
-          <div className="inline-group flex flex-wrap items-center gap-2">
-            <UiButton disabled={busy} aria-busy={busy} variant="default">
-              Lưu
-            </UiButton>
+          {/* Form Header */}
+          <div className="flex items-center justify-between border-b border-border/50 pb-3">
+            <div className="flex items-center gap-2.5">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 text-action border border-orange-500/20">
+                {id ? <Pencil className="size-4" /> : <FolderPlus className="size-4" />}
+              </span>
+              <div>
+                <h3 className="font-heading text-base font-extrabold text-foreground">
+                  {id ? trUI('Chỉnh sửa danh mục') : trUI('Tạo danh mục mới')}
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  {id ? trUI('Cập nhật thông tin danh mục đang chọn') : trUI('Phân loại kho bài tập để Coder dễ ôn tập')}
+                </p>
+              </div>
+            </div>
             {id && (
               <UiButton
                 type="button"
-                className="ghost bg-transparent text-muted-foreground shadow-none hover:bg-muted hover:text-foreground"
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground cursor-pointer"
                 onClick={() => {
                   setId(null);
                   setName('');
                   setDescription('');
                 }}
-                variant="ghost"
               >
-                Hủy
+                <X className="size-3.5 mr-1" />
+                {trUI('Hủy sửa')}
+              </UiButton>
+            )}
+          </div>
+
+          {/* Field: Tên danh mục */}
+          <div className="space-y-1.5">
+            <UiLabel htmlFor="cat-name" className="text-xs font-bold text-foreground">
+              {trUI('Tên danh mục')} <span className="text-destructive">*</span>
+            </UiLabel>
+            <div className="relative">
+              <Tag className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+              <UiInput
+                id="cat-name"
+                required
+                maxLength={100}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder={trUI('VD: Quy hoạch động, Đồ thị, Chuỗi...')}
+                className="h-10 pl-9 rounded-xl border border-border/90 bg-slate-100/60 dark:bg-slate-900/50 text-sm font-semibold text-foreground transition-all shadow-xs focus-visible:border-action focus-visible:bg-card focus-visible:ring-3 focus-visible:ring-action/20"
+              />
+            </div>
+          </div>
+
+          {/* Field: Mô tả danh mục */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <UiLabel htmlFor="cat-desc" className="text-xs font-bold text-foreground">
+                {trUI('Mô tả chi tiết')}
+              </UiLabel>
+              <span className="text-[11px] text-muted-foreground">Tối đa 1000 ký tự</span>
+            </div>
+            <UiTextarea
+              id="cat-desc"
+              value={description}
+              maxLength={1000}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder={trUI('Mô tả ngắn gọn về chủ đề hoặc kiến thức bài tập…')}
+              rows={4}
+              className="rounded-xl border border-border/90 bg-slate-100/60 dark:bg-slate-900/50 text-sm text-foreground transition-all shadow-xs focus-visible:border-action focus-visible:bg-card focus-visible:ring-3 focus-visible:ring-action/20 resize-none"
+            />
+          </div>
+
+          {/* Buttons */}
+          <div className="pt-2 flex flex-wrap items-center gap-2">
+            <UiButton
+              type="submit"
+              disabled={busy}
+              aria-busy={busy}
+              className="h-10 px-5 rounded-xl bg-action hover:bg-action-hover active:bg-action-active text-white font-bold text-sm shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto"
+            >
+              {id ? <Save className="size-4" /> : <FolderPlus className="size-4" />}
+              <span>{busy ? trUI('Đang lưu…') : (id ? trUI('Cập nhật danh mục') : trUI('Tạo danh mục'))}</span>
+            </UiButton>
+            {id && (
+              <UiButton
+                type="button"
+                variant="outline"
+                className="h-10 px-4 rounded-xl border border-border/90 text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted/50 cursor-pointer"
+                onClick={() => {
+                  setId(null);
+                  setName('');
+                  setDescription('');
+                }}
+              >
+                {trUI('Hủy')}
               </UiButton>
             )}
           </div>
         </form>
-        <InsightPanel title="Danh mục trong kho">
+
+        {/* Col 2: Danh mục trong kho */}
+        <div className="lg:col-span-7 rounded-2xl border border-border/80 bg-card p-5 sm:p-6 shadow-2xs space-y-4">
+          {/* Header with Search */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/50 pb-3">
+            <div className="flex items-center gap-2.5">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 text-action border border-orange-500/20">
+                <FolderTree className="size-4" />
+              </span>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-heading text-base font-extrabold text-foreground">
+                    {trUI('Danh mục trong kho')}
+                  </h3>
+                  <span className="rounded-full bg-muted px-2 py-0.2 font-mono text-[10px] font-bold text-muted-foreground">
+                    {data ? data.length : 0}
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {trUI('Các chủ đề đang quản lý trên hệ thống')}
+                </p>
+              </div>
+            </div>
+
+            {/* Quick Search */}
+            <div className="relative w-full sm:w-52">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
+              <UiInput
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={trUI('Tìm kiếm danh mục…')}
+                className="h-8 pl-8 pr-2.5 text-xs rounded-xl border-border/90 bg-slate-100/60 dark:bg-slate-900/50 shadow-2xs focus-visible:border-action focus-visible:ring-2 focus-visible:ring-action/20"
+              />
+            </div>
+          </div>
+
+          {/* List Content */}
           {!data ? (
             <Loading />
+          ) : filteredCategories.length === 0 ? (
+            <div className="py-12 text-center space-y-2">
+              <FolderSearch className="size-10 text-muted-foreground/40 mx-auto" />
+              <p className="text-sm font-semibold text-foreground">
+                {search ? trUI('Không tìm thấy danh mục phù hợp') : trUI('Chưa có danh mục nào')}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {search ? trUI('Thử tìm kiếm với từ khóa khác.') : trUI('Tạo danh mục đầu tiên từ biểu mẫu bên cạnh.')}
+              </p>
+            </div>
           ) : (
-            data.map((c) => (
-              <div
-                key={c.id}
-                className="category-row flex flex-wrap items-center justify-between gap-3 border-b py-3"
-              >
-                <div>
-                  <b data-user-content>{c.name}</b>
-                  <p data-user-content>{c.description}</p>
-                  <small>
-                    {problems ? problems.filter((p) => p.category_id === c.id).length : '—'}{' '}
-                    {trUI('bài tập')}
-                  </small>
-                </div>
-                <UiButton
-                  className="ghost bg-transparent text-muted-foreground shadow-none hover:bg-muted hover:text-foreground"
-                  onClick={() => {
-                    setId(c.id);
-                    setName(c.name);
-                    setDescription(c.description);
-                  }}
-                  variant="ghost"
-                >
-                  Sửa
-                </UiButton>
-              </div>
-            ))
+            <div className="space-y-2.5 max-h-[620px] overflow-y-auto pr-1">
+              {filteredCategories.map((c) => {
+                const count = problems ? problems.filter((p) => p.category_id === c.id).length : 0;
+                const isEditing = id === c.id;
+                return (
+                  <div
+                    key={c.id}
+                    className={cn(
+                      'category-row group relative flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border p-3.5 sm:px-4 transition-all duration-200',
+                      isEditing
+                        ? 'border-action bg-action/5 shadow-2xs ring-1 ring-action/40'
+                        : 'border-border/70 bg-card hover:border-action/30 hover:bg-muted/30 hover:shadow-2xs',
+                    )}
+                  >
+                    <div className="flex items-start gap-3 min-w-0">
+                      <span
+                        className={cn(
+                          'flex size-9 shrink-0 items-center justify-center rounded-xl border mt-0.5',
+                          count > 0
+                            ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                            : 'border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400',
+                        )}
+                      >
+                        <Folder className="size-4" />
+                      </span>
+                      <div className="min-w-0 space-y-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h4
+                            className="font-heading text-sm font-extrabold text-foreground tracking-tight leading-tight"
+                            data-user-content
+                          >
+                            {c.name}
+                          </h4>
+                          {isEditing && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-action/15 px-2 py-0.2 font-mono text-[9px] font-bold text-action">
+                              <span className="size-1 rounded-full bg-action" />
+                              {trUI('Đang sửa')}
+                            </span>
+                          )}
+                        </div>
+                        {c.description && (
+                          <p
+                            className="text-xs text-muted-foreground line-clamp-2 leading-relaxed"
+                            data-user-content
+                          >
+                            {c.description}
+                          </p>
+                        )}
+                        <div className="flex items-center gap-2 pt-0.5">
+                          {count > 0 ? (
+                            <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-emerald-700 dark:text-emerald-400">
+                              <FileCode2 className="size-3" />
+                              {count} {trUI('bài tập')}
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 rounded-md bg-amber-500/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-amber-700 dark:text-amber-400">
+                              <AlertCircle className="size-3" />
+                              {trUI('Chưa có bài')}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-1.5 sm:self-center shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-border/40">
+                      <UiButton
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className={cn(
+                          'h-8 px-2.5 rounded-lg text-xs font-semibold gap-1.5 transition-all cursor-pointer',
+                          isEditing
+                            ? 'bg-action text-white hover:bg-action-hover'
+                            : 'text-action hover:bg-action/10 hover:border-action/30 border border-transparent',
+                        )}
+                        onClick={() => {
+                          setId(c.id);
+                          setName(c.name);
+                          setDescription(c.description || '');
+                        }}
+                      >
+                        <Pencil className="size-3" />
+                        <span>{trUI('Sửa')}</span>
+                      </UiButton>
+
+                      <ActionLink asChild variant="ghost" size="sm">
+                        <a
+                          href={`#/practice?category=${encodeURIComponent(c.id)}`}
+                          className="inline-flex h-8 items-center gap-1 rounded-lg px-2 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
+                          title={trUI('Xem bài trong danh mục này')}
+                        >
+                          <ExternalLink className="size-3.5" />
+                          <span className="hidden min-[480px]:inline">{trUI('Xem bài')}</span>
+                        </a>
+                      </ActionLink>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           )}
-        </InsightPanel>
+        </div>
       </div>
-    </>
+    </div>
   );
 }
 export function Admin({ revision, onNotice }) {

@@ -40,8 +40,7 @@ const theme = EditorView.theme(
       letterSpacing: '0',
     },
     '&.cm-focused': {
-      outline: '2px solid var(--ring)',
-      outlineOffset: '-2px',
+      outline: 'none',
     },
   },
   {
