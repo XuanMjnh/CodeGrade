@@ -3,16 +3,12 @@ import {
   Eye,
   EyeOff,
   LoaderCircle,
-  Terminal,
-  Trophy,
-  Zap,
   User,
   UserPlus,
   LogIn,
   Lock,
   Mail,
   ShieldCheck,
-  Code2,
   ArrowRight,
   Sparkles,
 } from 'lucide-react';
@@ -25,27 +21,6 @@ import { Label } from './ui/label';
 import { Card } from './ui/card';
 import { Logo } from './layout/AppShell';
 import { cn } from '../lib/utils';
-
-const features = [
-  {
-    title: 'Luyện tập thuật toán',
-    desc: 'Kho bài tập đa dạng, chấm tự động theo chuẩn Olympic & CodeRunner với C++ & Python.',
-    icon: Terminal,
-    color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
-  },
-  {
-    title: 'Đấu trường Code Survival',
-    desc: 'Chế độ sinh tồn 5 Coder kịch tính, vượt qua từng vòng thi để đoạt vương miện.',
-    icon: Zap,
-    color: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
-  },
-  {
-    title: 'Contest & Xếp hạng Elo',
-    desc: 'Thi đấu định kỳ tính điểm rating, so tài cao thấp và thăng hạng trên bảng vàng.',
-    icon: Trophy,
-    color: 'bg-sky-500/20 text-sky-300 border-sky-500/30',
-  },
-];
 
 export default function Auth({ onUser, status, notice }) {
   const [register, setRegister] = useState(false);
@@ -72,78 +47,20 @@ export default function Auth({ onUser, status, notice }) {
   }
 
   return (
-    <div className="auth-layout relative grid min-h-dvh place-items-center bg-background px-4 py-8 sm:px-6 sm:py-12 overflow-hidden">
+    <div className="auth-layout relative flex min-h-dvh items-center justify-center bg-background px-4 py-8 sm:px-6 sm:py-12 overflow-hidden">
       {/* Ambient background glows */}
       <div className="pointer-events-none absolute -top-40 -left-40 size-96 rounded-full bg-emerald-500/10 blur-3xl dark:bg-emerald-500/5" aria-hidden="true" />
       <div className="pointer-events-none absolute -bottom-40 -right-40 size-96 rounded-full bg-amber-500/10 blur-3xl dark:bg-amber-500/5" aria-hidden="true" />
 
-      <Card className="auth-shell relative z-10 grid w-full max-w-[1020px] grid-cols-1 overflow-hidden rounded-3xl border border-border/80 bg-card py-0 shadow-[0_20px_60px_rgba(0,0,0,0.07),0_4px_16px_rgba(0,0,0,0.03)] min-[641px]:grid-cols-2">
+      <Card className="auth-shell relative z-10 w-full max-w-[460px] overflow-hidden rounded-3xl border border-border/80 bg-card p-0 gap-0 shadow-[0_20px_60px_rgba(0,0,0,0.07),0_4px_16px_rgba(0,0,0,0.03)]">
         {/* Top Header */}
-        <header className="auth-header col-span-full flex items-center justify-between gap-4 border-b border-border/70 bg-card px-6 py-4 sm:px-8">
+        <header className="auth-header flex items-center justify-between gap-4 border-b border-border/70 bg-card px-6 py-4">
           <Logo network />
           <LanguageButton />
         </header>
 
-        {/* Left Side: Brand & Feature Showcase */}
-        <section
-          className="auth-story relative flex flex-col justify-between overflow-hidden bg-gradient-to-br from-[#124b30] via-[#0f3d27] to-[#0a291a] p-8 sm:p-10 text-white max-[640px]:hidden"
-          aria-label={t('Khám phá CodeGrade Network')}
-        >
-          {/* Subtle interior glow */}
-          <div className="pointer-events-none absolute -top-24 -left-24 size-72 rounded-full bg-emerald-400/20 blur-3xl" aria-hidden="true" />
-          <div className="pointer-events-none absolute -bottom-24 -right-24 size-72 rounded-full bg-teal-300/15 blur-3xl" aria-hidden="true" />
-
-          {/* Top Headline */}
-          <div className="relative z-10">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-emerald-200 text-xs font-semibold backdrop-blur-xs border border-white/10 shadow-2xs">
-              <Sparkles className="size-3.5 text-emerald-300" aria-hidden="true" />
-              <span>Nền tảng luyện tập & thi đấu</span>
-            </span>
-
-            <h1 className="mt-4 font-heading text-2xl sm:text-3xl font-extrabold tracking-tight leading-tight text-white">
-              {t('Rèn luyện tư duy thuật toán đỉnh cao')}
-            </h1>
-
-            <p className="mt-2 text-xs sm:text-sm leading-relaxed text-emerald-100/80 max-w-sm">
-              {t('Nộp lời giải, nhận kết quả chấm tự động từ Docker sandbox cô lập và tranh tài xếp hạng Elo.')}
-            </p>
-          </div>
-
-          {/* Feature Showcase Cards */}
-          <div className="relative z-10 my-6 space-y-3">
-            {features.map((feat) => {
-              const IconComp = feat.icon;
-              return (
-                <div
-                  key={feat.title}
-                  className="flex items-start gap-3.5 rounded-2xl border border-white/10 bg-white/5 p-3.5 backdrop-blur-xs transition-all hover:bg-white/10"
-                >
-                  <span className={cn("flex size-9 shrink-0 items-center justify-center rounded-xl border shadow-2xs", feat.color)}>
-                    <IconComp className="size-4.5" aria-hidden="true" />
-                  </span>
-                  <div className="space-y-0.5 min-w-0">
-                    <h3 className="text-xs font-bold text-white tracking-wide">{t(feat.title)}</h3>
-                    <p className="text-[11px] leading-relaxed text-emerald-100/70">{t(feat.desc)}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Bottom Language & Sandbox Info */}
-          <div className="relative z-10 border-t border-white/10 pt-4 flex flex-wrap items-center justify-between gap-2 text-[11px] text-emerald-200/80">
-            <span className="flex items-center gap-1.5 font-medium">
-              <Code2 className="size-3.5 text-emerald-400" aria-hidden="true" />
-              <span>C++11 · C++17 · C++20 · Python 3.11</span>
-            </span>
-            <span className="inline-flex items-center gap-1 text-[10px] bg-emerald-950/60 px-2.5 py-0.5 rounded-md border border-emerald-500/30 text-emerald-300 font-mono font-semibold">
-              Docker Sandbox
-            </span>
-          </div>
-        </section>
-
-        {/* Right Side: Authentication Form */}
-        <main className="auth-card flex w-full flex-col justify-center bg-card p-6 sm:p-9">
+        {/* Authentication Form */}
+        <main className="auth-card flex w-full flex-col justify-center bg-card p-6 sm:p-8">
           {/* Segmented Switcher Tab */}
           <div className="grid grid-cols-2 p-1 rounded-xl bg-slate-100 dark:bg-muted/80 mb-6 border border-border/60">
             <button
@@ -359,7 +276,7 @@ export default function Auth({ onUser, status, notice }) {
             <span>{t(register ? 'Đã có tài khoản CodeGrade?' : 'Chưa có tài khoản?')}</span>{' '}
             <button
               type="button"
-              className="font-bold text-primary hover:underline cursor-pointer ml-1"
+              className="font-bold text-action hover:underline cursor-pointer ml-1"
               onClick={() => {
                 setRegister((value) => !value);
                 setError(null);

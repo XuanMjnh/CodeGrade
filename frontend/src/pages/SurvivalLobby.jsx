@@ -294,7 +294,7 @@ export default function SurvivalLobby({ user, revision }) {
   const [stats, statsError] = useResource('PROGRESSION_GET', {}, revision);
   const [leaders, leaderError] = useResource('RANKED_LEADERBOARD', {}, revision);
   const [history, historyError] = useResource('MATCH_HISTORY', {}, revision);
-  const [mode, M] = useState('PRACTICE'),
+  const [mode, M] = useState('RANKED'),
     [queue, Q] = useState(null),
     [error, E] = useState(null),
     [busy, B] = useState(false);
@@ -363,7 +363,7 @@ export default function SurvivalLobby({ user, revision }) {
     <div className="arena-lobby min-w-0 space-y-5">
       <header className="flex flex-wrap items-center justify-between gap-4 border-b pb-5">
         <div className="flex items-center gap-3">
-          <span className="grid size-12 place-items-center rounded-2xl border-b-4 border-primary/20 bg-accent text-primary">
+          <span className="grid size-12 place-items-center rounded-2xl border-b-4 border-orange-500/25 bg-orange-500/10 text-action">
             <Icon name="fa-solid fa-gamepad" className="size-6!" />
           </span>
           <div>
@@ -391,7 +391,7 @@ export default function SurvivalLobby({ user, revision }) {
               </div>
               <a
                 href="#/leaderboard?metric=rank"
-                className="flex items-center gap-1 text-[11px] font-semibold text-primary hover:text-primary-hover transition-colors"
+                className="flex items-center gap-1 text-[11px] font-semibold text-action hover:text-action-hover transition-colors"
               >
                 <span>{t('Bảng xếp hạng')}</span>
                 <Icon name="fa-solid fa-arrow-right" className="size-2.5" />
@@ -456,7 +456,7 @@ export default function SurvivalLobby({ user, revision }) {
               aria-label={t('Thiết lập phòng')}
             >
               <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
-                <span className="flex size-8 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
+                <span className="flex size-8 items-center justify-center rounded-xl bg-orange-500/10 text-action border border-orange-500/20">
                   <Icon name="fa-solid fa-plus" className="size-4" />
                 </span>
                 <div>
@@ -604,7 +604,7 @@ export default function SurvivalLobby({ user, revision }) {
             aria-label={t('Chọn chế độ Survival')}
           >
             <div className="flex items-center gap-2 border-b border-border/50 pb-2.5">
-              <span className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <span className="flex size-7 items-center justify-center rounded-lg bg-orange-500/10 text-action border border-orange-500/20">
                 <Icon name="fa-solid fa-gamepad" className="size-3.5" />
               </span>
               <h2 className="font-heading text-sm font-extrabold text-foreground">
@@ -629,7 +629,7 @@ export default function SurvivalLobby({ user, revision }) {
           </section>
           <section className="arena-join order-4 min-w-0 rounded-2xl border border-border/80 bg-card p-4 shadow-2xs space-y-3">
             <div className="flex items-center gap-2 border-b border-border/50 pb-2.5">
-              <span className="flex size-7 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600">
+              <span className="flex size-7 items-center justify-center rounded-lg bg-orange-500/10 text-action border border-orange-500/20">
                 <Icon name="fa-solid fa-ticket" className="size-3.5" />
               </span>
               <h3 className="font-heading text-sm font-extrabold text-foreground">
@@ -656,18 +656,18 @@ export default function SurvivalLobby({ user, revision }) {
                     autoComplete="off"
                     placeholder="VD: A1B2C3"
                     onChange={(e) => S(e.target.value.toUpperCase())}
-                    className="h-10 rounded-xl font-mono text-sm tracking-wider uppercase pl-3 pr-9 border-border/80 focus-visible:border-primary"
+                    className="h-10 rounded-xl font-mono text-sm tracking-wider uppercase pl-3 pr-9 border-border/80 bg-slate-100/60 focus-visible:border-action focus-visible:bg-card focus-visible:ring-3 focus-visible:ring-action/20"
                   />
                   <Icon
                     name="fa-solid fa-key"
-                    className="absolute right-3 top-3 size-4 text-muted-foreground/40 pointer-events-none"
+                    className="absolute right-3 top-3 size-4 text-action/70 pointer-events-none"
                   />
                 </div>
               </div>
               <Button
                 type="submit"
                 disabled={busy || occupied || !code.trim()}
-                className="w-full h-9 rounded-xl text-xs font-bold gap-1.5 bg-primary text-primary-foreground hover:bg-primary-hover shadow-2xs"
+                className="w-full h-10 rounded-xl text-xs font-bold gap-2 bg-action text-white hover:bg-action-hover active:bg-action-active shadow-xs transition-all disabled:opacity-50"
               >
                 <span>{t('Tham gia phòng')}</span>
                 <Icon name="fa-solid fa-arrow-right" className="size-3" />
@@ -678,14 +678,14 @@ export default function SurvivalLobby({ user, revision }) {
             <summary className="font-semibold">Luật chơi nhanh</summary>
             <ol className="mt-4 space-y-3 leading-relaxed text-muted-foreground">
               <li>
-                <b className="text-primary">01.</b> Giải đề trong thời gian giới hạn. Tối đa 2 lượt
+                <b className="text-action">01.</b> Giải đề trong thời gian giới hạn. Tối đa 2 lượt
                 nộp mỗi vòng.
               </li>
               <li>
-                <b className="text-primary">02.</b> Vượt qua các vòng loại để đến chung kết.
+                <b className="text-action">02.</b> Vượt qua các vòng loại để đến chung kết.
               </li>
               <li>
-                <b className="text-primary">03.</b> Trụ lại cuối cùng và giành chiến thắng.
+                <b className="text-action">03.</b> Trụ lại cuối cùng và giành chiến thắng.
               </li>
             </ol>
           </details>
@@ -737,7 +737,7 @@ export default function SurvivalLobby({ user, revision }) {
                 >
                   <Icon
                     name={'fa-solid ' + icon}
-                    className={cn('size-3.5', active ? 'text-primary' : 'text-muted-foreground/70')}
+                    className={cn('size-3.5', active ? 'text-action' : 'text-muted-foreground/70')}
                   />
                   <span>{label}</span>
                   {key === 'rooms' && (
@@ -745,7 +745,7 @@ export default function SurvivalLobby({ user, revision }) {
                       className={cn(
                         'inline-flex items-center justify-center rounded-full px-2 py-0.5 font-mono text-[11px] font-bold',
                         active
-                          ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+                          ? 'bg-orange-500/15 text-action border border-orange-500/25'
                           : 'bg-muted text-muted-foreground',
                       )}
                     >
@@ -811,7 +811,7 @@ export default function SurvivalLobby({ user, revision }) {
                         {/* Hàng 1: Tiêu đề bên trái, Trạng thái & Mã phòng bên phải */}
                         <div className="room-card-header flex items-center justify-between gap-2">
                           <h3
-                            className="room-card-title font-heading text-sm sm:text-base font-bold text-foreground group-hover:text-primary transition-colors tracking-tight line-clamp-1"
+                            className="room-card-title font-heading text-sm sm:text-base font-bold text-foreground group-hover:text-action transition-colors tracking-tight line-clamp-1"
                             data-user-content
                             title={r.name}
                           >
@@ -956,7 +956,7 @@ export default function SurvivalLobby({ user, revision }) {
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border/80 bg-muted/20 px-6 py-12 text-center">
-                  <div className="flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-3.5 shadow-2xs">
+                  <div className="flex size-14 items-center justify-center rounded-2xl bg-orange-500/10 text-action mb-3.5 shadow-2xs">
                     <Icon name="fa-solid fa-door-open" className="size-6" />
                   </div>
                   <h3 className="font-heading text-base font-extrabold text-foreground">
@@ -994,7 +994,7 @@ export default function SurvivalLobby({ user, revision }) {
                       <div>
                         {/* Hàng 1: Chế độ bên trái, Thứ hạng bên phải */}
                         <div className="history-card-header flex items-center justify-between gap-2">
-                          <h3 className="history-card-title font-heading text-sm sm:text-base font-bold text-foreground group-hover:text-primary transition-colors tracking-tight line-clamp-1">
+                          <h3 className="history-card-title font-heading text-sm sm:text-base font-bold text-foreground group-hover:text-action transition-colors tracking-tight line-clamp-1">
                             {survivalModes[h.mode] || h.mode}
                           </h3>
                           <div className="flex shrink-0 items-center gap-1.5">

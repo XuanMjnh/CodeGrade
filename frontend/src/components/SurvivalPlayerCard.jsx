@@ -16,14 +16,14 @@ export default function SurvivalPlayerCard({ stats, user }) {
       aria-label={t('Thông tin Coder')}
     >
       {/* Profile Hero Box */}
-      <div className="relative flex flex-col items-center gap-2.5 rounded-xl border border-primary/15 bg-gradient-to-b from-primary/10 via-primary/5 to-card/50 p-4 text-center">
-        <span className="absolute top-2.5 right-2.5 inline-flex items-center gap-1 rounded-full border border-primary/25 bg-card/95 px-2 py-0.5 font-mono text-[10px] font-extrabold text-primary shadow-2xs">
-          <Icon name="bolt" className="size-2.5 text-primary" />
+      <div className="relative flex flex-col items-center gap-2.5 rounded-xl border border-orange-500/20 bg-gradient-to-b from-orange-500/10 via-amber-500/5 to-card/50 p-4 text-center">
+        <span className="absolute top-2.5 right-2.5 inline-flex items-center gap-1 rounded-full border border-orange-500/30 bg-card/95 px-2 py-0.5 font-mono text-[10px] font-extrabold text-action shadow-2xs">
+          <Icon name="bolt" className="size-2.5 text-action" />
           LV.{stats.level}
         </span>
         <span
           className={cn(
-            'avatar flex size-14 items-center justify-center rounded-2xl border-2 border-primary bg-card font-heading text-2xl font-black text-primary shadow-xs transition-transform hover:scale-105',
+            'avatar flex size-14 items-center justify-center rounded-2xl border-2 border-action bg-card font-heading text-2xl font-black text-action shadow-xs transition-transform hover:scale-105',
             'avatar-frame-' + stats.avatarFrame,
           )}
           aria-hidden="true"
@@ -46,8 +46,8 @@ export default function SurvivalPlayerCard({ stats, user }) {
       {/* EXP Progress Meter */}
       <div className="space-y-2 rounded-xl border border-border/60 bg-muted/20 p-3">
         <div className="flex items-center justify-between text-xs">
-          <span className="flex items-center gap-1 font-bold text-primary">
-            <Icon name="star" className="size-3.5 fill-primary text-primary" />
+          <span className="flex items-center gap-1 font-bold text-action">
+            <Icon name="star" className="size-3.5 fill-amber-500 text-amber-500" />
             <span className="font-mono text-sm font-extrabold">{stats.exp} EXP</span>
           </span>
           <span className="font-mono text-[11px] text-muted-foreground">
@@ -58,7 +58,7 @@ export default function SurvivalPlayerCard({ stats, user }) {
           aria-label="EXP đến cấp tiếp theo"
           value={stats.exp - levelStart}
           max={stats.nextLevelExp - levelStart}
-          className="h-2 rounded-full"
+          className="h-2 rounded-full [&_[data-slot=progress-indicator]]:bg-action"
         />
       </div>
 
