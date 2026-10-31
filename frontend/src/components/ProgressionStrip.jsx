@@ -51,23 +51,23 @@ export function RankTierStrip({ stats }) {
                   : 'bg-transparent hover:bg-muted/30',
               )}
             >
-              {/* Logo Rank (Gọn gàng, không viền khung) */}
-              <div className="flex h-12 w-full items-center justify-center sm:h-13">
+              {/* Logo Rank (To hơn, nổi bật biểu trưng LoL) */}
+              <div className="flex h-16 w-full items-center justify-center sm:h-20">
                 <RankEmblem
                   rank={item.name}
                   decorative
-                  className="h-11 w-auto sm:h-12 shrink-0 transition-transform duration-200 group-hover:scale-105 drop-shadow-xs"
+                  className="h-16 w-auto sm:h-20 shrink-0 transition-transform duration-200 group-hover:scale-105 drop-shadow-xs"
                 />
               </div>
 
-              {/* Thông tin ở dưới logo */}
+              {/* Thông tin ở dưới logo (Chữ nhỏ lại, tinh gọn) */}
               <div className="flex flex-col items-center gap-0.5 w-full">
                 <div className="flex flex-wrap items-center justify-center gap-1">
-                  <b className="font-heading text-xs sm:text-sm font-extrabold text-foreground tracking-tight leading-tight">
+                  <b className="font-heading text-[11px] sm:text-xs font-bold text-foreground tracking-tight leading-tight">
                     {item.name}
                   </b>
                   {current && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-action/20 px-1.5 py-0.2 font-mono text-[9px] font-bold text-action leading-tight">
+                    <span className="inline-flex items-center gap-0.5 rounded-full bg-action/15 px-1 py-0.2 font-mono text-[8px] font-bold text-action leading-none">
                       <span className="size-1 rounded-full bg-action" />
                       {t('Hiện tại')}
                     </span>
@@ -75,18 +75,18 @@ export function RankTierStrip({ stats }) {
                 </div>
 
                 {hasRange && (
-                  <span className="font-mono text-[10px] sm:text-[11px] font-semibold text-muted-foreground leading-tight">
+                  <span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground leading-tight">
                     {ratingRange(item)}
                   </span>
                 )}
 
                 <div className="pt-0.5">
                   {item.gainMultiplier > 1 ? (
-                    <span className="inline-flex items-center gap-0.5 rounded-md bg-amber-500/10 px-1.5 py-0.2 font-mono text-[9px] sm:text-[10px] font-bold text-amber-700 dark:text-amber-400 leading-tight">
+                    <span className="inline-flex items-center gap-0.5 rounded-md bg-amber-500/10 px-1.5 py-0.2 font-mono text-[8.5px] sm:text-[9px] font-semibold text-amber-700 dark:text-amber-400 leading-none">
                       ×{item.gainMultiplier} {t('điểm tăng')}
                     </span>
                   ) : (
-                    <span className="inline-flex items-center rounded-md bg-muted/50 px-1.5 py-0.2 font-mono text-[9px] sm:text-[10px] font-medium text-muted-foreground/80 leading-tight">
+                    <span className="inline-flex items-center rounded-md bg-muted/50 px-1.5 py-0.2 font-mono text-[8.5px] sm:text-[9px] font-medium text-muted-foreground/80 leading-none">
                       ×1 {t('chuẩn')}
                     </span>
                   )}
@@ -240,31 +240,31 @@ export default function ProgressionStrip({ stats, user, showRankGuide = false })
                   )}
                   aria-current={current ? 'step' : undefined}
                 >
-                  <div className="flex h-12 w-full items-center justify-center sm:h-13">
+                  <div className="flex h-16 w-full items-center justify-center sm:h-20">
                     <RankEmblem
                       rank={item.name}
                       decorative
-                      className="h-11 w-auto sm:h-12 shrink-0 transition-transform duration-200 group-hover:scale-105 drop-shadow-xs"
+                      className="h-16 w-auto sm:h-20 shrink-0 transition-transform duration-200 group-hover:scale-105 drop-shadow-xs"
                     />
                   </div>
                   <div className="flex flex-col items-center gap-0.5 w-full">
                     <div className="flex flex-wrap items-center justify-center gap-1">
-                      <b className="font-heading font-extrabold text-foreground tracking-tight leading-tight">{item.name}</b>
+                      <b className="font-heading text-[11px] sm:text-xs font-bold text-foreground tracking-tight leading-tight">{item.name}</b>
                       {current && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-action/20 px-1.5 py-0.2 font-mono text-[9px] font-bold text-action leading-tight">
+                        <span className="inline-flex items-center gap-0.5 rounded-full bg-action/15 px-1 py-0.2 font-mono text-[8px] font-bold text-action leading-none">
                           <span className="size-1 rounded-full bg-action" />
                           {t('Hiện tại')}
                         </span>
                       )}
                     </div>
-                    <span className="font-mono text-[10px] font-semibold text-muted-foreground leading-tight">{ratingRange(item)}</span>
+                    <span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground leading-tight">{ratingRange(item)}</span>
                     <div className="pt-0.5">
                       {item.gainMultiplier > 1 ? (
-                        <span className="inline-flex items-center gap-0.5 rounded-md bg-amber-500/10 px-1.5 py-0.2 font-mono text-[9px] font-bold text-amber-700 dark:text-amber-400 leading-tight">
+                        <span className="inline-flex items-center gap-0.5 rounded-md bg-amber-500/10 px-1.5 py-0.2 font-mono text-[8.5px] sm:text-[9px] font-semibold text-amber-700 dark:text-amber-400 leading-none">
                           ×{item.gainMultiplier} {t('điểm tăng')}
                         </span>
                       ) : (
-                        <span className="inline-flex items-center rounded-md bg-muted/50 px-1.5 py-0.2 font-mono text-[9px] font-medium text-muted-foreground/80 leading-tight">
+                        <span className="inline-flex items-center rounded-md bg-muted/50 px-1.5 py-0.2 font-mono text-[8.5px] sm:text-[9px] font-medium text-muted-foreground/80 leading-none">
                           ×1 {t('chuẩn')}
                         </span>
                       )}
