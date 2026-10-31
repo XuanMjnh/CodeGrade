@@ -1,4 +1,4 @@
-# CodeGrade Network 6.0.0
+# CodeGrade Network
 
 Ứng dụng luyện tập và thi đấu lập trình qua WebSocket, gồm ngân hàng đề, chấm bài bằng Docker, Contest và Code Survival. Backend quyết định thời điểm nhận bài, trạng thái trận, kết quả và phần thưởng; trình duyệt nhận ACK/EVENT để cập nhật giao diện.
 
@@ -41,7 +41,7 @@ Source/
 │       └── db/migration/V1__initial_schema.sql
 ├── frontend/            # React, UI, thư viện giao thức và kiểm thử trình duyệt
 ├── worker/              # Dockerfile sandbox và watchdog sandbox.py
-├── scripts/             # Sinh/kiểm tra bank, smoke, benchmark và đóng gói
+├── scripts/             # Khởi tạo môi trường, sinh/kiểm tra bank, smoke và benchmark
 ├── solutions/           # 120 lời giải C++11, 200 lời giải Python, index.json
 ├── report/              # Báo cáo và phụ lục
 ├── statics/results/     # Kết quả kiểm tra, được bỏ qua trong Git
@@ -267,9 +267,6 @@ npm --prefix frontend run build
 # Backend: mặc định H2 MySQL mode, không cần MySQL đang chạy.
 mvn -f backend/pom.xml clean verify
 
-# Kiểm tra cơ chế đóng gói bằng fixture tạm.
-py -3.11 -m unittest discover -s scripts/tests -v
-
 # Full cần g++ có c++11/17/20; bỏ C++ binary bằng --python-only.
 py -3.11 -X utf8 scripts/verify_dataset.py
 ```
@@ -297,13 +294,12 @@ Nếu bỏ `CG_UI_URL`, Playwright tự chạy Vite tại 5173. `CG_ENV_FILE` tr
 
 `compose.test.yaml` cung cấp service kiểm thử độc lập. `tools-test` mặc định benchmark tới `ws://server:8080/ws`, mount `.env` hiện tại, nối network `codegrade-network_default`; cần ứng dụng đang chạy. Đổi tên project/network thì phải chỉnh network tương ứng. Kết quả thực nghiệm lưu ở `statics/results/`, không theo dõi trong Git.
 
-### Kết quả kiểm tra source ngày 31/10/2026
+### Kết quả kiểm tra
 
 | Kiểm tra chạy trong lần cập nhật README | Kết quả |
 |---|---|
 | Frontend `npm test` | **85/85 đạt** sau khi bổ sung mô phỏng IntersectionObserver cho JSDOM, cập nhật test theo bố cục cuộn và thêm kiểm tra observer |
 | Frontend `npm run build` | Đạt với Vite 7.3.7 |
-| Python unittest đóng gói | **3/3 đạt**, sử dụng fixture tạm |
 | Dataset `verify_dataset.py --python-only` | Đạt: 320 bài/1.600 test, 1.000 lần chạy Python, 125 kiểm tra độc lập và đối chiếu oracle 600 test C++; chưa chạy binary C++ |
 
 Backend, Playwright, Docker judge và benchmark tải chưa được chạy lại trong lần cập nhật này. Các số 82/82 frontend, 105/105 backend, 6/6 trình duyệt và 7/7 judge từng ghi trong tài liệu cũ không đại diện cho source hiện tại. Verifier ghi kết quả tham chiếu vào `statics/results/dataset-v6-verification.json`; chế độ `--python-only` không kiểm chứng binary C++ hoặc worker Docker.
@@ -319,7 +315,6 @@ Giới hạn hiện tại:
 - Runner nhận source text; Twig/combinator/preprocessor/prototype nâng cao, TemplateGrader và file đính kèm chỉ lưu cấu hình draft, chưa chạy như Moodle CodeRunner đầy đủ.
 - Thống kê tổng quan từ `SUBMISSIONS` dùng tối đa 100 bài gần nhất; bảng lịch sử dùng `SUBMISSIONS_PAGE` để xem dữ liệu phân trang đầy đủ.
 - Nháp Contest/Survival chỉ ở cùng trình duyệt; đổi thiết bị không khôi phục nháp từ server.
-- `scripts/package_release.py` yêu cầu `report/UI-Redesign.md`, nhưng file này không có trong source. Cần đồng bộ yêu cầu đóng gói hoặc bổ sung báo cáo trước khi xuất ZIP; 3 test fixture không chứng minh workspace hiện đóng gói được.
 
 ## Tài liệu đối chiếu
 

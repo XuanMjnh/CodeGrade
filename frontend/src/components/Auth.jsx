@@ -9,7 +9,6 @@ import {
   Lock,
   Mail,
   ShieldCheck,
-  ArrowRight,
   Sparkles,
 } from 'lucide-react';
 import { t, LanguageButton } from '../lib/locale';
@@ -262,12 +261,8 @@ export default function Auth({ onUser, status, notice }) {
               aria-busy={busy}
               disabled={busy || !connected}
             >
-              {busy ? (
-                <LoaderCircle className="size-4.5 animate-spin" />
-              ) : (
-                <ArrowRight className="size-4.5" />
-              )}
-              <span>{t(busy ? 'Đang xử lý…' : register ? 'Hoàn tất đăng ký →' : 'Đăng nhập vào hệ thống →')}</span>
+              {busy && <LoaderCircle className="size-4.5 animate-spin" />}
+              <span>{t(busy ? 'Đang xử lý…' : register ? 'Hoàn tất đăng ký' : 'Đăng nhập vào hệ thống')}</span>
             </Button>
           </form>
 
