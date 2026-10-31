@@ -30,7 +30,7 @@ export default function CurrentRankCard({ stats }) {
         <RankEmblem
           rank={stats.rank}
           decorative
-          className="h-20 w-16 drop-shadow-xs transition-transform duration-200 hover:scale-105"
+          className="h-24 w-auto sm:h-28 drop-shadow-sm transition-transform duration-200 hover:scale-105"
         />
         <div className="mt-2.5">
           <span className="font-mono text-2xl sm:text-3xl font-black tracking-tight text-foreground">

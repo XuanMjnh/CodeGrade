@@ -418,7 +418,7 @@ export default function SurvivalLobby({ user, revision }) {
                     >
                       {i + 1}
                     </span>
-                    <RankEmblem rank={p.rank} decorative className="h-8! w-6! shrink-0" />
+                    <RankEmblem rank={p.rank} decorative className="h-8! w-auto! max-w-7 shrink-0" />
                     <div className="min-w-0 flex-1">
                       <b
                         className="block text-xs font-bold text-foreground truncate"

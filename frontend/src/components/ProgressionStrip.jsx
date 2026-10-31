@@ -52,11 +52,11 @@ export function RankTierStrip({ stats }) {
               )}
             >
               {/* Logo Rank (Gọn gàng, không viền khung) */}
-              <div className="flex h-11 w-full items-center justify-center sm:h-12">
+              <div className="flex h-12 w-full items-center justify-center sm:h-13">
                 <RankEmblem
                   rank={item.name}
                   decorative
-                  className="h-10 w-9 sm:h-11 sm:w-10 shrink-0 transition-transform duration-200 group-hover:scale-105 drop-shadow-xs"
+                  className="h-11 w-auto sm:h-12 shrink-0 transition-transform duration-200 group-hover:scale-105 drop-shadow-xs"
                 />
               </div>
 
@@ -240,11 +240,11 @@ export default function ProgressionStrip({ stats, user, showRankGuide = false })
                   )}
                   aria-current={current ? 'step' : undefined}
                 >
-                  <div className="flex h-11 w-full items-center justify-center sm:h-12">
+                  <div className="flex h-12 w-full items-center justify-center sm:h-13">
                     <RankEmblem
                       rank={item.name}
                       decorative
-                      className="h-10 w-9 sm:h-11 sm:w-10 shrink-0 transition-transform duration-200 group-hover:scale-105 drop-shadow-xs"
+                      className="h-11 w-auto sm:h-12 shrink-0 transition-transform duration-200 group-hover:scale-105 drop-shadow-xs"
                     />
                   </div>
                   <div className="flex flex-col items-center gap-0.5 w-full">
