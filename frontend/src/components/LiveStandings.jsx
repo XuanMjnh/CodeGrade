@@ -43,13 +43,15 @@ export default function LiveStandings({ room, userId }) {
   const settled = room.history?.some((h) => h.round?.id === current.id && !h.type);
   return (
     <section
-      className="paper rounded-[14px] border bg-card text-card-foreground shadow-xs arena-live-standings"
+      className="arena-live-standings min-w-0 space-y-4 text-card-foreground"
       aria-labelledby="live-standings-title"
     >
       <div className="arena-section-heading flex flex-wrap items-center justify-between gap-3">
-        <h2 id="live-standings-title">{t('Bảng kết quả trực tiếp')}</h2>
+        <h2 id="live-standings-title" className="text-xl font-extrabold">
+          {t('Bảng kết quả trực tiếp')}
+        </h2>
         <span className="inline-group flex flex-wrap items-center gap-2">
-          <span>
+          <span className="text-base font-bold">
             {t('Vòng')} {current.number}
           </span>
           <Badge tone={live ? 'success' : ''}>
@@ -57,17 +59,11 @@ export default function LiveStandings({ room, userId }) {
           </Badge>
         </span>
       </div>
-      <p className="muted standings-note text-sm leading-relaxed text-muted-foreground">
-        {t(
-          voided
-            ? 'Vòng đã bị hủy. Kết quả không dùng để loại người chơi.'
-            : live
-              ? 'Kết quả tạm thời, cập nhật khi server nhận và chấm bài.'
-              : settled
-                ? 'Kết quả vòng đấu đã được server xác nhận.'
-                : 'Vòng đấu đã dừng. Xem trạng thái trận đấu để biết kết quả cuối cùng.',
-        )}
-      </p>
+      {voided && (
+        <p className="standings-note text-sm font-medium text-warning">
+          {t('Vòng đã bị hủy. Kết quả không dùng để loại người chơi.')}
+        </p>
+      )}
       <div
         className="table-wrap min-w-0 overflow-x-auto rounded-[14px] border bg-card"
         role="region"
@@ -100,7 +96,9 @@ export default function LiveStandings({ room, userId }) {
                   <UiTableCell>
                     <strong data-user-content>{player?.name || row.userId}</strong>
                     {row.userId === userId && (
-                      <small className="standings-self bg-accent/60">{t('Bạn')}</small>
+                      <small className="standings-self ml-2 rounded bg-accent px-1.5 py-0.5 text-[9px] text-primary">
+                        {t('Bạn')}
+                      </small>
                     )}
                   </UiTableCell>
                   <UiTableCell>

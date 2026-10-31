@@ -65,7 +65,7 @@ test('all administrative and learning pages render without runtime errors', asyn
   expect(errors).toEqual([]);
 });
 
-test('the original header, side rails and Survival mode layout are preserved', async ({ page }) => {
+test('the shared header and side rails surround the Survival game hub', async ({ page }) => {
   await page.setViewportSize({ width: 1600, height: 1000 });
   await login(page);
   const left = page.locator('.utility-rail.left');
@@ -91,11 +91,9 @@ test('the original header, side rails and Survival mode layout are preserved', a
   ).toBe('rgb(198, 83, 22)');
   await route(page, 'survival', 'CODE SURVIVAL.');
   await expect(page.locator('.utility-rail')).toHaveCount(0);
-  const tops = await page
-    .locator('.mode-card')
-    .evaluateAll((elements) => elements.map((element) => element.offsetTop));
-  expect(tops).toHaveLength(3);
-  expect(Math.max(...tops) - Math.min(...tops)).toBeLessThan(2);
+  await expect(page.locator('.mode-card')).toHaveCount(3);
+  await expect(page.locator('.mode-practice')).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('tab', { name: 'Bậc Rank' }).click();
   await expect(page.locator('.progression-rank-guide')).toHaveAttribute('open', '');
   await noOverflow(page);
 });

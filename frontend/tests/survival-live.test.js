@@ -184,6 +184,8 @@ test('live standings update and the submitted editor stays visible through gradi
     );
     assert.equal(editor.value, 'print(42)');
     assert.ok(h.calls.some((c) => c.type === 'SUBMIT' && c.payload.source === 'print(42)'));
+    assert.equal(doc.querySelector('#room-tab-submissions').getAttribute('aria-selected'), 'true');
+    await h.act(async () => doc.querySelector('#room-tab-standings').click());
     h.state.room = {
       ...h.state.room,
       state: 'ROUND_GRADING',

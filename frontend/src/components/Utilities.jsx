@@ -29,16 +29,6 @@ function Timer() {
             {t('Bộ đếm luyện tập')}
           </h3>
         </div>
-        {running ? (
-          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 ring-1 ring-emerald-500/20">
-            <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            LIVE
-          </span>
-        ) : seconds > 0 ? (
-          <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700 ring-1 ring-amber-500/20">
-            {t('Tạm dừng')}
-          </span>
-        ) : null}
       </div>
 
       <div className="my-2.5 flex flex-col items-center justify-center rounded-lg border border-action/20 bg-linear-to-b from-action-soft/60 to-action-soft/20 py-3 px-4 shadow-inner">

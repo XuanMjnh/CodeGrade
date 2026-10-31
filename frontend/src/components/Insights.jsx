@@ -4,19 +4,20 @@ import { t } from '../lib/locale';
 import { cn } from '../lib/utils';
 const metricTones = {
   total:
-    'border-primary/20 [&_.stat-card-icon]:bg-primary/10 [&_.stat-card-icon]:text-primary [&_.stat-card-value]:text-foreground hover:border-primary/40 hover:bg-primary/5 aria-pressed:border-primary aria-pressed:bg-primary/10 aria-pressed:ring-2 aria-pressed:ring-primary/20',
-  ac: 'border-emerald-500/20 [&_.stat-card-icon]:bg-emerald-500/10 [&_.stat-card-icon]:text-emerald-700 [&_.stat-card-value]:text-emerald-700 hover:border-emerald-400/40 hover:bg-emerald-50/20 aria-pressed:border-emerald-600 aria-pressed:bg-emerald-50/50 aria-pressed:ring-2 aria-pressed:ring-emerald-500/20',
-  star: 'border-amber-500/20 [&_.stat-card-icon]:bg-amber-500/10 [&_.stat-card-icon]:text-amber-700 [&_.stat-card-value]:text-amber-700 hover:border-amber-400/40 hover:bg-amber-50/20 aria-pressed:border-amber-500 aria-pressed:bg-amber-50/50 aria-pressed:ring-2 aria-pressed:ring-amber-500/20',
+    'border-border/80 hover:border-emerald-500/40 hover:bg-emerald-50/15 aria-pressed:border-emerald-600 aria-pressed:bg-emerald-50/30 aria-pressed:ring-1 aria-pressed:ring-emerald-500/20 [&_.stat-card-icon]:text-emerald-700 dark:[&_.stat-card-icon]:text-emerald-400 [&_.stat-card-value]:text-foreground',
+  ac: 'border-border/80 hover:border-emerald-500/40 hover:bg-emerald-50/15 aria-pressed:border-emerald-600 aria-pressed:bg-emerald-50/30 aria-pressed:ring-1 aria-pressed:ring-emerald-500/20 [&_.stat-card-icon]:text-emerald-700 dark:[&_.stat-card-icon]:text-emerald-400 [&_.stat-card-value]:text-emerald-700 dark:[&_.stat-card-value]:text-emerald-300',
+  star: 'border-border/80 hover:border-amber-500/40 hover:bg-amber-50/15 aria-pressed:border-amber-500 aria-pressed:bg-amber-50/30 aria-pressed:ring-1 aria-pressed:ring-amber-500/20 [&_.stat-card-icon]:text-amber-600 dark:[&_.stat-card-icon]:text-amber-400 [&_.stat-card-value]:text-amber-700 dark:[&_.stat-card-value]:text-amber-300',
   category:
-    'border-border/80 [&_.stat-card-icon]:bg-muted [&_.stat-card-icon]:text-muted-foreground hover:border-border hover:bg-muted/30 aria-pressed:border-foreground/30 aria-pressed:ring-2 aria-pressed:ring-muted-foreground/20',
-  live: 'border-emerald-500/20 [&_.stat-card-icon]:bg-emerald-500/10 [&_.stat-card-icon]:text-emerald-700 [&_.stat-card-value]:text-emerald-700 hover:border-emerald-400/40 hover:bg-emerald-50/20 aria-pressed:border-emerald-600 aria-pressed:bg-emerald-50/50 aria-pressed:ring-2 aria-pressed:ring-emerald-500/20',
+    'border-border/80 hover:border-orange-500/40 hover:bg-orange-50/15 aria-pressed:border-orange-500 aria-pressed:bg-orange-50/30 aria-pressed:ring-1 aria-pressed:ring-orange-500/20 [&_.stat-card-icon]:text-orange-600 dark:[&_.stat-card-icon]:text-orange-400 [&_.stat-card-value]:text-orange-700 dark:[&_.stat-card-value]:text-orange-300',
+  live: 'border-border/80 hover:border-emerald-500/40 hover:bg-emerald-50/15 aria-pressed:border-emerald-600 aria-pressed:bg-emerald-50/30 aria-pressed:ring-1 aria-pressed:ring-emerald-500/20 [&_.stat-card-icon]:text-emerald-700 dark:[&_.stat-card-icon]:text-emerald-400 [&_.stat-card-value]:text-emerald-700 dark:[&_.stat-card-value]:text-emerald-300',
   upcoming:
-    'border-orange-500/20 [&_.stat-card-icon]:bg-orange-500/10 [&_.stat-card-icon]:text-orange-600 [&_.stat-card-value]:text-orange-600 hover:border-orange-400/40 hover:bg-orange-50/20 aria-pressed:border-orange-500 aria-pressed:bg-orange-50/40 aria-pressed:ring-2 aria-pressed:ring-orange-500/20',
-  joined: 'border-amber-500/20 [&_.stat-card-icon]:bg-amber-500/10 [&_.stat-card-icon]:text-amber-700 [&_.stat-card-value]:text-amber-700 hover:border-amber-400/40 hover:bg-amber-50/20 aria-pressed:border-amber-500 aria-pressed:bg-amber-50/50 aria-pressed:ring-2 aria-pressed:ring-amber-500/20',
+    'border-border/80 hover:border-orange-500/40 hover:bg-orange-50/15 aria-pressed:border-orange-500 aria-pressed:bg-orange-50/30 aria-pressed:ring-1 aria-pressed:ring-orange-500/20 [&_.stat-card-icon]:text-orange-600 dark:[&_.stat-card-icon]:text-orange-400 [&_.stat-card-value]:text-orange-700 dark:[&_.stat-card-value]:text-orange-300',
+  joined:
+    'border-border/80 hover:border-amber-500/40 hover:bg-amber-50/15 aria-pressed:border-amber-500 aria-pressed:bg-amber-50/30 aria-pressed:ring-1 aria-pressed:ring-amber-500/20 [&_.stat-card-icon]:text-amber-600 dark:[&_.stat-card-icon]:text-amber-400 [&_.stat-card-value]:text-amber-700 dark:[&_.stat-card-value]:text-amber-300',
   pending:
-    'border-orange-500/20 [&_.stat-card-icon]:bg-orange-500/10 [&_.stat-card-icon]:text-orange-600 [&_.stat-card-value]:text-orange-600 hover:border-orange-400/40 hover:bg-orange-50/20 aria-pressed:border-orange-500 aria-pressed:bg-orange-50/40 aria-pressed:ring-2 aria-pressed:ring-orange-500/20',
+    'border-border/80 hover:border-orange-500/40 hover:bg-orange-50/15 aria-pressed:border-orange-500 aria-pressed:bg-orange-50/30 aria-pressed:ring-1 aria-pressed:ring-orange-500/20 [&_.stat-card-icon]:text-orange-600 dark:[&_.stat-card-icon]:text-orange-400 [&_.stat-card-value]:text-orange-700 dark:[&_.stat-card-value]:text-orange-300',
   score:
-    'border-amber-500/20 [&_.stat-card-icon]:bg-amber-500/10 [&_.stat-card-icon]:text-amber-700 [&_.stat-card-value]:text-amber-700 hover:border-amber-400/40 hover:bg-amber-50/20 aria-pressed:border-amber-500 aria-pressed:bg-amber-50/50 aria-pressed:ring-2 aria-pressed:ring-amber-500/20',
+    'border-border/80 hover:border-amber-500/40 hover:bg-amber-50/15 aria-pressed:border-amber-500 aria-pressed:bg-amber-50/30 aria-pressed:ring-1 aria-pressed:ring-amber-500/20 [&_.stat-card-icon]:text-amber-600 dark:[&_.stat-card-icon]:text-amber-400 [&_.stat-card-value]:text-amber-700 dark:[&_.stat-card-value]:text-amber-300',
 };
 export { useServerTime as useNow } from '../hooks/use-server-time';
 export function StatGrid({ items, label = 'Tổng quan', className = '' }) {
@@ -62,7 +63,7 @@ export function StatGrid({ items, label = 'Tổng quan', className = '' }) {
         >
           {icon && (
             <span
-              className="stat-card-icon flex size-8.5 shrink-0 items-center justify-center rounded-lg text-sm"
+              className="stat-card-icon flex shrink-0 items-center justify-center [&_svg]:size-6 sm:[&_svg]:size-6.5 [&_svg]:stroke-[2.5]"
               aria-hidden="true"
             >
               {icon}

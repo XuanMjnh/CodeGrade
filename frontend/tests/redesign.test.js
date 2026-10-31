@@ -366,12 +366,14 @@ test('queue confirmation and waiting states render only official counts and dead
   }
 });
 for (const state of [
+  'LOBBY',
   'COUNTDOWN',
   'ROUND_ACTIVE',
   'ROUND_GRADING',
   'ROUND_RESULT',
   'FINISHED',
   'UNRESOLVED',
+  'CLOSED',
 ])
   test(`arena renders official ${state} without inventing a winner`, async () => {
     const r = room(state);
