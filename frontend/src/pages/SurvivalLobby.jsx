@@ -787,7 +787,14 @@ export default function SurvivalLobby({ user, revision }) {
                     <article
                       key={r.id}
                       className={cn(
-                        'room-card group relative flex flex-col justify-between rounded-xl border border-border/80 bg-card p-3.5 sm:px-4 sm:py-3.5 text-left transition-all duration-150 hover:border-border hover:shadow-subtle cursor-pointer',
+                        'room-card group relative flex flex-col justify-between rounded-2xl border p-4 text-left transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-xs',
+                        r.state === 'LOBBY'
+                          ? 'border-emerald-600/30 bg-gradient-to-br from-emerald-50/70 via-emerald-50/20 to-teal-50/40 hover:border-emerald-600/60 hover:from-emerald-50/90 hover:to-teal-50/60 dark:from-emerald-950/35 dark:via-card dark:to-teal-950/20 dark:border-emerald-800/50'
+                          : ['ROUND_ACTIVE', 'COUNTDOWN'].includes(r.state)
+                            ? 'border-amber-500/30 bg-gradient-to-br from-amber-50/60 via-amber-50/15 to-orange-50/30 hover:border-amber-500/60 hover:from-amber-50/80 hover:to-orange-50/50 dark:from-amber-950/35 dark:via-card dark:to-orange-950/20 dark:border-amber-800/50'
+                            : ['ROUND_GRADING', 'ROUND_RESULT'].includes(r.state)
+                              ? 'border-blue-500/30 bg-gradient-to-br from-blue-50/60 via-blue-50/15 to-sky-50/30 hover:border-blue-500/60 hover:from-blue-50/80 hover:to-sky-50/50 dark:from-blue-950/35 dark:via-card dark:to-sky-950/20 dark:border-blue-800/50'
+                              : 'border-border/80 bg-gradient-to-br from-slate-50/80 via-card to-slate-50/40 hover:border-border dark:from-slate-900/30 dark:via-card dark:to-slate-900/20',
                         (busy || occupied) && 'opacity-60 cursor-not-allowed pointer-events-none',
                       )}
                       onClick={() => !busy && !occupied && action('ROOM_JOIN', { roomId: r.id })}
@@ -906,7 +913,7 @@ export default function SurvivalLobby({ user, revision }) {
                       </div>
 
                       {/* Hàng 3: Chân thẻ với Thông tin sẵn sàng bên trái & Tham gia phòng → bên phải */}
-                      <div className="room-card-footer mt-2.5 flex items-center justify-between border-t border-border/50 pt-2 text-xs">
+                      <div className="room-card-footer mt-3 flex items-center justify-between border-t border-border/60 pt-2.5 text-xs">
                         {r.state === 'LOBBY' ? (
                           <div className="room-card-status inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-emerald-700 dark:text-emerald-400">
                             <Icon

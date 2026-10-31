@@ -17,7 +17,29 @@ import {
   displayNames,
   languageNames,
 } from '../lib/coderunner';
-import { Field, Section, Check, ErrorBox, Loading, go } from '../components/ui';
+import { Section, Check, ErrorBox, Loading, go, Help } from '../components/ui';
+
+function Field({ label, help, children }) {
+  const id = React.useId();
+  const control = React.isValidElement(children)
+    ? React.cloneElement(children, {
+        id,
+        'aria-labelledby': `${id}-label`,
+      })
+    : children;
+  return (
+    <div className="field grid min-w-0 gap-1.5">
+      <div className="flex items-center gap-2">
+        <span className="size-1.5 rounded-full bg-action shrink-0" aria-hidden="true" />
+        <UiLabel id={`${id}-label`} htmlFor={id} className="text-xs font-bold text-foreground">
+          {label}
+        </UiLabel>
+        {help && <Help text={help} />}
+      </div>
+      {control}
+    </div>
+  );
+}
 import { cn } from '../lib/utils';
 function at(obj, path) {
   return path.split('.').reduce((v, k) => v?.[k], obj);
@@ -54,6 +76,23 @@ const difficultyInfo = [
     color: 'diff-6 text-[#a72844]',
   },
 ];
+const sectionStyles = {
+  'sec-1-info': {
+    iconBg: 'bg-emerald-100/80 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200/50',
+  },
+  'sec-2-grading': {
+    iconBg: 'bg-sky-100/80 text-sky-800 dark:bg-sky-950/70 dark:text-sky-300 border border-sky-200/50',
+  },
+  'sec-3-answer': {
+    iconBg: 'bg-violet-100/80 text-violet-800 dark:bg-violet-950/70 dark:text-violet-300 border border-violet-200/50',
+  },
+  'sec-4-testcases': {
+    iconBg: 'bg-amber-100/80 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300 border border-amber-200/50',
+  },
+  'sec-5-advanced': {
+    iconBg: 'bg-teal-100/80 text-teal-800 dark:bg-teal-950/70 dark:text-teal-300 border border-teal-200/50',
+  },
+};
 const questionTypeDescriptions = {
   python3_program: {
     title: 'Python 3 Program',
@@ -262,38 +301,47 @@ export default function QuestionEditor({ id, revision, onNotice }) {
     });
     setDirty(true);
   }
-  const input = (path, type = 'text', props = {}) => (
-    <UiInput
-      aria-label={path}
-      type={type}
-      value={at(q, path) ?? ''}
-      onChange={(e) =>
-        update(
-          path,
-          type === 'number'
-            ? e.target.value === ''
-              ? null
-              : Number(e.target.value)
-            : e.target.value,
-        )
-      }
-      {...props}
-    />
-  );
-  const area = (path, rows = 4) => (
-    <UiTextarea
-      className={
-        /answer|testcases|template|globalextra/i.test(path)
-          ? 'code-input w-full font-mono'
-          : undefined
-      }
-      aria-label={path}
-      spellCheck={false}
-      rows={rows}
-      value={at(q, path) ?? ''}
-      onChange={(e) => update(path, e.target.value)}
-    />
-  );
+  const input = (path, type = 'text', props = {}) => {
+    const { className, ...restProps } = props;
+    return (
+      <UiInput
+        aria-label={path}
+        type={type}
+        value={at(q, path) ?? ''}
+        onChange={(e) =>
+          update(
+            path,
+            type === 'number'
+              ? e.target.value === ''
+                ? null
+                : Number(e.target.value)
+              : e.target.value,
+          )
+        }
+        className={cn(
+          'h-10 rounded-xl border border-border/90 bg-slate-100/60 px-3 text-sm font-semibold text-foreground transition-all shadow-xs hover:border-action/60 hover:bg-card focus-visible:border-action focus-visible:bg-card focus-visible:ring-3 focus-visible:ring-action/20 dark:border-border dark:bg-slate-900/50 dark:hover:bg-card dark:focus-visible:bg-card',
+          className,
+        )}
+        {...restProps}
+      />
+    );
+  };
+  const area = (path, rows = 4) => {
+    const isCode = /answer|testcases|template|globalextra/i.test(path);
+    return (
+      <UiTextarea
+        className={cn(
+          'w-full rounded-xl border border-border/90 bg-slate-100/60 p-3 text-sm leading-relaxed text-foreground transition-all shadow-xs hover:border-action/60 hover:bg-card focus-visible:border-action focus-visible:bg-card focus-visible:ring-3 focus-visible:ring-action/20 dark:border-border dark:bg-slate-900/50 dark:hover:bg-card dark:focus-visible:bg-card',
+          isCode && 'code-input font-mono text-xs',
+        )}
+        aria-label={path}
+        spellCheck={false}
+        rows={rows}
+        value={at(q, path) ?? ''}
+        onChange={(e) => update(path, e.target.value)}
+      />
+    );
+  };
   const check = (path, label, disabled = false) => (
     <Check
       label={label}
@@ -307,6 +355,7 @@ export default function QuestionEditor({ id, revision, onNotice }) {
       aria-label={path}
       value={at(q, path) ?? ''}
       disabled={disabled}
+      className="h-10 rounded-xl border border-border/90 bg-slate-100/60 px-3 text-sm font-semibold text-foreground transition-all shadow-xs hover:border-action/60 hover:bg-card focus-visible:border-action focus-visible:bg-card focus-visible:ring-3 focus-visible:ring-action/20 dark:border-border dark:bg-slate-900/50 dark:hover:bg-card dark:focus-visible:bg-card"
       onChange={(e) =>
         update(path, typeof at(q, path) === 'number' ? Number(e.target.value) : e.target.value)
       }
@@ -318,7 +367,7 @@ export default function QuestionEditor({ id, revision, onNotice }) {
       ))}
     </UiNativeSelect>
   );
-  const field = (label, path, type = 'text', help = label, props = {}) => (
+  const field = (label, path, type = 'text', help = null, props = {}) => (
     <Field label={label} help={help}>
       {input(path, type, props)}
     </Field>
@@ -468,7 +517,8 @@ export default function QuestionEditor({ id, revision, onNotice }) {
       check: true,
     },
   ];
-  const checklistItems = [
+    const completedSectionsCount = sections.filter((s) => s.check).length;
+const checklistItems = [
     [!!q.general.questionName.trim(), 'Tên câu hỏi', 'sec-1-info', 'general.questionName'],
     [!!q.general.questionText.trim(), 'Nội dung đề', 'sec-1-info', 'general.questionText'],
     [q.languages.length > 0, 'Ngôn ngữ lập trình', 'sec-1-info', 'languages'],
@@ -482,109 +532,148 @@ export default function QuestionEditor({ id, revision, onNotice }) {
   return (
     <div className="question-editor studio min-w-0 space-y-5">
       {/* Top Header */}
-      <header className="studio-header mb-7 flex flex-col items-start justify-between gap-6 border-b pt-6 pb-7 min-[961px]:flex-row">
-        <div className="studio-header-main min-w-0 flex-1 space-y-3">
-          <div className="studio-breadcrumbs flex flex-wrap items-center gap-3 mb-2 text-xs text-muted-foreground">
-            <UiButton
+            {/* Top Header Card */}
+      <header className="studio-header rounded-2xl border border-border/80 bg-card p-4 sm:p-5 shadow-sm space-y-4 mb-6 transition-all">
+        {/* Top Control Bar: Breadcrumbs & Quick Actions */}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/70 pb-3.5">
+          {/* Breadcrumb Navigation */}
+          <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+            <button
               type="button"
-              className="ghost bg-transparent text-muted-foreground shadow-none hover:bg-muted hover:text-foreground studio-back-btn"
+              className="inline-flex items-center gap-1.5 h-8 rounded-lg px-2.5 text-xs font-semibold text-muted-foreground hover:bg-muted/70 hover:text-foreground transition-all cursor-pointer"
               onClick={cancel}
               title={trUI('Quay lại kho bài')}
-              variant="ghost"
             >
-              <Icon name="fa-solid fa-arrow-left" aria-hidden="true" />{' '}
+              <Icon name="fa-solid fa-arrow-left" className="size-3" aria-hidden="true" />
               <span>{trUI('Luyện tập')}</span>
-            </UiButton>
-            <span className="studio-breadcrumb-separator" aria-hidden="true">
-              /
+            </button>
+            <span className="text-border/80 select-none" aria-hidden="true">/</span>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-muted/60 text-[11px] font-bold uppercase tracking-wider text-muted-foreground select-none">
+              <Icon name="fa-solid fa-code" className="size-3 text-primary" aria-hidden="true" />
+              QUESTION STUDIO
             </span>
-            <span className="eyebrow studio-kicker text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              QUESTION STUDIO <span aria-hidden="true">/</span> {id ? 'EDIT' : 'NEW'}
+            <span className="text-border/80 select-none" aria-hidden="true">/</span>
+            <span className="text-xs font-semibold text-foreground">
+              {id ? `Cập nhật đề #${q.publicId || id}` : 'Tạo mới'}
             </span>
           </div>
 
-          <div className="studio-title-row flex items-center gap-3 flex-wrap">
-            <h1
-              className="studio-title text-2xl font-semibold tracking-tight"
-              title={q.general.questionName || 'Tạo câu hỏi mới'}
-            >
-              {q.general.questionName || 'Tạo câu hỏi mới'}
-            </h1>
-          </div>
-
-          <div className="studio-badges inline-group flex flex-wrap items-center gap-2">
-            <span className="badge studio-id-badge inline-flex items-center gap-1.5 rounded-full border bg-secondary px-2.5 py-1 text-xs font-medium">
-              <Icon name="fa-solid fa-hashtag" aria-hidden="true" /> {q.publicId || 'Chưa cấp mã'}
-            </span>
-            <span
+          {/* Quick Action Tools */}
+          <div className="studio-tools flex flex-wrap items-center gap-2">
+            <button
+              type="button"
               className={cn(
-                "badge inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium studio-status-badge",
-                q.general.status === 'ready'
-                  ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
-                  : 'border-amber-200 bg-amber-50 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                "inline-flex items-center gap-1.5 h-8 sm:h-9 rounded-xl border px-3 text-xs font-semibold shadow-2xs transition-all cursor-pointer",
+                preview
+                  ? "border-emerald-600 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 ring-2 ring-emerald-500/20 font-bold"
+                  : "border-border/80 bg-card text-foreground hover:border-emerald-600/40 hover:bg-muted/40"
               )}
+              aria-pressed={preview}
+              onClick={() => setPreview(!preview)}
             >
-              <span
-                className={cn("size-2 rounded-full", q.general.status === 'ready' ? 'bg-emerald-500' : 'bg-amber-500')}
-                aria-hidden="true"
+              <Icon name={`fa-solid ${preview ? 'fa-eye-slash' : 'fa-eye'}`} className="size-3.5 text-primary" aria-hidden="true" />
+              <span>{preview ? trUI('Đóng xem trước') : trUI('Xem nội dung đề')}</span>
+            </button>
+
+            <label
+              className="inline-flex items-center gap-1.5 h-8 sm:h-9 rounded-xl border border-border/80 bg-card px-3 text-xs font-semibold text-foreground hover:border-emerald-600/40 hover:bg-muted/40 shadow-2xs transition-all cursor-pointer"
+              title="Nhập file JSON đề"
+            >
+              <Icon name="fa-solid fa-file-import" className="size-3.5 text-primary" aria-hidden="true" />
+              <span>Nhập JSON</span>
+              <input
+                type="file"
+                accept=".json,application/json"
+                hidden
+                disabled={busy || loadFailed}
+                onChange={importJson}
               />
-              {q.general.status === 'ready' ? 'Ready / Công bố' : 'Bản nháp'}
-            </span>
-            <span
-              className={`badge inline-flex items-center gap-1.5 rounded-full border bg-secondary px-2.5 py-1 text-xs font-medium level-pill level-${q.difficulty}`}
+            </label>
+
+            <button
+              type="button"
+              className="inline-flex items-center gap-1.5 h-8 sm:h-9 rounded-xl border border-border/80 bg-card px-3 text-xs font-semibold text-foreground hover:border-emerald-600/40 hover:bg-muted/40 shadow-2xs transition-all cursor-pointer disabled:opacity-50"
+              disabled={busy || loadFailed}
+              onClick={exportJson}
+              title="Xuất file JSON đề"
             >
-              Mức {q.difficulty}
-            </span>
-            <small className="studio-meta-text text-sm leading-relaxed text-muted-foreground">
-              {q.id ? 'Version ' + q.version : 'Chưa lưu lên server'} ·{' '}
-              {dirty ? 'Có thay đổi chưa lưu' : 'Không có thay đổi'}
-            </small>
+              <Icon name="fa-solid fa-file-export" className="size-3.5 text-primary" aria-hidden="true" />
+              <span>Xuất JSON</span>
+            </button>
+
+            <button
+              type="button"
+              className="inline-flex items-center gap-1.5 h-8 sm:h-9 rounded-xl border border-border/80 bg-card px-3 text-xs font-semibold text-muted-foreground hover:border-destructive/40 hover:bg-red-50 hover:text-destructive dark:hover:bg-red-950/30 transition-all cursor-pointer shadow-2xs"
+              disabled={busy}
+              onClick={cancel}
+              title="Đóng trình tạo câu hỏi"
+            >
+              <Icon name="fa-solid fa-xmark" className="size-3.5" aria-hidden="true" />
+              <span>{trUI('Đóng')}</span>
+            </button>
           </div>
         </div>
 
-        <div className="studio-tools flex flex-wrap items-center gap-2.5 [&_button]:min-h-9 [&_button]:text-xs [&_.button]:inline-flex [&_.button]:min-h-9 [&_.button]:cursor-pointer [&_.button]:items-center [&_.button]:gap-2 [&_.button]:rounded-md [&_.button]:border [&_.button]:border-input [&_.button]:bg-card [&_.button]:px-3 [&_.button]:text-xs [&_.button]:font-semibold [&_.button]:text-success">
-          <UiButton
-            type="button"
-            className={`secondary border border-input bg-card text-foreground shadow-xs hover:bg-accent hover:text-accent-foreground studio-preview-toggle ${preview ? 'is-active border-primary/40 bg-accent text-accent-foreground ring-1 ring-primary/15' : ''}`}
-            aria-pressed={preview}
-            onClick={() => setPreview(!preview)}
-            variant="outline"
-          >
-            <Icon name={`fa-solid ${preview ? 'fa-eye-slash' : 'fa-eye'}`} aria-hidden="true" />
-            {preview ? trUI('Đóng xem trước') : trUI('Xem nội dung đề')}
-          </UiButton>
-          <UiLabel
-            className="button secondary border border-input bg-card text-foreground shadow-xs hover:bg-accent hover:text-accent-foreground studio-import-btn"
-            title="Nhập file JSON đề"
-          >
-            <Icon name="fa-solid fa-file-import" aria-hidden="true" /> Nhập JSON
-            <UiInput
-              type="file"
-              accept=".json,application/json"
-              hidden
-              disabled={busy || loadFailed}
-              onChange={importJson}
-            />
-          </UiLabel>
-          <UiButton
-            type="button"
-            className="secondary border border-input bg-card text-foreground shadow-xs hover:bg-accent hover:text-accent-foreground studio-export-btn"
-            disabled={busy || loadFailed}
-            onClick={exportJson}
-            title="Xuất file JSON đề"
-            variant="outline"
-          >
-            <Icon name="fa-solid fa-file-export" aria-hidden="true" /> Xuất JSON
-          </UiButton>
-          <UiButton
-            type="button"
-            className="ghost bg-transparent text-muted-foreground shadow-none hover:bg-muted hover:text-foreground studio-close-btn"
-            disabled={busy}
-            onClick={cancel}
-            variant="ghost"
-          >
-            {trUI('Đóng')}
-          </UiButton>
+        {/* Main Title Row & Metadata Badges */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5 min-w-0 flex-1">
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-xs">
+              <Icon name="fa-solid fa-file-lines" className="size-5" aria-hidden="true" />
+            </span>
+            <div className="min-w-0 space-y-1 flex-1">
+              <h1
+                className="studio-title text-xl sm:text-2xl font-bold tracking-tight text-foreground truncate"
+                title={q.general.questionName || 'Tạo câu hỏi mới'}
+              >
+                {q.general.questionName || 'Tạo câu hỏi mới'}
+              </h1>
+
+              {/* Status Badges Row */}
+              <div className="studio-badges flex flex-wrap items-center gap-2 pt-0.5">
+                <span className="badge inline-flex items-center gap-1.5 rounded-lg border border-border/80 bg-muted/40 px-2.5 py-1 text-xs font-mono font-medium text-foreground shadow-2xs">
+                  <Icon name="fa-solid fa-hashtag" className="size-3 text-muted-foreground" aria-hidden="true" />
+                  {q.publicId || 'Chưa cấp mã'}
+                </span>
+
+                <span
+                  className={cn(
+                    "badge inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-semibold shadow-2xs",
+                    q.general.status === 'ready'
+                      ? "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                      : "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300"
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "size-2 rounded-full",
+                      q.general.status === 'ready' ? "bg-emerald-500 animate-pulse" : "bg-amber-500"
+                    )}
+                    aria-hidden="true"
+                  />
+                  {q.general.status === 'ready' ? 'Ready / Công bố' : 'Bản nháp'}
+                </span>
+
+                <span className="badge inline-flex items-center gap-1.5 rounded-lg border border-border/80 bg-muted/40 px-2.5 py-1 text-xs font-bold text-foreground shadow-2xs">
+                  <span className="text-primary font-mono">L{q.difficulty}</span>
+                  <span className="text-muted-foreground font-normal">·</span>
+                  <span className="font-medium text-muted-foreground">
+                    {difficultyInfo.find((d) => d.level === q.difficulty)?.name || `Mức ${q.difficulty}`}
+                  </span>
+                </span>
+
+                <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground px-1 py-0.5">
+                  <Icon
+                    name={`fa-solid ${dirty ? 'fa-clock' : 'fa-circle-check'}`}
+                    className={cn("size-3", dirty ? "text-amber-500" : "text-emerald-600")}
+                    aria-hidden="true"
+                  />
+                  <span>
+                    {q.id ? `v${q.version}` : 'Chưa lưu lên server'} · {dirty ? 'Có thay đổi chưa lưu' : 'Đã đồng bộ'}
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -608,69 +697,84 @@ export default function QuestionEditor({ id, revision, onNotice }) {
       <div className="studio-layout grid min-w-0 items-start gap-6 min-[961px]:grid-cols-[260px_minmax(0,1fr)] min-[1361px]:grid-cols-[260px_minmax(0,1fr)_290px]">
         {/* Left Column: Table of Contents */}
         <nav
-          className="studio-nav rounded-2xl border bg-card p-4 shadow-sm min-[961px]:sticky min-[961px]:top-20 space-y-3"
+          className="studio-nav rounded-2xl border border-border/80 bg-card p-3.5 sm:p-4 shadow-sm min-[961px]:sticky min-[961px]:top-20 space-y-3"
           aria-label="Mục lục bài tập"
         >
-          <div className="flex items-center justify-between border-b border-border/80 pb-3 px-1">
-            <div className="flex items-center gap-2">
-              <Icon name="fa-solid fa-list-check" className="text-primary size-4" />
-              <span className="text-xs font-bold uppercase tracking-wider text-foreground">
-                MỤC LỤC ĐIỀU HƯỚNG
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-border/70 pb-3 px-1">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <Icon name="fa-solid fa-list-check" className="size-3.5" aria-hidden="true" />
+              </span>
+              <span className="font-heading text-xs font-bold uppercase tracking-wider text-foreground truncate">
+                Mục lục đề bài
               </span>
             </div>
-            <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-secondary text-muted-foreground">
+            <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-secondary text-muted-foreground font-mono">
               5 mục
             </span>
           </div>
 
-          <div className="space-y-1">
+          {/* Section Items */}
+          <div className="space-y-2">
             {sections.map((sec) => {
               const isActive = activeSection === sec.id;
+              const meta = sectionStyles[sec.id] || {
+                iconBg: 'bg-muted text-muted-foreground',
+              };
               return (
                 <button
                   key={sec.id}
                   type="button"
                   onClick={() => scrollToSection(sec.id)}
                   className={cn(
-                    "w-full text-left flex items-center justify-between gap-2.5 px-3 py-2.5 rounded-xl transition-all cursor-pointer group text-xs",
+                    "group relative flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left transition-all cursor-pointer shadow-2xs",
                     isActive
-                      ? "bg-primary/10 text-primary font-semibold border border-primary/25 shadow-xs"
-                      : "text-muted-foreground hover:bg-muted/70 hover:text-foreground border border-transparent"
+                      ? "border-2 border-emerald-600 bg-emerald-50/70 text-emerald-950 ring-2 ring-emerald-500/20 font-bold dark:border-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-200"
+                      : "border border-border/80 bg-card hover:border-emerald-600/40 hover:bg-muted/30 text-foreground"
                   )}
+                  aria-pressed={isActive}
                 >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <span
-                      className={cn(
-                        "flex size-6 shrink-0 items-center justify-center rounded-lg text-[11px] font-bold transition-colors",
-                        isActive
-                          ? "bg-primary text-primary-foreground"
-                          : sec.check
-                            ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
-                            : "bg-muted text-muted-foreground group-hover:bg-muted-foreground/20 group-hover:text-foreground"
-                      )}
-                    >
-                      {sec.num}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate font-medium">{sec.title}</div>
-                      <div className="text-[10px] text-muted-foreground truncate">{sec.subtitle}</div>
+                  {/* Left Icon Container */}
+                  <span
+                    className={cn(
+                      "flex size-8 shrink-0 items-center justify-center rounded-lg text-xs transition-all shadow-2xs",
+                      isActive
+                        ? "bg-emerald-600 text-white font-extrabold shadow-emerald-600/20"
+                        : meta.iconBg
+                    )}
+                  >
+                    <Icon name={'fa-solid ' + sec.icon} className="size-3.5" aria-hidden="true" />
+                  </span>
+
+                  {/* Title without truncation */}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className={cn(
+                          "font-mono text-xs font-bold transition-colors shrink-0",
+                          isActive
+                            ? "text-emerald-800 dark:text-emerald-300"
+                            : "text-muted-foreground"
+                        )}
+                      >
+                        {sec.num}.
+                      </span>
+                      <span
+                        className={cn(
+                          "text-xs font-heading whitespace-nowrap transition-colors",
+                          isActive
+                            ? "font-bold text-foreground"
+                            : "font-semibold text-foreground/90 group-hover:text-foreground"
+                        )}
+                      >
+                        {sec.title}
+                      </span>
                     </div>
                   </div>
-                  <Icon
-                    name={'fa-solid ' + (sec.check ? 'fa-circle-check text-emerald-600 dark:text-emerald-400' : sec.icon)}
-                    className={cn("size-3.5 shrink-0 opacity-70 group-hover:opacity-100", isActive && "opacity-100")}
-                  />
                 </button>
               );
             })}
-          </div>
-
-          <div className="mt-4 rounded-xl border border-border/60 bg-muted/40 p-3 text-[11px] leading-relaxed text-muted-foreground space-y-1.5">
-            <div className="flex items-center gap-1.5 font-semibold text-foreground">
-              <Icon name="fa-solid fa-circle-info" className="text-primary size-3.5" />
-              <span>Soạn đề liền mạch</span>
-            </div>
-            <p>Toàn bộ 5 phần được hiển thị liên tục không phân trang. Bấm mục lục hoặc checklist để cuộn nhanh đến phần cần xem.</p>
           </div>
         </nav>
 
@@ -749,9 +853,7 @@ export default function QuestionEditor({ id, revision, onNotice }) {
                   )}
                 </div>
 
-                <small className="muted text-xs text-muted-foreground block pt-2 border-t">
-                  Bản xem trước nội dung; bộ chấm sử dụng cấu hình đã lưu trên server.
-                </small>
+
               </div>
             </section>
           )}
@@ -759,7 +861,8 @@ export default function QuestionEditor({ id, revision, onNotice }) {
           {/* Continuous Fieldset */}
           <fieldset disabled={busy || loadFailed} className="space-y-6 border-0 p-0 m-0 min-w-0">
             {/* Section 1: Thông tin cơ bản */}
-            <section id="sec-1-info" className="scroll-mt-24 rounded-2xl border bg-card p-6 shadow-sm space-y-6">
+                        {/* Section 1: Thông tin cơ bản */}
+            <section id="sec-1-info" className="scroll-mt-24 rounded-2xl border border-border/80 bg-card p-5 sm:p-6 shadow-2xs space-y-5">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-4">
                 <div className="flex items-center gap-3">
                   <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-sm">
@@ -779,196 +882,176 @@ export default function QuestionEditor({ id, revision, onNotice }) {
                   </span>
                 </div>
               </div>
-                <div className="two-cols grid min-w-0 gap-4 sm:grid-cols-2">
-                  <Field label="Category">
-                    {select(
-                      'general.categoryId',
-                      categories.map((c) => [c.id, c.name]),
-                    )}
-                  </Field>
-                  {field(trUI('Mã tham chiếu ngoài'), 'general.idNumber')}
-                </div>
-                {field(
-                  'Question name',
-                  'general.questionName',
-                  'text',
-                  'Tên tiêu đề hiển thị của bài tập',
-                )}
 
-                {/* Visual Difficulty Selector */}
-                <div className="difficulty-selector space-y-3">
-                  <UiLabel className="field-label flex items-center gap-2 text-sm">
+              {/* Category & ID Number Row */}
+              <div className="grid min-w-0 gap-4 sm:grid-cols-2">
+                <Field label="Danh mục câu hỏi (Category)">
+                  {select(
+                    'general.categoryId',
+                    categories.map((c) => [c.id, c.name]),
+                  )}
+                </Field>
+                {field(trUI('Mã tham chiếu ngoài (ID Number)'), 'general.idNumber')}
+              </div>
+
+              {/* Question Name */}
+              {field('Tên câu hỏi (Question name)', 'general.questionName')}
+
+              {/* Visual Difficulty Selector */}
+              <div className="difficulty-selector space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="size-1.5 rounded-full bg-action shrink-0" aria-hidden="true" />
+                  <UiLabel className="text-xs font-bold text-foreground">
                     {trUI('Độ khó (Difficulty)')}
                   </UiLabel>
-                  <div className="difficulty-grid grid min-w-0 grid-cols-2 gap-2.5 min-[481px]:grid-cols-3 min-[1201px]:grid-cols-6 [&_button]:h-auto [&_button]:min-h-[76px] [&_button]:items-center [&_button]:border-border [&_button]:py-3 [&_button]:whitespace-normal [&_small]:text-[10px]">
-                    {difficultyInfo.map((item) => (
-                      <UiButton
+                </div>
+                <div className="difficulty-grid grid min-w-0 grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+                  {difficultyInfo.map((item) => {
+                    const isSelected = q.difficulty === item.level;
+                    return (
+                      <button
                         key={item.level}
-                        role="button"
-                        tabIndex={0}
-                        className={`difficulty-card flex h-auto min-h-20 cursor-pointer flex-col items-start justify-center gap-1 rounded-lg border bg-card p-3 text-foreground transition-colors hover:border-primary/50 ${item.color}  ${q.difficulty === item.level ? 'is-selected border-primary bg-accent text-accent-foreground ring-1 ring-primary/30' : ''}`}
-                        onClick={() => update('difficulty', item.level)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            update('difficulty', item.level);
-                          }
-                        }}
                         type="button"
-                        variant="outline"
-                        aria-pressed={q.difficulty === item.level}
+                        onClick={() => update('difficulty', item.level)}
+                        className={cn(
+                          "flex min-h-[70px] flex-col items-center justify-center gap-1 rounded-xl border p-2.5 text-center transition-all cursor-pointer shadow-2xs",
+                          isSelected
+                            ? "border-emerald-600 bg-emerald-50 text-emerald-900 ring-2 ring-emerald-500/20 font-extrabold dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-700"
+                            : "border-border/80 bg-card text-foreground hover:border-emerald-600/40 hover:bg-muted/30 font-semibold"
+                        )}
+                        aria-pressed={isSelected}
                       >
-                        <span className="diff-number text-lg font-semibold">L{item.level}</span>
-                        <span className="diff-name text-xs font-normal">{item.name}</span>
-                      </UiButton>
-                    ))}
-                  </div>
-                  {/* Kept synchronized for accessibility and form validation */}
-                  <div className="hidden">
-                    <Field label="Difficulty">
-                      {select(
-                        'difficulty',
-                        [1, 2, 3, 4, 5, 6].map((d) => [d, trUI('Mức ') + d]),
-                      )}
-                    </Field>
+                        <span className={cn(
+                          "font-heading text-base font-extrabold",
+                          isSelected ? "text-emerald-800 dark:text-emerald-300" : item.color
+                        )}>
+                          L{item.level}
+                        </span>
+                        <span className="text-[11px] font-medium leading-tight">
+                          {item.name}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Visual Language Chips */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="size-1.5 rounded-full bg-action shrink-0" aria-hidden="true" />
+                  <UiLabel className="text-xs font-bold text-foreground">
+                    {trUI('Ngôn ngữ lập trình hỗ trợ')}
+                  </UiLabel>
+                </div>
+                <div className="lang-selector-group flex flex-wrap items-center gap-2">
+                  {Object.entries(languageNames).map(([k, n]) => {
+                    const active = q.languages.includes(k);
+                    return (
+                      <button
+                        type="button"
+                        key={k}
+                        className={cn(
+                          "flex h-9 items-center gap-2 rounded-xl border px-3 text-xs font-semibold transition-all shadow-2xs cursor-pointer",
+                          active
+                            ? "border-emerald-600 bg-emerald-50 text-emerald-900 ring-2 ring-emerald-500/20 font-bold dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-700"
+                            : "border-border/80 bg-card text-muted-foreground hover:border-emerald-600/40 hover:bg-muted/40 hover:text-foreground"
+                        )}
+                        onClick={() =>
+                          update(
+                            'languages',
+                            active ? q.languages.filter((l) => l !== k) : [...q.languages, k],
+                          )
+                        }
+                      >
+                        <Icon
+                          name={`fa-solid ${k.startsWith('PY') ? 'fa-brands fa-python' : 'fa-code'}`}
+                          className={cn("size-3.5", active ? "text-emerald-700 dark:text-emerald-400" : "text-muted-foreground")}
+                          aria-hidden="true"
+                        />
+                        <span>{n}</span>
+                        {active && <Icon name="fa-solid fa-check" className="size-3 text-emerald-700 dark:text-emerald-400" aria-hidden="true" />}
+                      </button>
+                    );
+                  })}
+                  <div className="lang-quick-actions flex flex-wrap items-center gap-1.5 ml-1">
+                    <button
+                      type="button"
+                      className="h-8 rounded-lg px-2.5 text-xs font-medium text-muted-foreground hover:bg-muted/70 hover:text-foreground transition-all cursor-pointer"
+                      onClick={() => update('languages', Object.keys(languageNames))}
+                    >
+                      Tất cả
+                    </button>
+                    <button
+                      type="button"
+                      className="h-8 rounded-lg px-2.5 text-xs font-medium text-muted-foreground hover:bg-muted/70 hover:text-foreground transition-all cursor-pointer"
+                      onClick={() => update('languages', ['PY311'])}
+                    >
+                      Chỉ Python
+                    </button>
+                    <button
+                      type="button"
+                      className="h-8 rounded-lg px-2.5 text-xs font-medium text-muted-foreground hover:bg-muted/70 hover:text-foreground transition-all cursor-pointer"
+                      onClick={() => update('languages', ['CPP11', 'CPP17', 'CPP20'])}
+                    >
+                      Chỉ C++
+                    </button>
                   </div>
                 </div>
+              </div>
 
-                {/* Visual Language Chips */}
-                <div className="field grid min-w-0 gap-4">
-                  <div className="field-label flex items-center gap-2 text-sm">
-                    {trUI('Ngôn ngữ lập trình hỗ trợ')}
-                  </div>
-                  <div className="lang-selector-group flex flex-wrap items-center gap-2">
-                    {Object.entries(languageNames).map(([k, n]) => {
-                      const active = q.languages.includes(k);
-                      return (
-                        <UiButton
+              {/* Question Statement with Toolbar */}
+              <div className="field grid min-w-0 gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="size-1.5 rounded-full bg-action shrink-0" aria-hidden="true" />
+                  <UiLabel className="text-xs font-bold text-foreground">
+                    Question text (Nội dung đề bài)
+                  </UiLabel>
+                </div>
+                <div className="rounded-xl border border-border/90 bg-card shadow-xs overflow-hidden focus-within:border-action focus-within:ring-3 focus-within:ring-action/20 transition-all">
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/70 bg-slate-100/70 dark:bg-slate-900/60 px-3.5 py-2.5">
+                    <span className="flex items-center gap-1.5 text-xs font-bold text-foreground">
+                      <Icon name="fa-solid fa-wand-magic-sparkles" className="text-action size-3.5" aria-hidden="true" />
+                      Chèn mẫu đề bài:
+                    </span>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {[
+                        ['desc', '+ Mô tả'],
+                        ['input', '+ Đầu vào'],
+                        ['output', '+ Đầu ra'],
+                        ['constraints', '+ Ràng buộc'],
+                        ['example', '+ Ví dụ'],
+                      ].map(([tmpl, label]) => (
+                        <button
+                          key={tmpl}
                           type="button"
-                          key={k}
-                          className={`lang-chip-btn h-9 ${active ? 'is-active border-primary/40 bg-accent text-accent-foreground ring-1 ring-primary/15' : ''}`}
-                          onClick={() =>
-                            update(
-                              'languages',
-                              active ? q.languages.filter((l) => l !== k) : [...q.languages, k],
-                            )
-                          }
-                          variant="default"
+                          onClick={() => insertStatementTemplate(tmpl)}
+                          className="h-7 px-2.5 text-xs font-semibold rounded-lg border border-border/80 bg-card text-foreground hover:bg-accent hover:border-primary/40 hover:text-primary transition-all shadow-2xs cursor-pointer"
                         >
-                          <Icon
-                            name={`fa-solid ${k.startsWith('PY') ? 'fa-brands fa-python' : 'fa-code'}`}
-                            aria-hidden="true"
-                          />
-                          <span>{n}</span>
-                          {active && <Icon name="fa-solid fa-check" aria-hidden="true" />}
-                        </UiButton>
-                      );
-                    })}
-                    <div className="lang-quick-actions flex flex-wrap items-center gap-2">
-                      <UiButton
-                        type="button"
-                        className="ghost bg-transparent text-muted-foreground shadow-none hover:bg-muted hover:text-foreground"
-                        onClick={() => update('languages', Object.keys(languageNames))}
-                        variant="ghost"
-                      >
-                        Tất cả
-                      </UiButton>
-                      <UiButton
-                        type="button"
-                        className="ghost bg-transparent text-muted-foreground shadow-none hover:bg-muted hover:text-foreground"
-                        onClick={() => update('languages', ['PY311'])}
-                        variant="ghost"
-                      >
-                        Chỉ Python
-                      </UiButton>
-                      <UiButton
-                        type="button"
-                        className="ghost bg-transparent text-muted-foreground shadow-none hover:bg-muted hover:text-foreground"
-                        onClick={() => update('languages', ['CPP11', 'CPP17', 'CPP20'])}
-                        variant="ghost"
-                      >
-                        Chỉ C++
-                      </UiButton>
-                    </div>
-                  </div>
-                  {/* Standard hidden check group for form accessibility */}
-                  <div className="hidden">
-                    <div className="inline-group flex flex-wrap items-center gap-2">
-                      {Object.entries(languageNames).map(([k, n]) => (
-                        <Check
-                          key={k}
-                          label={n}
-                          checked={q.languages.includes(k)}
-                          onChange={(yes) =>
-                            update(
-                              'languages',
-                              yes ? [...q.languages, k] : q.languages.filter((l) => l !== k),
-                            )
-                          }
-                        />
+                          {label}
+                        </button>
                       ))}
                     </div>
                   </div>
+                  <UiTextarea
+                    aria-label="general.questionText"
+                    spellCheck={false}
+                    rows={10}
+                    value={at(q, 'general.questionText') ?? ''}
+                    onChange={(e) => update('general.questionText', e.target.value)}
+                    className="w-full border-0 bg-slate-100/40 focus:bg-card p-3.5 text-sm font-mono leading-relaxed outline-none focus-visible:ring-0 focus:outline-none min-h-[280px] dark:bg-slate-900/40 dark:focus:bg-card"
+                  />
                 </div>
+              </div>
 
-                {/* Question Statement with Toolbar */}
-                <div className="field grid min-w-0 gap-4">
-                  <div className="field-label flex items-center gap-2 text-sm">Question text</div>
-                  <div className="statement-toolbar rounded-t-lg border bg-muted/50 p-2 flex flex-wrap items-center gap-2">
-                    <span className="statement-toolbar-label text-xs text-muted-foreground flex items-center gap-1.5">
-                      <Icon name="fa-solid fa-wand-magic-sparkles" aria-hidden="true" /> Mẫu nhanh:
-                    </span>
-                    <UiButton
-                      type="button"
-                      className="statement-tool-btn flex flex-wrap items-center gap-2"
-                      onClick={() => insertStatementTemplate('desc')}
-                      variant="ghost"
-                    >
-                      + Mô tả
-                    </UiButton>
-                    <UiButton
-                      type="button"
-                      className="statement-tool-btn flex flex-wrap items-center gap-2"
-                      onClick={() => insertStatementTemplate('input')}
-                      variant="ghost"
-                    >
-                      + Đầu vào
-                    </UiButton>
-                    <UiButton
-                      type="button"
-                      className="statement-tool-btn flex flex-wrap items-center gap-2"
-                      onClick={() => insertStatementTemplate('output')}
-                      variant="ghost"
-                    >
-                      + Đầu ra
-                    </UiButton>
-                    <UiButton
-                      type="button"
-                      className="statement-tool-btn flex flex-wrap items-center gap-2"
-                      onClick={() => insertStatementTemplate('constraints')}
-                      variant="ghost"
-                    >
-                      + Ràng buộc
-                    </UiButton>
-                    <UiButton
-                      type="button"
-                      className="statement-tool-btn flex flex-wrap items-center gap-2"
-                      onClick={() => insertStatementTemplate('example')}
-                      variant="ghost"
-                    >
-                      + Ví dụ
-                    </UiButton>
-                  </div>
-                  <div className="statement-textarea-wrapper w-full font-mono [&_textarea]:min-h-[300px] [&_textarea]:leading-[1.8]">
-                    {area('general.questionText', 10)}
-                  </div>
-                </div>
-
-                <Field label="General feedback">{area('general.generalFeedback', 3)}</Field>
+              {/* General Feedback */}
+              <Field label="Phản hồi chung (General feedback)">
+                {area('general.generalFeedback', 3)}
+              </Field>
             </section>
 
             {/* Section 2: Cấu hình chấm */}
-            <section id="sec-2-grading" className="scroll-mt-24 rounded-2xl border bg-card p-6 shadow-sm space-y-6">
+            <section id="sec-2-grading" className="scroll-mt-24 rounded-2xl border border-border/80 bg-card p-5 sm:p-6 shadow-2xs space-y-5">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-4">
                 <div className="flex items-center gap-3">
                   <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-sm">
@@ -986,150 +1069,181 @@ export default function QuestionEditor({ id, revision, onNotice }) {
                   {q.coderunnertype}
                 </span>
               </div>
-                {/* Visual Type Picker Grid */}
-                <div className="coderunner-type-grid [&_button]:h-auto [&_button]:whitespace-normal [&_button]:p-4 grid min-w-0 gap-4 sm:grid-cols-2">
-                  {Object.entries(questionTypeDescriptions).map(([typeKey, info]) => (
-                    <UiButton
-                      key={typeKey}
-                      role="button"
-                      tabIndex={0}
-                      className={`coderunner-type-card grid h-auto min-h-28 cursor-pointer gap-2 whitespace-normal rounded-[14px] border bg-card p-4 text-left text-foreground hover:border-primary/50 [&_h4]:flex [&_h4]:items-center [&_h4]:gap-2 [&_p]:text-xs [&_p]:font-normal [&_p]:leading-5 [&_p]:text-muted-foreground ${q.coderunnertype === typeKey ? 'is-active border-primary/40 bg-accent text-accent-foreground ring-1 ring-primary/15' : ''}`}
-                      onClick={() => update('coderunnertype', typeKey)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          update('coderunnertype', typeKey);
-                        }
-                      }}
-                      type="button"
-                      variant="outline"
-                      aria-pressed={q.coderunnertype === typeKey}
-                    >
-                      <h4>
-                        <Icon
-                          name={`fa-solid ${typeKey.startsWith('py') ? 'fa-brands fa-python' : 'fa-code'}`}
-                          aria-hidden="true"
-                        />
-                        {info.title}
-                        {q.coderunnertype === typeKey && (
-                          <Icon
-                            name="fa-solid fa-circle-check"
-                            aria-hidden="true"
-                            className="ml-auto text-emerald-700"
-                          />
+
+              {/* Visual Type Picker Grid */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="size-1.5 rounded-full bg-action shrink-0" aria-hidden="true" />
+                  <UiLabel className="text-xs font-bold text-foreground">
+                    Loại bài tập (Question type template)
+                  </UiLabel>
+                </div>
+                <div className="grid min-w-0 gap-3 sm:grid-cols-2">
+                  {Object.entries(questionTypeDescriptions).map(([typeKey, info]) => {
+                    const isSelected = q.coderunnertype === typeKey;
+                    return (
+                      <button
+                        key={typeKey}
+                        type="button"
+                        onClick={() => update('coderunnertype', typeKey)}
+                        className={cn(
+                          "group relative flex flex-col items-start gap-2.5 rounded-xl border p-4 text-left transition-all cursor-pointer shadow-2xs",
+                          isSelected
+                            ? "border-emerald-600 bg-emerald-50/70 text-emerald-950 ring-2 ring-emerald-500/20 font-medium dark:bg-emerald-950/40 dark:text-emerald-200 dark:border-emerald-700"
+                            : "border-border/80 bg-card text-foreground hover:border-emerald-600/40 hover:bg-muted/30"
                         )}
-                      </h4>
-                      <p>{info.desc}</p>
-                    </UiButton>
-                  ))}
+                        aria-pressed={isSelected}
+                      >
+                        <div className="flex w-full items-center justify-between gap-2">
+                          <div className="flex items-center gap-2.5">
+                            <span className={cn(
+                              "flex size-8 shrink-0 items-center justify-center rounded-lg text-sm transition-colors",
+                              isSelected
+                                ? "bg-emerald-600 text-white shadow-2xs"
+                                : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                            )}>
+                              <Icon name={`fa-solid ${typeKey.startsWith('py') ? 'fa-brands fa-python' : 'fa-code'}`} />
+                            </span>
+                            <span className="font-heading font-bold text-sm text-foreground">
+                              {info.title}
+                            </span>
+                          </div>
+                          {isSelected && (
+                            <span className="flex size-5 items-center justify-center rounded-full bg-emerald-600 text-white shrink-0">
+                              <Icon name="fa-solid fa-check" className="size-3" />
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                          {info.desc}
+                        </p>
+                      </button>
+                    );
+                  })}
                 </div>
+              </div>
 
-                <div className="two-cols grid min-w-0 gap-4 sm:grid-cols-2">
-                  <Field label="Question type">
-                    {select('coderunnertype', [
-                      ['Undefined', 'Undefined'],
-                      ...types.map((t) => [t.id, t.id]),
+              {/* Row 1: Question Type Select & Default Mark */}
+              <div className="grid min-w-0 gap-4 sm:grid-cols-2">
+                <Field label="Loại chấm điểm CodeRunner">
+                  {select('coderunnertype', [
+                    ['Undefined', 'Undefined'],
+                    ...types.map((t) => [t.id, t.id]),
+                  ])}
+                </Field>
+                {field(
+                  'Điểm mặc định (Default mark)',
+                  'general.defaultMark',
+                  'number',
+                  null,
+                  {
+                    min: 0.01,
+                    step: 'any',
+                  },
+                )}
+              </div>
+
+              {/* Row 2: Answer box rows & Penalty regime */}
+              <div className="grid min-w-0 gap-4 sm:grid-cols-2">
+                {field(
+                  'Số dòng ô code (Answer box rows)',
+                  'answerboxlines',
+                  'number',
+                  null,
+                  {
+                    min: 1,
+                    max: 200,
+                  },
+                )}
+                {field('Chế độ phạt (Penalty regime)', 'penaltyregime', 'text', null)}
+              </div>
+
+              {/* Row 3: Precheck & Stop Button */}
+              <div className="grid min-w-0 gap-4 sm:grid-cols-2">
+                <Field label="Nút kiểm tra thử (Precheck buttons)">
+                  <div className="grid grid-cols-[1fr_auto] gap-2.5 items-center">
+                    {select('precheck', [
+                      [0, 'Disabled (Tắt)'],
+                      [1, 'Empty (Rỗng)'],
+                      [2, 'Examples (Ví dụ)'],
+                      [3, 'Selected (Đã chọn)'],
+                      [4, 'All (Toàn bộ)'],
                     ])}
-                  </Field>
-                  {field(
-                    'Default mark',
-                    'general.defaultMark',
-                    'number',
-                    trUI('Tổng điểm câu hỏi, khác trọng số Mark của từng test.'),
-                    {
-                      min: 0.01,
-                      step: 'any',
-                    },
-                  )}
-                </div>
-
-                <div className="two-cols grid min-w-0 gap-4 sm:grid-cols-2">
-                  {field(
-                    'Answer box — Rows',
-                    'answerboxlines',
-                    'number',
-                    trUI('Số dòng ô trả lời của coder, không phải số dòng testcase.'),
-                    {
-                      min: 1,
-                      max: 200,
-                    },
-                  )}
-                  {field(
-                    'Penalty regime',
-                    'penaltyregime',
-                    'text',
-                    trUI('Lưu penalty Moodle; Code Survival dùng cố định 10 giây/lần sai.'),
-                  )}
-                </div>
-
-                <div className="two-cols grid min-w-0 gap-4 sm:grid-cols-2">
-                  <Field label="Submit buttons">
-                    <div className="inline-group flex flex-wrap items-center gap-2">
-                      {select('precheck', [
-                        [0, 'Disabled'],
-                        [1, 'Empty'],
-                        [2, 'Examples'],
-                        [3, 'Selected'],
-                        [4, 'All'],
-                      ])}
-                      {check('hidecheck', 'Hide check')}
+                    <div className="h-10 flex items-center px-1">
+                      {check('hidecheck', 'Ẩn nút check')}
                     </div>
-                  </Field>
-                  <Field label="Stop button">
-                    {select('giveupallowed', [
-                      [0, 'Never available'],
-                      [1, 'After maximum marks'],
-                      [2, 'Always available'],
-                    ])}
-                    <small className="muted text-sm leading-relaxed text-muted-foreground">
-                      Chỉ khả dụng với bản nháp.
-                    </small>
-                  </Field>
-                </div>
-
-                <div className="two-cols grid min-w-0 gap-4 sm:grid-cols-2">
-                  <Field label="Feedback">
-                    {select('displayfeedback', [
-                      [0, 'Use quiz settings'],
-                      [1, 'Force show'],
-                      [2, 'Force hide'],
-                    ])}
-                  </Field>
-                  <Field label="Marking">{check('allornothing', 'All-or-nothing grading')}</Field>
-                </div>
-
-                <Field label="Customisation">
-                  <div className="inline-group flex flex-wrap items-center gap-2">
-                    {check('customise', 'Customise')}
-                    {check('showsource', 'Template debugging')}
                   </div>
                 </Field>
+                <Field label="Nút dừng/bỏ cuộc (Stop button)">
+                  {select('giveupallowed', [
+                    [0, 'Never available (Không cho phép)'],
+                    [1, 'After maximum marks (Sau điểm tối đa)'],
+                    [2, 'Always available (Luôn cho phép)'],
+                  ])}
+                </Field>
+              </div>
 
-                <Section title="Chi tiết loại câu hỏi">
-                  <p>
-                    <strong>{q.coderunnertype}:</strong> {selectedHelp}
-                  </p>
-                  <p className="muted text-sm leading-relaxed text-muted-foreground">
-                    EqualityGrader so sánh chính xác, chỉ chuẩn hóa CRLF → LF. NearEqualityGrader dùng
-                    sai số tương đối 10⁻⁶. RegexGrader dùng RE2.
-                  </p>
-                </Section>
+              {/* Row 4: Feedback & All-or-nothing Marking */}
+              <div className="grid min-w-0 gap-4 sm:grid-cols-2">
+                <Field label="Hiển thị phản hồi (Feedback)">
+                  {select('displayfeedback', [
+                    [0, 'Use quiz settings (Theo bài thi)'],
+                    [1, 'Force show (Luôn hiện)'],
+                    [2, 'Force hide (Luôn ẩn)'],
+                  ])}
+                </Field>
+                <Field label="Quy tắc tính điểm (Marking)">
+                  <div className="h-10 flex items-center rounded-xl border border-border/70 bg-muted/20 px-3">
+                    {check('allornothing', 'Chấm đạt tất cả hoặc không (All-or-nothing)')}
+                  </div>
+                </Field>
+              </div>
 
-                {q.customise && (
-                  <Section title="Tùy biến nâng cao (Customisation)" open>
-                    <div className="alert my-3 rounded-lg border border-border bg-muted/60 px-4 py-3 text-sm leading-relaxed">
-                      Chỉ khả dụng với bản nháp.
-                    </div>
-                    <Field label="Template">{area('customisation.template', 8)}</Field>
+              {/* Customisation Options Box */}
+              <div className="rounded-xl border border-border/80 bg-muted/20 p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="size-1.5 rounded-full bg-action shrink-0" aria-hidden="true" />
+                  <span className="text-xs font-bold text-foreground">Tùy biến nâng cao (Customisation)</span>
+                </div>
+                <div className="flex flex-wrap items-center gap-6">
+                  {check('customise', 'Bật chế độ tùy biến (Customise)')}
+                  {check('showsource', 'Gỡ lỗi mẫu chấm (Template debugging)')}
+                </div>
+              </div>
+
+              {/* Chi tiết loại câu hỏi */}
+              {selectedHelp && (
+                <div className="rounded-xl border border-border/70 bg-muted/30 p-3.5 text-xs text-muted-foreground flex items-start gap-2.5">
+                  <Icon name="fa-solid fa-circle-info" className="size-3.5 text-primary mt-0.5 shrink-0" />
+                  <div>
+                    <span className="font-bold text-foreground mr-1">{q.coderunnertype}:</span>
+                    <span>{selectedHelp}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Form Customisation nếu được bật */}
+              {q.customise && (
+                <div className="rounded-xl border border-border/80 bg-muted/20 p-5 space-y-4 shadow-2xs">
+                  <h3 className="font-heading font-bold text-sm text-foreground flex items-center gap-2">
+                    <Icon name="fa-solid fa-wrench" className="text-action size-3.5" />
+                    Thiết lập mẫu CodeRunner tùy chỉnh
+                  </h3>
+                  <Field label="Template">{area('customisation.template', 8)}</Field>
+                  <div className="grid min-w-0 gap-4 sm:grid-cols-2">
                     <Field label="Combinator">
-                      {check('customisation.iscombinatortemplate', 'Is combinator template')}
-                      {check('customisation.allowmultiplestdins', 'Allow multiple stdins')}
+                      <div className="h-10 flex items-center gap-4">
+                        {check('customisation.iscombinatortemplate', 'Is combinator template')}
+                        {check('customisation.allowmultiplestdins', 'Allow multiple stdins')}
+                      </div>
                     </Field>
                     <Field label="Test splitter regex">
                       {input('customisation.testsplitterre', 'text', {
                         disabled: !q.customisation.iscombinatortemplate,
                       })}
                     </Field>
+                  </div>
+                  <div className="grid min-w-0 gap-4 sm:grid-cols-2">
                     <Field label="Grader">
                       {select(
                         'customisation.grader',
@@ -1138,21 +1252,24 @@ export default function QuestionEditor({ id, revision, onNotice }) {
                         ),
                       )}
                     </Field>
-                    <Field label="Result columns">{area('customisation.resultcolumns')}</Field>
                     <Field label="UI plugin">
-                      {select('customisation.uiplugin', [
-                        ['textarea', 'Textarea'],
-                        ['ace', 'Ace (metadata)'],
-                      ])}
-                      {check('customisation.useace', 'Use Ace (metadata)')}
+                      <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
+                        {select('customisation.uiplugin', [
+                          ['textarea', 'Textarea'],
+                          ['ace', 'Ace (metadata)'],
+                        ])}
+                        {check('customisation.useace', 'Use Ace')}
+                      </div>
                     </Field>
-                    <Field label="Prototype extra">{area('customisation.prototypeextra')}</Field>
-                  </Section>
-                )}
+                  </div>
+                  <Field label="Result columns">{area('customisation.resultcolumns')}</Field>
+                  <Field label="Prototype extra">{area('customisation.prototypeextra')}</Field>
+                </div>
+              )}
             </section>
 
             {/* Section 3: Đáp án mẫu & Khung khởi tạo */}
-            <section id="sec-3-answer" className="scroll-mt-24 rounded-2xl border bg-card p-6 shadow-sm space-y-6">
+            <section id="sec-3-answer" className="scroll-mt-24 rounded-2xl border border-border/80 bg-card p-5 sm:p-6 shadow-2xs space-y-5">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-4">
                 <div className="flex items-center gap-3">
                   <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-sm">
@@ -1173,90 +1290,102 @@ export default function QuestionEditor({ id, revision, onNotice }) {
                   {verified ? '✓ Đã xác thực' : 'Chưa xác thực'}
                 </span>
               </div>
-                <div className="two-cols grid min-w-0 gap-4 sm:grid-cols-2">
-                  <Field label="Sample answer language">
-                    {select(
-                      'answer.language',
-                      q.languages.map((l) => [l, languageNames[l]]),
-                    )}
-                  </Field>
-                  <Field label="Validate on Save">
-                    {check('answer.validateOnSave', 'Validate sample answer on save')}
-                  </Field>
-                </div>
 
-                <div className="answer-editor-box min-w-0 overflow-hidden rounded-lg border bg-card">
-                  <div className="answer-editor-toolbar flex flex-wrap items-center gap-2">
-                    <span className="answer-editor-filename">
-                      <Icon name="fa-solid fa-file-code" aria-hidden="true" />
-                      solution.{q.answer.language === 'PY311' ? 'py' : 'cpp'}
-                    </span>
-                    <div className="answer-editor-actions flex flex-wrap items-center gap-2">
-                      <UiButton
-                        type="button"
-                        className="ghost bg-transparent text-muted-foreground shadow-none hover:bg-muted hover:text-foreground text-[11px] px-2 py-1 min-h-7"
-                        onClick={() => {
-                          const boilerplate =
-                            q.answer.language === 'PY311'
-                              ? '# Đáp án mẫu Python 3\nimport sys\n\ndef solve():\n    pass\n\nif __name__ == "__main__":\n    solve()\n'
-                              : '// Đáp án mẫu C++\n#include <iostream>\nusing namespace std;\n\nint main() {\n    return 0;\n}\n';
-                          update('answer.sampleAnswer', boilerplate);
-                        }}
-                        variant="ghost"
-                      >
-                        <Icon name="fa-solid fa-wand-magic-sparkles" aria-hidden="true" /> Chèn
-                        khung mẫu
-                      </UiButton>
-                    </div>
+              {/* Top row: Language & Validation */}
+              <div className="grid min-w-0 gap-4 sm:grid-cols-2">
+                <Field label="Ngôn ngữ đáp án mẫu (Language)">
+                  {select(
+                    'answer.language',
+                    q.languages.map((l) => [l, languageNames[l]]),
+                  )}
+                </Field>
+                <Field label="Kiểm tra khi lưu (Validation)">
+                  <div className="h-10 flex items-center rounded-xl border border-border/70 bg-muted/20 px-3">
+                    {check('answer.validateOnSave', 'Xác thực đáp án mẫu khi bấm Lưu')}
                   </div>
-                  <Field label="Sample answer">
-                    <CodeEditor
-                      label="answer.sampleAnswer"
-                      readOnly={busy || loadFailed}
-                      value={q.answer.sampleAnswer}
-                      language={q.answer.language}
-                      height="400px"
-                      onChange={(value) => update('answer.sampleAnswer', value)}
-                    />
-                  </Field>
-                </div>
+                </Field>
+              </div>
 
-              <Section title="Answer box preload" open={!!q.answer.preloadAnswer}>
-                <div className="inline-group flex flex-wrap items-center gap-2 mb-2.5">
-                  <span className="muted text-sm leading-relaxed text-muted-foreground">
-                    Mã khởi tạo sẵn trong ô code của học viên:
+              {/* Sample Answer Code Editor Box */}
+              <div className="overflow-hidden rounded-xl border border-border/90 bg-card shadow-xs">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/70 bg-slate-100/70 dark:bg-slate-900/60 px-3.5 py-2.5">
+                  <span className="flex items-center gap-2 font-mono text-xs font-bold text-foreground">
+                    <span className="size-2 rounded-full bg-action" />
+                    <Icon name="fa-solid fa-file-code" className="text-action size-3.5" aria-hidden="true" />
+                    solution.{q.answer.language === 'PY311' ? 'py' : 'cpp'}
                   </span>
-                  <UiButton
+                  <button
                     type="button"
-                    className="ghost bg-transparent text-muted-foreground shadow-none hover:bg-muted hover:text-foreground text-[11px] px-2 py-1 min-h-7"
-                    onClick={() => insertPreloadTemplate('cpp')}
-                    variant="ghost"
+                    onClick={() => {
+                      const boilerplate =
+                        q.answer.language === 'PY311'
+                          ? '# Đáp án mẫu Python 3\nimport sys\n\ndef solve():\n    pass\n\nif __name__ == "__main__":\n    solve()\n'
+                          : '// Đáp án mẫu C++\n#include <iostream>\nusing namespace std;\n\nint main() {\n    return 0;\n}\n';
+                      update('answer.sampleAnswer', boilerplate);
+                    }}
+                    className="flex items-center gap-1.5 h-7 px-2.5 rounded-lg border border-border/80 bg-card text-xs font-bold text-foreground hover:bg-accent hover:border-primary/40 hover:text-primary transition-all shadow-2xs cursor-pointer"
                   >
-                    Khung C++
-                  </UiButton>
-                  <UiButton
-                    type="button"
-                    className="ghost bg-transparent text-muted-foreground shadow-none hover:bg-muted hover:text-foreground text-[11px] px-2 py-1 min-h-7"
-                    onClick={() => insertPreloadTemplate('py')}
-                    variant="ghost"
-                  >
-                    Khung Python
-                  </UiButton>
+                    <Icon name="fa-solid fa-wand-magic-sparkles" className="size-3" aria-hidden="true" />
+                    <span>Chèn khung mẫu</span>
+                  </button>
                 </div>
-                <Field label="Preload">{area('answer.preloadAnswer', 6)}</Field>
-              </Section>
+                <div className="p-3">
+                  <CodeEditor
+                    label="answer.sampleAnswer"
+                    readOnly={busy || loadFailed}
+                    value={q.answer.sampleAnswer}
+                    language={q.answer.language}
+                    height="400px"
+                    onChange={(value) => update('answer.sampleAnswer', value)}
+                  />
+                </div>
+              </div>
 
-              <Section title="Global extra" open={!!q.answer.globalExtra}>
-                <p className="muted text-sm leading-relaxed text-muted-foreground">
-                  Mã bổ trợ chung (header, struct, hoặc hàm test harness) được ghép nối khi chấm
-                  bài.
-                </p>
-                <Field label="Global extra">{area('answer.globalExtra', 5)}</Field>
-              </Section>
+              {/* Answer box preload sub-card */}
+              <div className="rounded-xl border border-border/80 bg-muted/20 p-4 space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="size-1.5 rounded-full bg-action shrink-0" aria-hidden="true" />
+                    <span className="text-xs font-bold text-foreground">
+                      Khung mã khởi tạo sẵn cho học viên (Answer box preload)
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => insertPreloadTemplate('cpp')}
+                      className="flex items-center gap-1.5 h-7 px-2.5 rounded-lg border border-border/60 bg-card text-xs font-semibold text-foreground hover:bg-accent hover:border-primary/40 hover:text-primary transition-all shadow-2xs cursor-pointer"
+                    >
+                      <Icon name="fa-solid fa-code" className="size-3" aria-hidden="true" />
+                      <span>Khung C++</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => insertPreloadTemplate('py')}
+                      className="flex items-center gap-1.5 h-7 px-2.5 rounded-lg border border-border/60 bg-card text-xs font-semibold text-foreground hover:bg-accent hover:border-primary/40 hover:text-primary transition-all shadow-2xs cursor-pointer"
+                    >
+                      <Icon name="fa-brands fa-python" className="size-3" aria-hidden="true" />
+                      <span>Khung Python</span>
+                    </button>
+                  </div>
+                </div>
+                {area('answer.preloadAnswer', 5)}
+              </div>
+
+              {/* Global extra sub-card */}
+              <div className="rounded-xl border border-border/80 bg-muted/20 p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="size-1.5 rounded-full bg-action shrink-0" aria-hidden="true" />
+                  <span className="text-xs font-bold text-foreground">
+                    Mã ghép nối chung (Global extra harness/headers)
+                  </span>
+                </div>
+                {area('answer.globalExtra', 4)}
+              </div>
             </section>
 
             {/* Section 4: Bộ kiểm thử (Test cases) */}
-            <section id="sec-4-testcases" className="scroll-mt-24 rounded-2xl border bg-card p-6 shadow-sm space-y-6">
+            <section id="sec-4-testcases" className="scroll-mt-24 rounded-2xl border border-border/80 bg-card p-5 sm:p-6 shadow-2xs space-y-5">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-4">
                 <div className="flex items-center gap-3">
                   <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-sm">
@@ -1282,146 +1411,166 @@ export default function QuestionEditor({ id, revision, onNotice }) {
                   )}
                 </div>
               </div>
-                <div className="testcases-toolbar mb-4 flex flex-wrap items-center gap-2">
-                  <div className="testcases-nav-strip mb-4 flex flex-wrap items-center gap-2">
-                    {q.testcases.map((t, idx) => {
-                      const isFilled = Boolean(
-                        t.stdin.trim() || t.expected.trim() || t.testcode.trim(),
-                      );
-                      return (
-                        <UiButton
-                          type="button"
-                          key={t.id}
-                          className={`test-pill-btn h-8 ${activeTestTab === idx ? 'is-active border-primary/40 bg-accent text-accent-foreground ring-1 ring-primary/15' : ''}`}
-                          onClick={() => {
-                            setActiveTestTab(idx);
-                            const el = document.getElementById('test-block-' + idx);
-                            el?.scrollIntoView({
-                              behavior: 'smooth',
-                              block: 'nearest',
-                            });
-                          }}
-                          variant="default"
-                        >
-                          <span
-                            className={`test-status-dot ${isFilled ? 'is-filled border-emerald-200 bg-emerald-50 text-emerald-800' : ''}`}
-                            aria-hidden="true"
-                          />
-                          <span>Test {String(idx + 1).padStart(2, '0')}</span>
-                          {t.useasexample && (
-                            <Icon
-                              name="fa-solid fa-star"
-                              title="Public Example"
-                              aria-hidden="true"
-                            />
-                          )}
-                        </UiButton>
-                      );
-                    })}
-                  </div>
-                  <p className="muted text-muted-foreground m-0 text-[11px]">
-                    Whitespace được giữ nguyên. Display chỉ điều khiển hiển thị, mọi test đã chọn
-                    vẫn được chấm.
-                  </p>
-                </div>
 
-                {/* 5 Test Case Blocks */}
-                {q.testcases.map((t, i) => (
-                  <div
-                    className="test-block space-y-4 rounded-[14px] border bg-card p-5"
-                    key={t.id}
-                    id={'test-block-' + i}
-                  >
-                    <div className="test-heading flex flex-wrap items-center justify-between gap-3">
-                      <h3>
-                        <Icon name="fa-solid fa-vial" aria-hidden="true" />
-                        Test {String(i + 1).padStart(2, '0')} <small>/ 05</small>
+              {/* Test Navigation Tabs */}
+              <div className="flex flex-wrap items-center gap-2">
+                {q.testcases.map((t, idx) => {
+                  const isFilled = Boolean(
+                    t.stdin.trim() || t.expected.trim() || t.testcode.trim(),
+                  );
+                  const isActive = activeTestTab === idx;
+                  return (
+                    <button
+                      type="button"
+                      key={t.id}
+                      onClick={() => {
+                        setActiveTestTab(idx);
+                        const el = document.getElementById('test-block-' + idx);
+                        el?.scrollIntoView({
+                          behavior: 'smooth',
+                          block: 'nearest',
+                        });
+                      }}
+                      className={cn(
+                        "flex h-9 items-center gap-2 rounded-xl border px-3 text-xs font-semibold transition-all cursor-pointer shadow-2xs",
+                        isActive
+                          ? "border-emerald-600 bg-emerald-50 text-emerald-900 ring-2 ring-emerald-500/20 font-bold dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-700"
+                          : "border-border/80 bg-card text-muted-foreground hover:border-emerald-600/40 hover:bg-muted/40 hover:text-foreground"
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "size-2 rounded-full",
+                          isFilled ? "bg-emerald-500" : "bg-muted-foreground/30"
+                        )}
+                        aria-hidden="true"
+                      />
+                      <span>Test {String(idx + 1).padStart(2, '0')}</span>
+                      {t.useasexample && (
+                        <Icon
+                          name="fa-solid fa-star"
+                          className="size-3 text-amber-500"
+                          title="Public Example"
+                          aria-hidden="true"
+                        />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* 5 Test Case Blocks */}
+              {q.testcases.map((t, i) => (
+                <div
+                  className="test-block space-y-4 rounded-xl border border-border/80 bg-card p-5 shadow-2xs transition-all"
+                  key={t.id}
+                  id={'test-block-' + i}
+                >
+                  <div className="test-heading flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3">
+                    <div className="flex items-center gap-2.5">
+                      <span className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold font-mono">
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <h3 className="font-heading font-bold text-sm text-foreground flex items-center gap-1.5">
+                        Test {String(i + 1).padStart(2, '0')} <span className="text-muted-foreground font-normal text-xs">/ 05</span>
                       </h3>
-                      <div className="inline-group flex flex-wrap items-center gap-2">
-                        <span className="badge inline-flex items-center gap-1.5 rounded-full border bg-secondary px-2.5 py-1 text-xs font-medium">
-                          {t.useasexample ? 'Public Example' : 'Không phải ví dụ công khai'}
+                    </div>
+                    <div className="inline-group flex flex-wrap items-center gap-2">
+                      {t.useasexample ? (
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 text-amber-800 dark:bg-amber-950 dark:text-amber-300 px-2.5 py-0.5 text-xs font-medium">
+                          <Icon name="fa-solid fa-star" className="size-3 text-amber-500" /> Public Example
                         </span>
-                        <span className="badge inline-flex items-center gap-1.5 rounded-full border bg-secondary px-2.5 py-1 text-xs font-medium">
-                          Display: {displayNames[t.display] || t.display}
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/40 text-muted-foreground px-2.5 py-0.5 text-xs font-medium">
+                          Không công khai
                         </span>
+                      )}
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary px-2.5 py-0.5 text-xs font-mono font-medium text-foreground">
+                        {displayNames[t.display] || t.display}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="test-io-grid grid min-w-0 gap-4 sm:grid-cols-2">
+                    {[
+                      { key: 'stdin', label: 'Standard Input', tag: 'stdin', badge: 'bg-teal-50 text-teal-800 border-teal-200 dark:bg-teal-950/40 dark:text-teal-300' },
+                      { key: 'expected', label: 'Expected output', tag: 'stdout', badge: 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300' },
+                      { key: 'testcode', label: 'Test code / harness', tag: 'harness', badge: 'bg-indigo-50 text-indigo-800 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300' },
+                      { key: 'extra', label: 'Extra template data', tag: 'extra', badge: 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300' },
+                    ].map(({ key, label, tag, badge }) => (
+                      <div key={key} className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                            <span className="size-1.5 rounded-full bg-action" />
+                            {label}
+                          </span>
+                          <span className={cn("text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md border", badge)}>
+                            {tag}
+                          </span>
+                        </div>
+                        {area('testcases.' + i + '.' + key, 3)}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="rounded-xl border border-border/80 bg-slate-100/60 dark:bg-slate-900/40 p-4 space-y-3.5">
+                    {/* Checkboxes row */}
+                    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/60 pb-3">
+                      <div className="flex flex-wrap items-center gap-5 sm:gap-7">
+                        {check('testcases.' + i + '.useasexample', 'Ví dụ công khai (Use as example)')}
+                        {check('testcases.' + i + '.hiderestiffail', 'Ẩn các test sau nếu sai')}
                       </div>
                     </div>
 
-                    <div className="test-io-grid grid min-w-0 gap-4 sm:grid-cols-2">
-                      {['stdin', 'expected', 'testcode', 'extra'].map((key, j) => (
-                        <Field
-                          key={key}
-                          label={
-                            [
-                              'Standard Input',
-                              'Expected output',
-                              'Test code / harness',
-                              'Extra template data',
-                            ][j]
-                          }
-                          help={
-                            [
-                              trUI('Dữ liệu stdin, có thể rỗng.'),
-                              trUI('Chuỗi mong đợi; không tự trim. Có thể rỗng.'),
-                              trUI('Mã harness (bài viết hàm), khác dữ liệu stdin.'),
-                              trUI('Metadata riêng cho template, được lưu nguyên vẹn.'),
-                            ][j]
-                          }
-                        >
-                          {area('testcases.' + i + '.' + key, 3)}
-                        </Field>
-                      ))}
-                    </div>
+                    {/* Controls row: Display, Mark, Order in clean 3-col grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                      <div className="space-y-1.5">
+                        <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                          <span className="size-1.5 rounded-full bg-action" />
+                          Hiển thị (Display)
+                        </span>
+                        {select('testcases.' + i + '.display', Object.entries(displayNames))}
+                      </div>
 
-                    <div className="test-properties-bar grid min-w-0 gap-4 sm:grid-cols-2">
-                      <Field label="Test properties">
-                        <div className="inline-group flex flex-wrap items-center gap-4">
-                          {check('testcases.' + i + '.useasexample', 'Use as example')}
-                          <UiLabel className="inline-group flex flex-wrap items-center gap-2">
-                            <span>Display</span>{' '}
-                            {select('testcases.' + i + '.display', Object.entries(displayNames))}
-                          </UiLabel>
-                          {check('testcases.' + i + '.hiderestiffail', 'Hide rest if fail')}
-                          <div className="inline-group flex flex-wrap items-center gap-2">
-                            <UiLabel className="grid gap-2 text-sm font-medium">
-                              Mark{' '}
-                              {input('testcases.' + i + '.mark', 'number', {
-                                min: 0,
-                                step: 'any',
-                                disabled: q.allornothing,
-                              })}
-                            </UiLabel>
-                            <UiLabel className="grid gap-2 text-sm font-medium">
-                              Ordering{' '}
-                              {input('testcases.' + i + '.ordering', 'number', {
-                                step: 1,
-                              })}
-                            </UiLabel>
-                          </div>
-                        </div>
-                      </Field>
-                    </div>
+                      <div className="space-y-1.5">
+                        <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                          <span className="size-1.5 rounded-full bg-action" />
+                          Điểm số (Mark)
+                        </span>
+                        {input('testcases.' + i + '.mark', 'number', {
+                          min: 0,
+                          step: 'any',
+                          disabled: q.allornothing,
+                        })}
+                      </div>
 
-                    {q.precheck === 3 && (
-                      <Field label="Precheck test type">
-                        {select('testcases.' + i + '.testtype', [
-                          [0, 'Check only'],
-                          [1, 'Precheck only'],
-                          [2, 'Both'],
-                        ])}
-                      </Field>
-                    )}
+                      <div className="space-y-1.5">
+                        <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                          <span className="size-1.5 rounded-full bg-action" />
+                          Thứ tự test (Order)
+                        </span>
+                        {input('testcases.' + i + '.ordering', 'number', {
+                          step: 1,
+                        })}
+                      </div>
+                    </div>
                   </div>
-                ))}
 
-                <p className="muted text-sm leading-relaxed text-muted-foreground mt-4">
-                  <Icon name="fa-solid fa-lightbulb" aria-hidden="true" /> Mỗi đề công bố có đúng 5
-                  testcase: ví dụ, cơ bản, biên, đặc biệt và phức tạp.
-                </p>
+                  {q.precheck === 3 && (
+                    <Field label="Loại test kiểm tra trước (Precheck test type)">
+                      {select('testcases.' + i + '.testtype', [
+                        [0, 'Check only (Chỉ khi Check)'],
+                        [1, 'Precheck only (Chỉ khi Precheck)'],
+                        [2, 'Both (Cả hai)'],
+                      ])}
+                    </Field>
+                  )}
+                </div>
+              ))}
             </section>
 
             {/* Section 5: Nâng cao & Xuất bản */}
-            <section id="sec-5-advanced" className="scroll-mt-24 rounded-2xl border bg-card p-6 shadow-sm space-y-6">
+            <section id="sec-5-advanced" className="scroll-mt-24 rounded-2xl border border-border/80 bg-card p-5 sm:p-6 shadow-2xs space-y-5">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-4">
                 <div className="flex items-center gap-3">
                   <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-sm">
@@ -1445,83 +1594,88 @@ export default function QuestionEditor({ id, revision, onNotice }) {
                   {q.general.status === 'ready' ? 'Ready' : 'Draft'}
                 </span>
               </div>
-                <div className="status-choice-grid [&_button]:h-auto [&_button]:whitespace-normal [&_button]:p-4 grid min-w-0 gap-4 sm:grid-cols-2">
-                  <UiButton
-                    role="button"
-                    tabIndex={0}
-                    className={`status-choice-card card-draft flex h-auto min-h-24 cursor-pointer flex-col items-start justify-center gap-2 whitespace-normal rounded-lg border bg-card p-4 text-left text-foreground ${q.general.status === 'draft' ? 'is-active border-primary/40 bg-accent text-accent-foreground ring-1 ring-primary/15' : ''}`}
-                    onClick={() => update('general.status', 'draft')}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        update('general.status', 'draft');
-                      }
-                    }}
-                    type="button"
-                    variant="outline"
-                    aria-pressed={q.general.status === 'draft'}
-                  >
-                    <Icon name="fa-solid fa-file-pen" aria-hidden="true" />
-                    <div>
-                      <h4>Bản nháp (Draft)</h4>
-                      <p>
-                        Đang biên soạn, chưa hiện trong danh sách chính thức. Có thể lưu dù chưa đủ
-                        5 testcase.
-                      </p>
-                    </div>
-                  </UiButton>
 
-                  <UiButton
-                    role="button"
-                    tabIndex={0}
-                    className={`status-choice-card card-ready flex h-auto min-h-24 cursor-pointer flex-col items-start justify-center gap-2 whitespace-normal rounded-lg border bg-card p-4 text-left text-foreground ${q.general.status === 'ready' ? 'is-active border-primary/40 bg-accent text-accent-foreground ring-1 ring-primary/15' : ''}`}
-                    onClick={() => update('general.status', 'ready')}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        update('general.status', 'ready');
-                      }
-                    }}
-                    type="button"
-                    variant="outline"
-                    aria-pressed={q.general.status === 'ready'}
-                  >
-                    <Icon name="fa-solid fa-circle-check" aria-hidden="true" />
-                    <div>
-                      <h4>Công bố (Ready)</h4>
-                      <p>
-                        Công khai cho học viên luyện tập. Yêu cầu đúng 5 testcase hợp lệ và cấu hình
-                        đạt chuẩn.
-                      </p>
-                    </div>
-                  </UiButton>
+              {/* Status choice cards (Bản nháp / Công bố) */}
+              <div className="grid min-w-0 gap-3 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => update('general.status', 'draft')}
+                  className={cn(
+                    "flex items-start gap-3 rounded-xl border p-4 text-left transition-all cursor-pointer shadow-2xs",
+                    q.general.status === 'draft'
+                      ? "border-amber-500 bg-amber-50/70 text-amber-950 ring-2 ring-amber-500/20 font-medium dark:bg-amber-950/40 dark:text-amber-200 dark:border-amber-600"
+                      : "border-border/80 bg-card text-foreground hover:border-amber-500/40 hover:bg-muted/30"
+                  )}
+                  aria-pressed={q.general.status === 'draft'}
+                >
+                  <span className={cn(
+                    "flex size-9 shrink-0 items-center justify-center rounded-lg text-sm",
+                    q.general.status === 'draft'
+                      ? "bg-amber-500 text-white shadow-2xs"
+                      : "bg-muted text-muted-foreground"
+                  )}>
+                    <Icon name="fa-solid fa-file-pen" />
+                  </span>
+                  <div>
+                    <h4 className="font-heading font-bold text-sm text-foreground">Bản nháp (Draft)</h4>
+                    <p className="text-xs text-muted-foreground mt-0.5">Đang biên soạn, lưu tự do không yêu cầu đủ test</p>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => update('general.status', 'ready')}
+                  className={cn(
+                    "flex items-start gap-3 rounded-xl border p-4 text-left transition-all cursor-pointer shadow-2xs",
+                    q.general.status === 'ready'
+                      ? "border-emerald-600 bg-emerald-50/70 text-emerald-950 ring-2 ring-emerald-500/20 font-medium dark:bg-emerald-950/40 dark:text-emerald-200 dark:border-emerald-700"
+                      : "border-border/80 bg-card text-foreground hover:border-emerald-600/40 hover:bg-muted/30"
+                  )}
+                  aria-pressed={q.general.status === 'ready'}
+                >
+                  <span className={cn(
+                    "flex size-9 shrink-0 items-center justify-center rounded-lg text-sm",
+                    q.general.status === 'ready'
+                      ? "bg-emerald-600 text-white shadow-2xs"
+                      : "bg-muted text-muted-foreground"
+                  )}>
+                    <Icon name="fa-solid fa-circle-check" />
+                  </span>
+                  <div>
+                    <h4 className="font-heading font-bold text-sm text-foreground">Công bố (Ready)</h4>
+                    <p className="text-xs text-muted-foreground mt-0.5">Công khai luyện tập (yêu cầu đúng 5 testcase hợp lệ)</p>
+                  </div>
+                </button>
+              </div>
+
+              {/* Code Survival Card */}
+              <div className="rounded-xl border border-border/80 bg-muted/20 p-4 flex flex-wrap items-center justify-between gap-3">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="size-1.5 rounded-full bg-action shrink-0" aria-hidden="true" />
+                    <span className="text-xs font-bold text-foreground">Đấu trường Code Survival</span>
+                  </div>
+                  <div>
+                    {check('survivalEligible', trUI('Cho phép sử dụng bài tập này trong chế độ sinh tồn Code Survival'))}
+                  </div>
                 </div>
+                <span className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium border",
+                  verified ? "bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300" : "bg-muted text-muted-foreground border-border"
+                )}>
+                  <Icon name={`fa-solid ${verified ? 'fa-check' : 'fa-clock'}`} className="size-3" />
+                  {verified ? 'Đáp án mẫu đã xác thực' : 'Chưa xác thực đáp án'}
+                </span>
+              </div>
 
-                <div className="hidden">
-                  <Field label="Question status">
-                    {select('general.status', [
-                      ['draft', 'Draft'],
-                      ['ready', trUI('Ready / Công bố')],
-                    ])}
-                  </Field>
-                </div>
-
-                <Field label="Code Survival">
-                  {check('survivalEligible', trUI('Cho phép dùng trong Code Survival'))}
-                  <small className="muted text-sm leading-relaxed text-muted-foreground">
-                    Đáp án mẫu đã xác thực:{' '}
-                    {q.validatedVersion === q.version && q.version && !dirty
-                      ? 'v' + q.version
-                      : trUI('chưa xác thực phiên bản này')}
-                  </small>
-                </Field>
-
-              <Section title="Tags & Phân loại chủ đề" open>
-                <Field label="Tags">
+              {/* Tags Box */}
+              <div className="rounded-xl border border-border/80 bg-card p-4 space-y-3">
+                <Field label="Tags (Thẻ phân loại đề)">
                   <UiInput
                     aria-label="tags"
-                    placeholder="Ví dụ: dp, math, greedy, array..."
+                    placeholder="Ví dụ: dp, math, greedy, array, binary-search..."
                     value={q.tags.join(', ')}
+                    className="h-10 rounded-xl border border-border/90 bg-slate-100/60 px-3 text-sm font-semibold text-foreground transition-all shadow-xs hover:border-action/60 hover:bg-card focus-visible:border-action focus-visible:bg-card focus-visible:ring-3 focus-visible:ring-action/20 dark:border-border dark:bg-slate-900/50 dark:hover:bg-card dark:focus-visible:bg-card"
                     onChange={(e) =>
                       update(
                         'tags',
@@ -1533,8 +1687,8 @@ export default function QuestionEditor({ id, revision, onNotice }) {
                     }
                   />
                 </Field>
-                <div className="inline-group flex flex-wrap items-center mt-2 gap-1.5">
-                  <span className="muted text-muted-foreground text-[11px]">Gợi ý nhanh:</span>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="text-[11px] font-semibold text-muted-foreground">Gợi ý nhanh:</span>
                   {[
                     'dp',
                     'math',
@@ -1545,32 +1699,38 @@ export default function QuestionEditor({ id, revision, onNotice }) {
                     'sorting',
                     'graphs',
                   ].map((tag) => (
-                    <UiButton
+                    <button
                       key={tag}
                       type="button"
-                      className="ghost bg-transparent text-muted-foreground shadow-none hover:bg-muted hover:text-foreground text-[11px] px-2 py-0.5 min-h-6"
+                      className="h-6 px-2 text-xs font-mono font-medium rounded-md border border-border/70 bg-card text-muted-foreground hover:border-primary/40 hover:bg-muted/70 hover:text-foreground transition-all shadow-2xs cursor-pointer"
                       onClick={() => {
                         if (!q.tags.includes(tag)) {
                           update('tags', [...q.tags, tag]);
                         }
                       }}
-                      variant="ghost"
                     >
                       +{tag}
-                    </UiButton>
+                    </button>
                   ))}
                 </div>
-              </Section>
+              </div>
 
-              <Section title="Tham số & cấu hình giao diện">
-                <Field label="Template params">{area('templateparams', 4)}</Field>
-                <Field label="Template param controls">
-                  <div className="inline-group flex flex-wrap items-center gap-2">
-                    {check('hoisttemplateparams', 'Hoist template parameters')}
-                    {check('extractcodefromjson', 'Extract code from JSON')}
-                    {check('twigall', 'Twig all')}
-                  </div>
-                  <div className="inline-group flex flex-wrap items-center gap-2 mt-2">
+              {/* Tham số & cấu hình giao diện */}
+              <div className="rounded-xl border border-border/80 bg-muted/20 p-4 space-y-4">
+                <div className="flex items-center gap-2">
+                  <span className="size-1.5 rounded-full bg-action shrink-0" aria-hidden="true" />
+                  <span className="text-xs font-bold text-foreground">Tham số giao diện & Template</span>
+                </div>
+                <Field label="Template params">{area('templateparams', 3)}</Field>
+                <div className="grid min-w-0 gap-4 sm:grid-cols-2">
+                  <Field label="Template controls">
+                    <div className="h-10 flex items-center gap-3 flex-wrap">
+                      {check('hoisttemplateparams', 'Hoist params')}
+                      {check('extractcodefromjson', 'JSON code')}
+                      {check('twigall', 'Twig all')}
+                    </div>
+                  </Field>
+                  <Field label="Ngôn ngữ Template">
                     {select(
                       'templateparamslang',
                       [
@@ -1585,100 +1745,67 @@ export default function QuestionEditor({ id, revision, onNotice }) {
                         'Pascal',
                       ].map((v) => [v, v === 'twig' ? 'Twig' : v]),
                     )}
-                    {!['None', 'twig'].includes(q.templateparamslang) &&
-                      check('templateparamsevalpertry', 'Evaluate per try')}
-                  </div>
-                </Field>
-                <Field label="UI parameters">{area('uiparameters')}</Field>
-              </Section>
+                  </Field>
+                </div>
+                <Field label="UI parameters">{area('uiparameters', 3)}</Field>
+              </div>
 
+              {/* Advanced Customisation (Sandbox & Limits) */}
               {q.customise && (
-                <Section title="Advanced customisation">
-                  <Field label="Prototype type">
-                    {select('advancedCustomisation.prototypetype', [
-                      [0, 'No'],
-                      [2, 'Yes — user defined (draft)'],
-                    ])}
-                  </Field>
-                  <Field label="Type name">
-                    {input('advancedCustomisation.typename', 'text', {
-                      disabled: q.advancedCustomisation.prototypetype !== 2,
-                    })}
-                  </Field>
-                  <Field label="Sandbox">
-                    {select('advancedCustomisation.sandbox', [
-                      ['DOCKER', 'Docker isolated runner'],
-                    ])}
-                  </Field>
-                  <div className="two-cols grid min-w-0 gap-4 sm:grid-cols-2">
+                <div className="rounded-xl border border-border/80 bg-muted/20 p-4 space-y-4">
+                  <div className="flex items-center gap-2">
+                    <span className="size-1.5 rounded-full bg-action shrink-0" aria-hidden="true" />
+                    <span className="text-xs font-bold text-foreground">Cấu hình Sandbox & Giới hạn</span>
+                  </div>
+                  <div className="grid min-w-0 gap-4 sm:grid-cols-3">
+                    <Field label="Prototype type">
+                      {select('advancedCustomisation.prototypetype', [
+                        [0, 'No'],
+                        [2, 'Yes — user defined (draft)'],
+                      ])}
+                    </Field>
+                    <Field label="Type name">
+                      {input('advancedCustomisation.typename', 'text', {
+                        disabled: q.advancedCustomisation.prototypetype !== 2,
+                      })}
+                    </Field>
+                    <Field label="Sandbox">
+                      {select('advancedCustomisation.sandbox', [
+                        ['DOCKER', 'Docker isolated runner'],
+                      ])}
+                    </Field>
+                  </div>
+                  <div className="grid min-w-0 gap-4 sm:grid-cols-2">
                     {field(
-                      'CPU time limit (seconds)',
+                      'Giới hạn thời gian CPU (CPU time limit - giây)',
                       'advancedCustomisation.cputimelimitsecs',
                       'number',
-                      trUI('1–10 giây mỗi test.'),
+                      null,
                       {
                         min: 1,
                         max: 10,
                       },
                     )}
                     {field(
-                      'Memory limit (MB)',
+                      'Giới hạn bộ nhớ (Memory limit - MB)',
                       'advancedCustomisation.memlimitmb',
                       'number',
-                      trUI('64–512 MB; trống/0 dùng tối thiểu 64 MB.'),
+                      null,
                       {
                         min: 0,
                         max: 512,
                       },
                     )}
                   </div>
-                  <Field label="Sandbox params">
-                    {area('advancedCustomisation.sandboxparams')}
-                  </Field>
-                  <div className="two-cols grid min-w-0 gap-4 sm:grid-cols-2">
+                  <div className="grid min-w-0 gap-4 sm:grid-cols-2">
                     {field('Language', 'advancedCustomisation.language')}
                     {field('Ace language', 'advancedCustomisation.acelang')}
                   </div>
-                </Section>
+                  <Field label="Sandbox params">{area('advancedCustomisation.sandboxparams', 2)}</Field>
+                </div>
               )}
-
-              <Section title="Support files">
-                <div className="alert my-3 rounded-lg border border-border bg-muted/60 px-4 py-3 text-sm leading-relaxed">
-                  Chỉ khả dụng với bản nháp.
-                </div>
-                <pre>{JSON.stringify(q.datafiles, null, 2)}</pre>
-              </Section>
-
-              <Section title="Attachment options">
-                <div className="alert my-3 rounded-lg border border-border bg-muted/60 px-4 py-3 text-sm leading-relaxed">
-                  Chỉ khả dụng với bản nháp.
-                </div>
-                <Field label="Attachments">
-                  {select('attachments.attachments', [
-                    [0, 'No'],
-                    [1, '1'],
-                    [2, '2'],
-                    [3, '3'],
-                    [-1, 'Unlimited'],
-                  ])}
-                </Field>
-                <Field label="Attachments required">
-                  {select(
-                    'attachments.attachmentsrequired',
-                    [0, 1, 2, 3].map((v) => [v, String(v)]),
-                    q.attachments.attachments === 0,
-                  )}
-                </Field>
-                {['filenamesregex', 'filenamesexplain', 'maxfilesize'].map((k) => (
-                  <Field key={k} label={k}>
-                    {input('attachments.' + k, k === 'maxfilesize' ? 'number' : 'text', {
-                      disabled: q.attachments.attachments === 0,
-                    })}
-                  </Field>
-                ))}
-              </Section>
             </section>
-          </fieldset>
+</fieldset>
         </div>
 
         {/* Right Column: Support, Checklist & Fact List */}
@@ -1784,21 +1911,16 @@ export default function QuestionEditor({ id, revision, onNotice }) {
                 <dd>{q.survivalEligible ? 'Cho phép' : 'Không dùng'}</dd>
               </div>
             </dl>
-            <p className="text-[11px] leading-relaxed text-muted-foreground mt-3">
-              Public Example và Display là hai thuộc tính độc lập. Ẩn hiển thị không thay đổi việc
-              chấm test.
-            </p>
+
           </section>
 
           {readDraft() && (
             <section className="space-y-3">
               <h3 className="font-bold text-sm text-foreground">Nháp trên thiết bị</h3>
-              <p className="text-xs text-muted-foreground">
-                Thay đổi được giữ cục bộ; chỉ nút Lưu mới cập nhật server.
-              </p>
+
               <UiButton
                 type="button"
-                className="w-full secondary border border-input bg-card text-foreground shadow-xs hover:bg-accent hover:text-accent-foreground text-xs rounded-xl"
+                className="w-full h-9 border border-border/80 bg-card text-foreground shadow-2xs hover:bg-accent hover:border-primary/40 hover:text-primary text-xs font-semibold rounded-xl transition-all"
                 disabled={busy || loadFailed}
                 onClick={() => {
                   try {
@@ -1838,11 +1960,11 @@ export default function QuestionEditor({ id, revision, onNotice }) {
                 'Không có thay đổi'
               )}
             </b>
-            <div className="text-[11px] text-muted-foreground">
-              {dirty
-                ? 'Nháp cục bộ được giữ trên thiết bị'
-                : 'Cấu hình server là nguồn dữ liệu chính thức'}
-            </div>
+            {dirty && (
+              <div className="text-[11px] text-muted-foreground">
+                Đã lưu tạm trên thiết bị
+              </div>
+            )}
           </div>
         </div>
         <div className="inline-group flex flex-wrap items-center gap-2.5">

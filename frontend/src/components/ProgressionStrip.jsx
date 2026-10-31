@@ -5,7 +5,6 @@ import { Badge } from './ui';
 import { t } from '../lib/locale';
 import RankEmblem, { RANK_TIERS, RANK_STYLES, getRankTier } from './RankEmblem';
 import { cn } from '../lib/utils';
-import RankAmbientBackground from './RankAmbientBackground';
 function ratingRange(item) {
   if (item.minRating == null && typeof item.maxRating === 'number')
     return (
@@ -30,43 +29,55 @@ function ratingRange(item) {
 const TIER_THEMES = {
   bronze: {
     title: 'text-[#ffdbb3]',
-    active:
-      'border-[#efa767]/70 bg-[#39271e]/50 ring-1 ring-[#efa767]/45 shadow-[inset_0_0_20px_#efa76715]',
+    surface: 'from-[#493022] via-[#291f1b] to-[#181b20] border-[#efa767]/35',
+    crest: 'border-[#efa767]/30 bg-[#efa767]/10 shadow-[0_0_24px_#efa76718]',
+    accent: 'bg-[#efa767]',
+    active: 'border-[#efa767] ring-2 ring-[#efa767]/30 shadow-[0_4px_16px_#a95f3226]',
     badge: 'border-[#efa767]/35 bg-[#efa767]/15 text-[#ffdbb3]',
     multiplier: 'border-[#efa767]/25 bg-[#efa767]/10 text-[#ffdbb3]',
   },
   silver: {
     title: 'text-[#e1f0ff]',
-    active:
-      'border-[#b6d8f2]/70 bg-[#263240]/50 ring-1 ring-[#b6d8f2]/45 shadow-[inset_0_0_20px_#b6d8f215]',
+    surface: 'from-[#344858] via-[#222d38] to-[#191e28] border-[#b6d8f2]/35',
+    crest: 'border-[#b6d8f2]/30 bg-[#b6d8f2]/10 shadow-[0_0_24px_#b6d8f218]',
+    accent: 'bg-[#b6d8f2]',
+    active: 'border-[#b6d8f2] ring-2 ring-[#b6d8f2]/30 shadow-[0_4px_16px_#62788a26]',
     badge: 'border-[#b6d8f2]/35 bg-[#b6d8f2]/15 text-[#e1f0ff]',
     multiplier: 'border-[#b6d8f2]/25 bg-[#b6d8f2]/10 text-[#e1f0ff]',
   },
   gold: {
     title: 'text-[#ffe89a]',
-    active:
-      'border-[#ffd76d]/70 bg-[#3a301b]/50 ring-1 ring-[#ffd76d]/45 shadow-[inset_0_0_20px_#ffd76d15]',
+    surface: 'from-[#51401c] via-[#2e281a] to-[#1f1e22] border-[#ffd76d]/40',
+    crest: 'border-[#ffd76d]/35 bg-[#ffd76d]/10 shadow-[0_0_24px_#ffd76d20]',
+    accent: 'bg-[#ffd76d]',
+    active: 'border-[#ffd76d] ring-2 ring-[#ffd76d]/30 shadow-[0_4px_16px_#a8761226]',
     badge: 'border-[#ffd76d]/35 bg-[#ffd76d]/15 text-[#ffe89a]',
     multiplier: 'border-[#ffd76d]/25 bg-[#ffd76d]/10 text-[#ffe89a]',
   },
   platinum: {
     title: 'text-[#bceee0]',
-    active:
-      'border-[#62e2ba]/70 bg-[#173d36]/50 ring-1 ring-[#62e2ba]/45 shadow-[inset_0_0_20px_#62e2ba15]',
+    surface: 'from-[#184e42] via-[#17332e] to-[#17242a] border-[#62e2ba]/35',
+    crest: 'border-[#62e2ba]/30 bg-[#62e2ba]/10 shadow-[0_0_24px_#62e2ba18]',
+    accent: 'bg-[#62e2ba]',
+    active: 'border-[#62e2ba] ring-2 ring-[#62e2ba]/30 shadow-[0_4px_16px_#24826c26]',
     badge: 'border-[#62e2ba]/35 bg-[#62e2ba]/15 text-[#bceee0]',
     multiplier: 'border-[#62e2ba]/25 bg-[#62e2ba]/10 text-[#bceee0]',
   },
   diamond: {
     title: 'text-[#b9edff]',
-    active:
-      'border-[#68dcff]/70 bg-[#183347]/50 ring-1 ring-[#68dcff]/45 shadow-[inset_0_0_20px_#68dcff15]',
+    surface: 'from-[#19485d] via-[#1b3047] to-[#23233b] border-[#68dcff]/40',
+    crest: 'border-[#68dcff]/35 bg-[#68dcff]/10 shadow-[0_0_24px_#68dcff20]',
+    accent: 'bg-[#68dcff]',
+    active: 'border-[#68dcff] ring-2 ring-[#68dcff]/30 shadow-[0_4px_16px_#237d9d26]',
     badge: 'border-[#68dcff]/35 bg-[#68dcff]/15 text-[#b9edff]',
     multiplier: 'border-[#68dcff]/25 bg-[#68dcff]/10 text-[#b9edff]',
   },
   master: {
     title: 'text-[#ffce77]',
-    active:
-      'border-[#ffac64]/70 bg-[#3b2632]/50 ring-1 ring-[#ffac64]/45 shadow-[inset_0_0_20px_#ffac6415]',
+    surface: 'from-[#5a3025] via-[#3a2233] to-[#262039] border-[#ffac64]/45',
+    crest: 'border-[#ffac64]/40 bg-[#ffac64]/10 shadow-[0_0_24px_#ffac6426]',
+    accent: 'bg-[#ffac64]',
+    active: 'border-[#ffac64] ring-2 ring-[#ffac64]/30 shadow-[0_4px_16px_#b84e2326]',
     badge: 'border-[#ffac64]/35 bg-[#ffac64]/15 text-[#ffce77]',
     multiplier: 'border-[#ffac64]/25 bg-[#ffac64]/10 text-[#ffce77]',
   },
@@ -81,7 +92,7 @@ export function RankTierStrip({ stats }) {
       className="survival-rank-strip min-w-0 rounded-2xl border border-border/80 bg-card p-2 shadow-sm sm:p-2.5"
       aria-label={t('Các bậc Rank')}
     >
-      <ol className="grid grid-cols-2 gap-2 min-[640px]:grid-cols-3 min-[1080px]:grid-cols-6">
+      <ol className="grid grid-cols-1 gap-2.5 min-[360px]:grid-cols-2 min-[640px]:grid-cols-3 min-[1080px]:grid-cols-6">
         {guide.map((item) => {
           const visual = getRankTier(item.name),
             current = visual.id === currentRank;
@@ -92,28 +103,40 @@ export function RankTierStrip({ stats }) {
               key={visual.id}
               aria-current={current ? 'step' : undefined}
               className={cn(
-                'group relative isolate flex min-w-0 items-center gap-2.5 overflow-hidden rounded-xl border bg-[#14232b] p-2.5 transition-colors sm:px-3 sm:py-2.5',
+                'relative isolate flex min-h-28 min-w-0 items-center gap-2.5 overflow-hidden rounded-xl border bg-linear-to-br p-2.5 sm:px-3',
+                theme?.surface || 'from-slate-700 to-slate-900 border-slate-600',
                 current
                   ? theme?.active || 'border-primary bg-primary/5 ring-2 ring-primary/20 shadow-xs'
-                  : 'border-white/15 hover:border-white/40',
+                  : 'shadow-xs',
               )}
             >
-              <RankAmbientBackground tone={visual.id} />
-              <div className="relative shrink-0 flex items-center justify-center">
+              <div
+                aria-hidden="true"
+                className={cn(
+                  'absolute inset-x-0 bottom-0',
+                  current ? 'h-1' : 'h-0.5 opacity-50',
+                  theme?.accent,
+                )}
+              />
+              <div
+                className={cn(
+                  'relative grid h-16 w-12 shrink-0 place-items-center rounded-xl border sm:h-18 sm:w-14',
+                  theme?.crest,
+                )}
+              >
                 <RankEmblem
                   rank={item.name}
                   decorative
                   className={cn(
-                    'h-10! w-8! sm:h-11! sm:w-9! shrink-0 transition-transform group-hover:scale-105',
-                    current && 'drop-shadow-xs',
+                    'h-14! w-11! sm:h-16! sm:w-13! shrink-0 drop-shadow-[0_4px_6px_#0006]',
                   )}
                 />
               </div>
-              <div className="relative min-w-0 flex-1 space-y-0.5">
+              <div className="relative min-w-0 flex-1 space-y-1">
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <b
                     className={cn(
-                      'font-heading text-xs sm:text-sm font-extrabold tracking-tight truncate',
+                      'font-heading text-base min-[1280px]:text-lg font-black leading-tight tracking-tight',
                       theme?.title || 'text-slate-100',
                     )}
                   >
@@ -132,7 +155,7 @@ export function RankTierStrip({ stats }) {
                   )}
                 </div>
                 {hasRange && (
-                  <span className={cn('block truncate font-mono text-[10px]', 'text-slate-300')}>
+                  <span className="block font-mono text-[10px] leading-relaxed text-slate-300">
                     {ratingRange(item)}
                   </span>
                 )}
@@ -140,7 +163,7 @@ export function RankTierStrip({ stats }) {
                   <span
                     className={cn(
                       'inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.2 font-mono text-[9px] font-bold border leading-tight',
-                      current ? theme?.multiplier : 'border-white/15 bg-white/10 text-slate-200',
+                      theme?.multiplier || 'border-white/15 bg-white/10 text-slate-200',
                     )}
                   >
                     ×{item.gainMultiplier} {t('điểm tăng')}
