@@ -52,12 +52,12 @@ export function GameButton({ className, children, ...props }) {
 export function GameHeading({ icon, title, children }) {
   return (
     <div className="flex min-w-0 flex-wrap items-center justify-between gap-3">
-      <div className="flex min-w-0 items-center gap-3">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl border bg-accent text-primary">
-          <Icon name={'fa-solid ' + icon} />
+      <div className="flex min-w-0 items-center gap-2.5">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-orange-500/20 bg-orange-500/10 text-action">
+          <Icon name={'fa-solid ' + icon} className="size-4" />
         </span>
         <div className="min-w-0">
-          <h2 className="font-heading text-xl font-extrabold">{title}</h2>
+          <h2 className="font-heading text-lg sm:text-xl font-extrabold text-foreground">{title}</h2>
         </div>
       </div>
       {children}
@@ -144,49 +144,63 @@ export function ArenaRoster({ room, userId }) {
     ? Math.max(0, (room.capacity || 5) - players.filter((p) => p.status === 'ALIVE').length)
     : 0;
   return (
-    <section className="survival-roster min-w-0 space-y-4" aria-label="Người trong phòng">
+    <section className="survival-roster min-w-0 space-y-3" aria-label="Người trong phòng">
       <GameHeading icon="fa-users" eyebrow="ROSTER" title="Đội hình">
-        <span className="font-mono text-xl font-bold text-primary">{players.length}</span>
+        <span className="font-mono text-base font-bold text-action bg-action/10 px-2.5 py-0.5 rounded-full border border-action/20">
+          {players.length}
+        </span>
       </GameHeading>
       <div className="players grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
         {players.map((p, i) => (
           <div
             key={p.id}
             className={cn(
-              'player relative flex min-w-0 items-center gap-3 rounded-xl border p-3',
-              p.id === userId ? 'border-primary/40 bg-accent' : 'bg-card',
-              p.status === 'ALIVE' ? 'alive' : 'eliminated',
+              'player relative flex min-w-0 items-center gap-2.5 rounded-xl border p-2.5 transition-all shadow-2xs',
+              p.id === userId
+                ? 'border-action/50 bg-action/5 ring-1 ring-action/25'
+                : 'border-border/70 bg-card hover:border-border',
+              p.status === 'ALIVE' ? 'alive' : 'eliminated opacity-60',
             )}
           >
             <span
               className={cn(
-                'relative grid size-10 shrink-0 place-items-center rounded-lg border-b-[3px] font-heading text-lg font-extrabold',
+                'relative grid size-9 shrink-0 place-items-center rounded-xl font-heading text-sm font-black border shadow-2xs',
                 p.status === 'ALIVE'
-                  ? 'border-primary/20 bg-success-soft text-primary'
+                  ? p.id === userId
+                    ? 'border-action/30 bg-action/15 text-action'
+                    : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
                   : 'border-border bg-muted text-muted-foreground',
               )}
               aria-hidden="true"
             >
-              {p.name.slice(0, 1)}
+              {p.name.slice(0, 1).toUpperCase()}
               {p.id === room.hostId && (
-                <Icon
-                  name="fa-solid fa-crown"
-                  className="absolute -top-2 -right-1 size-3.5! fill-gold text-warning"
-                />
+                <span
+                  className="absolute -top-1 -right-1 flex size-3.5 items-center justify-center rounded-full bg-amber-500 text-white shadow-2xs"
+                  title="Chủ phòng"
+                >
+                  <Icon name="fa-solid fa-crown" className="size-2 fill-current" />
+                </span>
               )}
             </span>
             <div className="min-w-0 flex-1">
-              <b className="block text-sm font-extrabold wrap-anywhere" data-user-content>
-                {p.name}
-              </b>
-              <span className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1.5">
+                <b className="block text-xs sm:text-sm font-extrabold truncate text-foreground" data-user-content>
+                  {p.name}
+                </b>
+                {p.id === userId && (
+                  <span className="shrink-0 rounded-full bg-action/15 px-1.5 py-0.2 font-mono text-[8px] font-bold text-action">
+                    Bạn
+                  </span>
+                )}
+              </div>
+              <span className="mt-0.5 flex items-center gap-1.5 text-[10px] sm:text-[11px] text-muted-foreground">
                 <span
                   className={cn(
                     'size-1.5 shrink-0 rounded-full',
-                    p.status === 'ALIVE' ? 'bg-primary' : 'bg-muted-foreground/40',
+                    p.status === 'ALIVE' ? 'bg-emerald-500 animate-pulse' : 'bg-muted-foreground/40',
                   )}
                 />
-                {p.id === userId ? 'Bạn · ' : ''}
                 {p.id === room.winnerId
                   ? 'Chiến thắng'
                   : p.status === 'ALIVE'
@@ -200,21 +214,21 @@ export function ArenaRoster({ room, userId }) {
                       : 'Theo dõi'}
               </span>
             </div>
-            <span className="self-start font-mono text-[9px] text-muted-foreground/60">
-              {String(i + 1).padStart(2, '0')}
+            <span className="self-center font-mono text-[9px] font-semibold text-muted-foreground/50">
+              #{String(i + 1).padStart(2, '0')}
             </span>
           </div>
         ))}
         {Array.from({ length: slots }, (_, i) => (
           <div
             key={'slot-' + i}
-            className="flex items-center gap-3 rounded-xl border border-dashed bg-muted/40 p-3 text-muted-foreground"
+            className="flex items-center gap-2.5 rounded-xl border border-dashed border-border/70 bg-muted/20 p-2.5 text-muted-foreground"
           >
-            <span className="grid size-10 place-items-center rounded-lg border border-dashed">
-              <Icon name="fa-solid fa-user-plus" className="size-4!" />
+            <span className="grid size-9 place-items-center rounded-xl border border-dashed border-border text-muted-foreground/60">
+              <Icon name="fa-solid fa-user-plus" className="size-3.5!" />
             </span>
             <div>
-              <b className="block text-sm font-medium">Vị trí trống</b>
+              <b className="block text-xs font-semibold text-muted-foreground/80">Vị trí trống</b>
             </div>
           </div>
         ))}
