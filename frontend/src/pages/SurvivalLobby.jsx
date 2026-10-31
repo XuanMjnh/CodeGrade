@@ -7,13 +7,8 @@ import Icon from '../components/Icon';
 import RankEmblem from '../components/RankEmblem';
 import { RankTierStrip } from '../components/ProgressionStrip';
 import SurvivalPlayerCard from '../components/SurvivalPlayerCard';
-import {
-  ArenaScene,
-  GameButton,
-  GameHeading,
-  survivalStates,
-  survivalModes,
-} from '../components/SurvivalKit';
+import SurvivalModeBanner from '../components/SurvivalModeBanner';
+import { GameButton, GameHeading, survivalStates, survivalModes } from '../components/SurvivalKit';
 import { Badge, ErrorBox, Loading, TimeLeft, go, useResource } from '../components/ui';
 import { cn } from '../lib/utils';
 import { live } from '../lib/live';
@@ -246,9 +241,7 @@ function MatchmakingPanel({ mode, queue, waiting, found, waited, busy, user, act
             >
               <Icon name="fa-solid fa-check" className="size-3.5" />
               <span>
-                {queue.state === 'ACCEPTED'
-                  ? t('Đã xác nhận · Chờ đủ 5 người')
-                  : t('Nhận trận')}
+                {queue.state === 'ACCEPTED' ? t('Đã xác nhận · Chờ đủ 5 người') : t('Nhận trận')}
               </span>
             </Button>
             <Button
@@ -271,11 +264,7 @@ function MatchmakingPanel({ mode, queue, waiting, found, waited, busy, user, act
           >
             <Icon name="fa-solid fa-play" className="size-3.5" />
             <span>
-              {busy
-                ? t('Đang xử lý…')
-                : mode === 'RANKED'
-                  ? t('Tìm trận Ranked')
-                  : t('Tìm trận')}
+              {busy ? t('Đang xử lý…') : mode === 'RANKED' ? t('Tìm trận Ranked') : t('Tìm trận')}
             </span>
             <Icon name="fa-solid fa-arrow-right" className="size-3.5" />
           </Button>
@@ -396,7 +385,9 @@ export default function SurvivalLobby({ user, revision }) {
                 <span className="flex size-7 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600">
                   <Icon name="fa-solid fa-trophy" className="size-3.5" />
                 </span>
-                <h3 className="font-heading text-sm font-extrabold text-foreground">{t('Top Ranked')}</h3>
+                <h3 className="font-heading text-sm font-extrabold text-foreground">
+                  {t('Top Ranked')}
+                </h3>
               </div>
               <a
                 href="#/leaderboard?metric=rank"
@@ -429,12 +420,19 @@ export default function SurvivalLobby({ user, revision }) {
                     </span>
                     <RankEmblem rank={p.rank} decorative className="h-8! w-6! shrink-0" />
                     <div className="min-w-0 flex-1">
-                      <b className="block text-xs font-bold text-foreground truncate" data-user-content>
+                      <b
+                        className="block text-xs font-bold text-foreground truncate"
+                        data-user-content
+                      >
                         {p.display_name}
                       </b>
-                      <small className="block text-[10px] text-muted-foreground truncate">{p.rank}</small>
+                      <small className="block text-[10px] text-muted-foreground truncate">
+                        {p.rank}
+                      </small>
                     </div>
-                    <b className="font-mono text-xs font-black text-primary tabular-nums">{p.rating}</b>
+                    <b className="font-mono text-xs font-black text-primary tabular-nums">
+                      {p.rating}
+                    </b>
                   </li>
                 ))
               ) : (
@@ -442,39 +440,16 @@ export default function SurvivalLobby({ user, revision }) {
                   <span className="mx-auto flex size-8 items-center justify-center rounded-full bg-muted text-muted-foreground/50 mb-1.5">
                     <Icon name="fa-solid fa-trophy" className="size-4" />
                   </span>
-                  <p className="text-xs text-muted-foreground">{t('Chưa có trận Ranked được chốt.')}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {t('Chưa có trận Ranked được chốt.')}
+                  </p>
                 </div>
               )}
             </ol>
           </section>
         </aside>
         <div className="order-2 min-w-0 space-y-4">
-          <section
-            className="overflow-hidden rounded-2xl border bg-card shadow-sm"
-            aria-label="Đấu trường đã chọn"
-          >
-            <ArenaScene mode={mode}>
-              <div className="relative mt-2">
-                <h2 className="mt-4 font-heading text-4xl font-black tracking-tight sm:text-5xl">
-                  {selected.name}
-                </h2>
-              </div>
-            </ArenaScene>
-            <div className="grid grid-cols-3 divide-x border-t bg-muted/40">
-              {selected.facts.map((fact, i) => (
-                <span
-                  className="flex items-center justify-center gap-2 px-2 py-4 text-center text-xs font-bold text-foreground sm:text-sm"
-                  key={fact}
-                >
-                  <Icon
-                    name={'fa-solid ' + ['fa-users', 'fa-crosshairs', 'fa-medal'][i]}
-                    className="hidden size-3.5! text-primary sm:block"
-                  />
-                  {fact}
-                </span>
-              ))}
-            </div>
-          </section>
+          <SurvivalModeBanner mode={mode} facts={selected.facts} />
           {mode === 'PRACTICE' ? (
             <section
               className="arena-practice rounded-2xl border border-border/80 bg-card p-4 sm:p-5 shadow-2xs space-y-4"
@@ -485,7 +460,9 @@ export default function SurvivalLobby({ user, revision }) {
                   <Icon name="fa-solid fa-plus" className="size-4" />
                 </span>
                 <div>
-                  <h2 className="font-heading text-base font-extrabold text-foreground">{t('Tạo phòng thi đấu')}</h2>
+                  <h2 className="font-heading text-base font-extrabold text-foreground">
+                    {t('Tạo phòng thi đấu')}
+                  </h2>
                   <p className="text-xs text-muted-foreground">
                     {t('Tùy chỉnh số lượng người chơi và mức độ khó của đề bài')}
                   </p>
@@ -505,7 +482,10 @@ export default function SurvivalLobby({ user, revision }) {
               >
                 <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_120px] gap-3">
                   <div className="space-y-1.5">
-                    <label htmlFor="create-room-name" className="text-xs font-semibold text-foreground">
+                    <label
+                      htmlFor="create-room-name"
+                      className="text-xs font-semibold text-foreground"
+                    >
                       {t('Tên phòng')}
                     </label>
                     <Input
@@ -518,7 +498,10 @@ export default function SurvivalLobby({ user, revision }) {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label htmlFor="create-room-capacity" className="text-xs font-semibold text-foreground">
+                    <label
+                      htmlFor="create-room-capacity"
+                      className="text-xs font-semibold text-foreground"
+                    >
                       {t('Số người')}
                     </label>
                     <NativeSelect
@@ -538,7 +521,9 @@ export default function SurvivalLobby({ user, revision }) {
 
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-foreground">{t('Độ khó đề bài')}</span>
+                    <span className="text-xs font-semibold text-foreground">
+                      {t('Độ khó đề bài')}
+                    </span>
                     <span className="text-[11px] text-muted-foreground font-mono">
                       {levels.length} {t('mức đã chọn')}
                     </span>
@@ -566,7 +551,9 @@ export default function SurvivalLobby({ user, revision }) {
                             name={isChecked ? 'fa-solid fa-check' : 'fa-solid fa-hashtag'}
                             className={cn(
                               'size-3',
-                              isChecked ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground/40',
+                              isChecked
+                                ? 'text-emerald-600 dark:text-emerald-400'
+                                : 'text-muted-foreground/40',
                             )}
                           />
                           <span>
@@ -590,7 +577,9 @@ export default function SurvivalLobby({ user, revision }) {
                   </Button>
                   {user.role !== 'CODER' && (
                     <p className="mt-2 text-center text-xs text-muted-foreground">
-                      {t('Tài khoản của bạn là Quản trị viên (chỉ Coder mới có thể tạo phòng thi đấu).')}
+                      {t(
+                        'Tài khoản của bạn là Quản trị viên (chỉ Coder mới có thể tạo phòng thi đấu).',
+                      )}
                     </p>
                   )}
                 </div>
@@ -618,7 +607,9 @@ export default function SurvivalLobby({ user, revision }) {
               <span className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <Icon name="fa-solid fa-gamepad" className="size-3.5" />
               </span>
-              <h2 className="font-heading text-sm font-extrabold text-foreground">{t('Chọn chế độ')}</h2>
+              <h2 className="font-heading text-sm font-extrabold text-foreground">
+                {t('Chọn chế độ')}
+              </h2>
             </div>
             <div
               id="survival-modes"
@@ -641,7 +632,9 @@ export default function SurvivalLobby({ user, revision }) {
               <span className="flex size-7 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600">
                 <Icon name="fa-solid fa-ticket" className="size-3.5" />
               </span>
-              <h3 className="font-heading text-sm font-extrabold text-foreground">{t('Có mã mời?')}</h3>
+              <h3 className="font-heading text-sm font-extrabold text-foreground">
+                {t('Có mã mời?')}
+              </h3>
             </div>
             <form
               className="space-y-3"
@@ -821,10 +814,14 @@ export default function SurvivalLobby({ user, revision }) {
                             <span
                               className={cn(
                                 'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold tracking-tight',
-                                r.state === 'LOBBY' && 'bg-emerald-50 text-emerald-700 border border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60',
-                                ['ROUND_ACTIVE', 'COUNTDOWN'].includes(r.state) && 'bg-amber-50 text-amber-700 border border-amber-200/60 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/60',
-                                ['ROUND_GRADING', 'ROUND_RESULT'].includes(r.state) && 'bg-blue-50 text-blue-700 border border-blue-200/60 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800/60',
-                                ['FINISHED', 'CLOSED'].includes(r.state) && 'bg-muted/70 text-muted-foreground border border-border/60',
+                                r.state === 'LOBBY' &&
+                                  'bg-emerald-50 text-emerald-700 border border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60',
+                                ['ROUND_ACTIVE', 'COUNTDOWN'].includes(r.state) &&
+                                  'bg-amber-50 text-amber-700 border border-amber-200/60 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/60',
+                                ['ROUND_GRADING', 'ROUND_RESULT'].includes(r.state) &&
+                                  'bg-blue-50 text-blue-700 border border-blue-200/60 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800/60',
+                                ['FINISHED', 'CLOSED'].includes(r.state) &&
+                                  'bg-muted/70 text-muted-foreground border border-border/60',
                               )}
                             >
                               {r.state === 'LOBBY' && (
@@ -836,7 +833,11 @@ export default function SurvivalLobby({ user, revision }) {
                               className="room-code-tag inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-mono font-extrabold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 shadow-2xs"
                               title={`${t('Mã phòng')}: ${r.code}`}
                             >
-                              <Icon name="fa-solid fa-key" className="size-2.5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+                              <Icon
+                                name="fa-solid fa-key"
+                                className="size-2.5 text-amber-600 dark:text-amber-400"
+                                aria-hidden="true"
+                              />
                               <span>Mã {r.code}</span>
                             </span>
                           </div>
@@ -845,29 +846,60 @@ export default function SurvivalLobby({ user, revision }) {
                         {/* Hàng 2: Thông tin Host & metadata xếp gọn gàng trên 1 dòng với dấu chấm ngăn cách */}
                         <div className="room-card-meta mt-2.5 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-xs text-muted-foreground">
                           <span className="inline-flex items-center gap-1.5 font-medium text-foreground">
-                            <Icon name="fa-solid fa-user" className="size-3 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+                            <Icon
+                              name="fa-solid fa-user"
+                              className="size-3 text-emerald-600 dark:text-emerald-400"
+                              aria-hidden="true"
+                            />
                             <span>{r.hostName}</span>
                           </span>
-                          <span className="text-muted-foreground/30" aria-hidden="true">•</span>
+                          <span className="text-muted-foreground/30" aria-hidden="true">
+                            •
+                          </span>
                           <span className="inline-flex items-center gap-1.5 font-medium text-foreground">
-                            <Icon name="fa-solid fa-users" className="size-3 text-blue-600 dark:text-blue-400" aria-hidden="true" />
+                            <Icon
+                              name="fa-solid fa-users"
+                              className="size-3 text-blue-600 dark:text-blue-400"
+                              aria-hidden="true"
+                            />
                             <span>
-                              <b className="font-mono font-extrabold text-blue-600 dark:text-blue-400">{r.count}</b>
-                              <span className="text-muted-foreground font-mono">/{r.capacity} Coder</span>
+                              <b className="font-mono font-extrabold text-blue-600 dark:text-blue-400">
+                                {r.count}
+                              </b>
+                              <span className="text-muted-foreground font-mono">
+                                /{r.capacity} Coder
+                              </span>
                             </span>
                           </span>
                           {r.selectedDifficulties?.length ? (
                             <>
-                              <span className="text-muted-foreground/30" aria-hidden="true">•</span>
+                              <span className="text-muted-foreground/30" aria-hidden="true">
+                                •
+                              </span>
                               <span className="inline-flex items-center gap-1.5 font-medium text-foreground">
-                                <Icon name="fa-solid fa-layer-group" className="size-3 text-orange-500 dark:text-orange-400" aria-hidden="true" />
-                                <span>{t('Mức')} <b className="font-mono font-bold text-orange-600 dark:text-orange-400">{r.selectedDifficulties.join(', ')}</b></span>
+                                <Icon
+                                  name="fa-solid fa-layer-group"
+                                  className="size-3 text-orange-500 dark:text-orange-400"
+                                  aria-hidden="true"
+                                />
+                                <span>
+                                  {t('Mức')}{' '}
+                                  <b className="font-mono font-bold text-orange-600 dark:text-orange-400">
+                                    {r.selectedDifficulties.join(', ')}
+                                  </b>
+                                </span>
                               </span>
                             </>
                           ) : null}
-                          <span className="text-muted-foreground/30" aria-hidden="true">•</span>
+                          <span className="text-muted-foreground/30" aria-hidden="true">
+                            •
+                          </span>
                           <span className="inline-flex items-center gap-1.5 font-medium text-foreground">
-                            <Icon name="fa-solid fa-gamepad" className="size-3 text-purple-600 dark:text-purple-400" aria-hidden="true" />
+                            <Icon
+                              name="fa-solid fa-gamepad"
+                              className="size-3 text-purple-600 dark:text-purple-400"
+                              aria-hidden="true"
+                            />
                             <span>{t('Giao lưu')}</span>
                           </span>
                         </div>
@@ -877,24 +909,39 @@ export default function SurvivalLobby({ user, revision }) {
                       <div className="room-card-footer mt-2.5 flex items-center justify-between border-t border-border/50 pt-2 text-xs">
                         {r.state === 'LOBBY' ? (
                           <div className="room-card-status inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-emerald-700 dark:text-emerald-400">
-                            <Icon name="fa-solid fa-circle-check" className="size-3.5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+                            <Icon
+                              name="fa-solid fa-circle-check"
+                              className="size-3.5 text-emerald-600 dark:text-emerald-400"
+                              aria-hidden="true"
+                            />
                             <span className="clock-label font-sans text-[11px] text-muted-foreground font-normal">
                               {t('Trạng thái')}:
                             </span>
                             <span className="font-bold">
-                              {r.capacity - r.count > 0 ? `${t('Còn')} ${r.capacity - r.count} ${t('chỗ')}` : t('Đã đủ người')}
+                              {r.capacity - r.count > 0
+                                ? `${t('Còn')} ${r.capacity - r.count} ${t('chỗ')}`
+                                : t('Đã đủ người')}
                             </span>
                           </div>
                         ) : (
                           <div className="room-card-status inline-flex items-center gap-1.5 text-[11px] font-medium text-amber-700 dark:text-amber-400">
-                            <Icon name="fa-solid fa-flag-checkered" className="size-3.5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
-                            <span className="font-semibold">{survivalStates[r.state] || r.state}</span>
+                            <Icon
+                              name="fa-solid fa-flag-checkered"
+                              className="size-3.5 text-amber-600 dark:text-amber-400"
+                              aria-hidden="true"
+                            />
+                            <span className="font-semibold">
+                              {survivalStates[r.state] || r.state}
+                            </span>
                           </div>
                         )}
 
                         <span className="inline-flex items-center gap-1 font-bold text-action transition-all group-hover:text-action-hover">
                           <span>{t('Tham gia phòng')}</span>
-                          <Icon name="fa-solid fa-arrow-right" className="size-3 text-action group-hover:translate-x-1 transition-transform" />
+                          <Icon
+                            name="fa-solid fa-arrow-right"
+                            className="size-3 text-action group-hover:translate-x-1 transition-transform"
+                          />
                         </span>
                       </div>
                     </article>
@@ -909,7 +956,9 @@ export default function SurvivalLobby({ user, revision }) {
                     {t('Chưa có phòng nào đang mở')}
                   </h3>
                   <p className="mt-1 max-w-sm text-xs text-muted-foreground">
-                    {t('Hãy tạo phòng mới hoặc chuyển sang chế độ Ghép trận để bắt đầu thi đấu ngay.')}
+                    {t(
+                      'Hãy tạo phòng mới hoặc chuyển sang chế độ Ghép trận để bắt đầu thi đấu ngay.',
+                    )}
                   </p>
                 </div>
               )}
@@ -938,9 +987,7 @@ export default function SurvivalLobby({ user, revision }) {
                       <div>
                         {/* Hàng 1: Chế độ bên trái, Thứ hạng bên phải */}
                         <div className="history-card-header flex items-center justify-between gap-2">
-                          <h3
-                            className="history-card-title font-heading text-sm sm:text-base font-bold text-foreground group-hover:text-primary transition-colors tracking-tight line-clamp-1"
-                          >
+                          <h3 className="history-card-title font-heading text-sm sm:text-base font-bold text-foreground group-hover:text-primary transition-colors tracking-tight line-clamp-1">
                             {survivalModes[h.mode] || h.mode}
                           </h3>
                           <div className="flex shrink-0 items-center gap-1.5">
@@ -963,22 +1010,48 @@ export default function SurvivalLobby({ user, revision }) {
                         {/* Hàng 2: Metadata */}
                         <div className="history-card-meta mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-muted-foreground">
                           <span className="inline-flex items-center gap-1.5 font-medium text-foreground">
-                            <Icon name="fa-solid fa-gamepad" className="size-3 text-purple-600 dark:text-purple-400" aria-hidden="true" />
+                            <Icon
+                              name="fa-solid fa-gamepad"
+                              className="size-3 text-purple-600 dark:text-purple-400"
+                              aria-hidden="true"
+                            />
                             <span>Code Survival</span>
                           </span>
                           {h.mode === 'RANKED' && (
                             <>
-                              <span className="text-muted-foreground/30" aria-hidden="true">•</span>
+                              <span className="text-muted-foreground/30" aria-hidden="true">
+                                •
+                              </span>
                               <span className="inline-flex items-center gap-1.5 font-mono font-medium text-foreground">
-                                <Icon name="fa-solid fa-trophy" className="size-3 text-amber-500 dark:text-amber-400" aria-hidden="true" />
-                                <span>Rating: <b className="text-amber-700 dark:text-amber-400">{h.rating_before} → {h.rating_after}</b></span>
+                                <Icon
+                                  name="fa-solid fa-trophy"
+                                  className="size-3 text-amber-500 dark:text-amber-400"
+                                  aria-hidden="true"
+                                />
+                                <span>
+                                  Rating:{' '}
+                                  <b className="text-amber-700 dark:text-amber-400">
+                                    {h.rating_before} → {h.rating_after}
+                                  </b>
+                                </span>
                               </span>
                             </>
                           )}
-                          <span className="text-muted-foreground/30" aria-hidden="true">•</span>
+                          <span className="text-muted-foreground/30" aria-hidden="true">
+                            •
+                          </span>
                           <span className="inline-flex items-center gap-1.5 font-medium text-foreground">
-                            <Icon name="fa-solid fa-award" className="size-3 text-blue-600 dark:text-blue-400" aria-hidden="true" />
-                            <span>Vị trí <b className="font-mono text-blue-600 dark:text-blue-400">#{h.placement}</b></span>
+                            <Icon
+                              name="fa-solid fa-award"
+                              className="size-3 text-blue-600 dark:text-blue-400"
+                              aria-hidden="true"
+                            />
+                            <span>
+                              Vị trí{' '}
+                              <b className="font-mono text-blue-600 dark:text-blue-400">
+                                #{h.placement}
+                              </b>
+                            </span>
                           </span>
                         </div>
                       </div>
@@ -986,12 +1059,19 @@ export default function SurvivalLobby({ user, revision }) {
                       {/* Hàng 3: Chân thẻ */}
                       <div className="history-card-footer mt-2.5 flex items-center justify-between border-t border-border/50 pt-2 text-xs">
                         <div className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
-                          <Icon name="fa-solid fa-flag-checkered" className="size-3 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+                          <Icon
+                            name="fa-solid fa-flag-checkered"
+                            className="size-3 text-emerald-600 dark:text-emerald-400"
+                            aria-hidden="true"
+                          />
                           <span>{t('Đã kết thúc')}</span>
                         </div>
                         <span className="inline-flex items-center gap-1 font-bold text-action transition-all group-hover:text-action-hover">
                           <span>{t('Xem chi tiết')}</span>
-                          <Icon name="fa-solid fa-arrow-right" className="size-3 text-action group-hover:translate-x-1 transition-transform" />
+                          <Icon
+                            name="fa-solid fa-arrow-right"
+                            className="size-3 text-action group-hover:translate-x-1 transition-transform"
+                          />
                         </span>
                       </div>
                     </article>

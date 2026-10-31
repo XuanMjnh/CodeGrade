@@ -18,6 +18,7 @@ import {
   languageNames,
 } from '../lib/coderunner';
 import { Field, Section, Check, ErrorBox, Loading, go } from '../components/ui';
+import { cn } from '../lib/utils';
 function at(obj, path) {
   return path.split('.').reduce((v, k) => v?.[k], obj);
 }
@@ -209,16 +210,16 @@ export default function QuestionEditor({ id, revision, onNotice }) {
       return null;
     }
   }
+  function scrollToSection(secId) {
+    const el = document.getElementById(secId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
   function changeStep(next) {
     setStep(next);
-    requestAnimationFrame(() => {
-      document.querySelector('.studio-panel-heading')?.scrollIntoView({
-        block: 'start',
-      });
-      document.getElementById('studio-tab-' + next)?.focus({
-        preventScroll: true,
-      });
-    });
+    const secIds = ['sec-1-info', 'sec-2-grading', 'sec-3-answer', 'sec-4-testcases', 'sec-5-advanced'];
+    if (secIds[next]) scrollToSection(secIds[next]);
   }
   function update(path, value) {
     setQ((prev) => {
