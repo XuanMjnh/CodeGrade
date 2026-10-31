@@ -109,9 +109,10 @@ export default function ProgressionStrip({ stats, user, showRankGuide = false })
   return (
     <section
       className={cn(
-        'progression-strip paper mb-5 flex flex-wrap items-center gap-7 rounded-[14px] border border-t-[3px] border-t-primary bg-card p-6 text-card-foreground shadow-panel [&_small]:text-[11px]',
-        showRankGuide &&
-          'grid grid-cols-[minmax(0,1fr)] gap-x-9 gap-y-7 px-6 py-7 min-[641px]:grid-cols-2 min-[1101px]:grid-cols-[minmax(190px,1fr)_minmax(200px,1.1fr)_minmax(300px,1.15fr)] sm:px-8',
+        'progression-strip mb-5 rounded-2xl border border-border/80 bg-card p-5 sm:p-6 text-card-foreground shadow-2xs [&_small]:text-[11px]',
+        showRankGuide
+          ? 'grid grid-cols-[minmax(0,1fr)] gap-x-8 gap-y-6 min-[641px]:grid-cols-2 min-[1101px]:grid-cols-[minmax(190px,1fr)_minmax(200px,1.1fr)_minmax(300px,1.15fr)]'
+          : 'flex flex-wrap items-center gap-6',
       )}
       aria-label={t('Tiến trình học tập')}
     >
@@ -235,7 +236,7 @@ export default function ProgressionStrip({ stats, user, showRankGuide = false })
                   className={cn(
                     'group flex flex-col items-center justify-between gap-1.5 rounded-xl px-2 py-2 text-center text-xs transition-all duration-200',
                     current
-                      ? 'bg-action/10 dark:bg-action/15 shadow-2xs'
+                      ? 'is-current bg-action/10 dark:bg-action/15 shadow-2xs'
                       : 'bg-transparent hover:bg-muted/30',
                   )}
                   aria-current={current ? 'step' : undefined}
@@ -257,10 +258,10 @@ export default function ProgressionStrip({ stats, user, showRankGuide = false })
                         </span>
                       )}
                     </div>
-                    <span className="font-mono text-[9px] sm:text-[10px] text-muted-foreground leading-tight">{ratingRange(item)}</span>
+                    <span className="rank-rating-range font-mono text-[9px] sm:text-[10px] text-muted-foreground leading-tight">{ratingRange(item)}</span>
                     <div className="pt-0.5">
                       {item.gainMultiplier > 1 ? (
-                        <span className="inline-flex items-center gap-0.5 rounded-md bg-amber-500/10 px-1.5 py-0.2 font-mono text-[8.5px] sm:text-[9px] font-semibold text-amber-700 dark:text-amber-400 leading-none">
+                        <span className="rank-gain-badge inline-flex items-center gap-0.5 rounded-md bg-amber-500/10 px-1.5 py-0.2 font-mono text-[8.5px] sm:text-[9px] font-semibold text-amber-700 dark:text-amber-400 leading-none">
                           ×{item.gainMultiplier} {t('điểm tăng')}
                         </span>
                       ) : (
