@@ -26,6 +26,57 @@ function ratingRange(item) {
     );
   return '—';
 }
+export function RankTierStrip({ stats }) {
+  if (!stats) return null;
+  const guide = stats.rankTiers || RANK_TIERS;
+  const currentRank = getRankTier(stats.rank).id;
+  return (
+    <section
+      className="survival-rank-strip min-w-0 overflow-hidden rounded-xl border border-t-2 border-t-primary bg-card"
+      aria-label={t('Các bậc Rank')}
+    >
+      <ol className="grid grid-cols-6 divide-x">
+        {guide.map((item) => {
+          const visual = getRankTier(item.name),
+            current = visual.id === currentRank;
+          const hasRange = item.minRating != null || item.maxRating != null;
+          return (
+            <li
+              key={visual.id}
+              aria-current={current ? 'step' : undefined}
+              className={cn(
+                'flex min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-center sm:flex-row sm:gap-2 sm:px-2 sm:py-3 sm:text-left',
+                current ? cn('is-current', RANK_STYLES[visual.id]) : 'bg-card',
+              )}
+            >
+              <RankEmblem
+                rank={item.name}
+                decorative
+                className="size-7! shrink-0 sm:h-11! sm:w-9!"
+              />
+              <div className="min-w-0">
+                <b className="block text-[10px] font-extrabold wrap-anywhere sm:text-sm">
+                  {item.name}
+                </b>
+                {hasRange && (
+                  <span className="rank-rating-range hidden text-[10px] wrap-anywhere text-muted-foreground sm:block">
+                    {ratingRange(item)}
+                  </span>
+                )}
+                {item.gainMultiplier > 1 && (
+                  <span className="rank-gain-badge hidden text-[10px] font-medium sm:block">
+                    ×{item.gainMultiplier} {t('điểm tăng')}
+                  </span>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    </section>
+  );
+}
+
 export default function ProgressionStrip({ stats, user, showRankGuide = false }) {
   if (!stats) return null;
   const tier = getRankTier(stats.rank);

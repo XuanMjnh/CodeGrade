@@ -5,8 +5,8 @@ import { Label } from '../components/ui/label';
 import { NativeSelect } from '../components/ui/native-select';
 import Icon from '../components/Icon';
 import RankEmblem from '../components/RankEmblem';
-import ProgressMeter from '../components/ProgressMeter';
-import ProgressionStrip from '../components/ProgressionStrip';
+import { RankTierStrip } from '../components/ProgressionStrip';
+import SurvivalPlayerCard from '../components/SurvivalPlayerCard';
 import {
   ArenaScene,
   GameButton,
@@ -79,71 +79,6 @@ function ModeCard({ item, index, selected, disabled, onSelect }) {
         {selected ? <Icon name="fa-solid fa-check" className="size-3!" /> : index + 1}
       </span>
     </Button>
-  );
-}
-
-function PlayerLoadout({ stats, user }) {
-  if (!stats) return <Loading />;
-  const base = 100 * (stats.level - 1) ** 2;
-  return (
-    <section
-      className="progression-strip min-w-0 overflow-hidden rounded-2xl border bg-card"
-      aria-label="Hồ sơ người chơi"
-    >
-      <div className="relative flex flex-col items-center border-b bg-accent/60 px-5 pt-7 pb-5 text-center">
-        <span className="absolute top-3 right-3 rounded-lg border border-primary/20 bg-card px-2 py-1 font-mono text-sm font-bold text-primary">
-          LV.{stats.level}
-        </span>
-        <span
-          className={cn(
-            'avatar mb-3 grid size-16 place-items-center rounded-2xl border-2 border-primary bg-card font-heading text-3xl font-black text-primary shadow-[0_4px_0_var(--surface-strong)]',
-            'avatar-frame-' + stats.avatarFrame,
-          )}
-          aria-hidden="true"
-        >
-          {user.displayName?.slice(0, 1)}
-        </span>
-        <b
-          className="max-w-full font-heading text-xl font-extrabold wrap-anywhere"
-          data-user-content
-        >
-          {user.displayName}
-        </b>
-      </div>
-      <div className="space-y-5 p-5">
-        <div>
-          <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-            <b className="font-mono text-xl font-extrabold text-primary">{stats.exp} EXP</b>
-            <span className="text-xs text-muted-foreground">/ {stats.nextLevelExp}</span>
-          </div>
-          <ProgressMeter
-            aria-label="EXP đến cấp tiếp theo"
-            value={stats.exp - base}
-            max={stats.nextLevelExp - base}
-          />
-        </div>
-        <div className="flex items-center gap-3 rounded-xl border bg-warning-soft/40 p-3">
-          <RankEmblem rank={stats.rank} decorative className="h-16! w-14!" />
-          <div className="min-w-0">
-            <b className="block font-heading text-3xl font-extrabold text-warning">{stats.rank}</b>
-            <span className="flex flex-wrap items-baseline gap-1">
-              <b className="font-mono text-xl font-extrabold text-foreground">{stats.rating}</b>
-              <span className="text-xs text-muted-foreground">rating</span>
-            </span>
-          </div>
-        </div>
-        {stats.badges?.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {stats.badges.map((badge) => (
-              <Badge key={badge} className="text-[9px]">
-                <Icon name="fa-solid fa-medal" className="size-3!" />
-                {badge}
-              </Badge>
-            ))}
-          </div>
-        )}
-      </div>
-    </section>
   );
 }
 
@@ -331,7 +266,6 @@ export default function SurvivalLobby({ user, revision }) {
   const tabs = [
     ['rooms', 'fa-door-open', 'Phòng đang mở'],
     ['history', 'fa-clock-rotate-left', 'Lịch sử chiến đấu'],
-    ['ranks', 'fa-medal', 'Bậc Rank'],
   ];
   return (
     <div className="arena-lobby min-w-0 space-y-5">
@@ -348,10 +282,11 @@ export default function SurvivalLobby({ user, revision }) {
           </div>
         </div>
       </header>
+      {stats ? <RankTierStrip stats={stats} /> : <Loading />}
       <ErrorBox error={error || roomError || statsError || leaderError || historyError} />
       <div className="grid min-w-0 items-start gap-5 xl:grid-cols-[230px_minmax(0,1fr)_270px]">
-        <aside className="order-3 grid min-w-0 gap-4 sm:grid-cols-2 xl:order-1 xl:sticky xl:top-24 xl:grid-cols-1">
-          <PlayerLoadout stats={stats} user={user} />
+        <aside className="order-3 min-w-0 space-y-4 xl:order-1 xl:sticky xl:top-24">
+          <SurvivalPlayerCard stats={stats} user={user} />
           <section className="arena-leaderboard min-w-0 rounded-2xl border bg-card p-4">
             <GameHeading icon="fa-trophy" title="Top Ranked" />
             <ol className="mt-4 space-y-3">
@@ -723,8 +658,6 @@ export default function SurvivalLobby({ user, revision }) {
               )}
             </div>
           )}
-          {tab === 'ranks' &&
-            (stats ? <ProgressionStrip stats={stats} user={user} showRankGuide /> : <Loading />)}
         </div>
       </section>
     </div>

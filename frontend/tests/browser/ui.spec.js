@@ -93,8 +93,10 @@ test('the shared header and side rails surround the Survival game hub', async ({
   await expect(page.locator('.utility-rail')).toHaveCount(0);
   await expect(page.locator('.mode-card')).toHaveCount(3);
   await expect(page.locator('.mode-practice')).toHaveAttribute('aria-pressed', 'true');
-  await page.getByRole('tab', { name: 'Bậc Rank' }).click();
-  await expect(page.locator('.progression-rank-guide')).toHaveAttribute('open', '');
+  await expect(page.locator('.progression-strip')).toHaveCount(1);
+  await expect(page.locator('.survival-rank-strip ol > li')).toHaveCount(6);
+  await expect(page.locator('.survival-rank-strip')).toBeVisible();
+  await expect(page.locator('.survival-rank-strip details')).toHaveCount(0);
   await noOverflow(page);
 });
 
