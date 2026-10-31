@@ -26,46 +26,126 @@ function ratingRange(item) {
     );
   return '—';
 }
+const TIER_THEMES = {
+  bronze: {
+    title: 'text-[#a95f32] dark:text-[#f5d6ad]',
+    active:
+      'border-[#a95f32]/60 bg-gradient-to-br from-[#fcf0e4] to-card dark:from-[#a95f32]/25 dark:to-card ring-2 ring-[#a95f32]/25 shadow-xs',
+    badge: 'bg-[#a95f32]/15 text-[#a95f32] border-[#a95f32]/30 dark:text-[#f5d6ad]',
+    multiplier: 'bg-[#a95f32]/15 text-[#a95f32] border-[#a95f32]/30 dark:text-[#f5d6ad]',
+  },
+  silver: {
+    title: 'text-[#62788a] dark:text-[#e8f0f6]',
+    active:
+      'border-[#62788a]/60 bg-gradient-to-br from-[#f0f4f7] to-card dark:from-[#62788a]/25 dark:to-card ring-2 ring-[#62788a]/25 shadow-xs',
+    badge: 'bg-[#62788a]/15 text-[#62788a] border-[#62788a]/30 dark:text-[#e8f0f6]',
+    multiplier: 'bg-[#62788a]/15 text-[#62788a] border-[#62788a]/30 dark:text-[#e8f0f6]',
+  },
+  gold: {
+    title: 'text-amber-700 dark:text-amber-300',
+    active:
+      'border-amber-400 bg-gradient-to-br from-[#fff7da] to-card dark:from-amber-500/25 dark:to-card ring-2 ring-amber-400/30 shadow-xs',
+    badge: 'bg-amber-500/15 text-amber-700 border-amber-400/40 dark:text-amber-300',
+    multiplier: 'bg-amber-500/15 text-amber-700 border-amber-400/40 dark:text-amber-300',
+  },
+  platinum: {
+    title: 'text-[#24826c] dark:text-[#bceee0]',
+    active:
+      'border-emerald-500/60 bg-gradient-to-br from-[#e9f7f1] to-card dark:from-emerald-500/25 dark:to-card ring-2 ring-emerald-500/25 shadow-xs',
+    badge: 'bg-emerald-500/15 text-emerald-700 border-emerald-400/40 dark:text-emerald-300',
+    multiplier: 'bg-emerald-500/15 text-emerald-700 border-emerald-400/40 dark:text-emerald-300',
+  },
+  diamond: {
+    title: 'text-[#237d9d] dark:text-[#b9edff]',
+    active:
+      'border-sky-500/60 bg-gradient-to-br from-[#eaf8fc] to-card dark:from-sky-500/25 dark:to-card ring-2 ring-sky-500/25 shadow-xs',
+    badge: 'bg-sky-500/15 text-sky-700 border-sky-400/40 dark:text-sky-300',
+    multiplier: 'bg-sky-500/15 text-sky-700 border-sky-400/40 dark:text-sky-300',
+  },
+  master: {
+    title: 'text-[#c65316] dark:text-[#ffce77]',
+    active:
+      'border-orange-500/60 bg-gradient-to-br from-[#fff0e4] to-card dark:from-orange-500/25 dark:to-card ring-2 ring-orange-500/25 shadow-xs',
+    badge: 'bg-orange-500/15 text-orange-700 border-orange-400/40 dark:text-orange-300',
+    multiplier: 'bg-orange-500/15 text-orange-700 border-orange-400/40 dark:text-orange-300',
+  },
+};
+
 export function RankTierStrip({ stats }) {
   if (!stats) return null;
   const guide = stats.rankTiers || RANK_TIERS;
   const currentRank = getRankTier(stats.rank).id;
   return (
     <section
-      className="survival-rank-strip min-w-0 overflow-hidden rounded-xl border border-t-2 border-t-primary bg-card"
+      className="survival-rank-strip min-w-0 rounded-2xl border border-border/80 bg-card p-2 sm:p-2.5 shadow-2xs"
       aria-label={t('Các bậc Rank')}
     >
-      <ol className="grid grid-cols-6 divide-x">
+      <ol className="grid grid-cols-2 min-[640px]:grid-cols-3 min-[1080px]:grid-cols-6 gap-2">
         {guide.map((item) => {
           const visual = getRankTier(item.name),
             current = visual.id === currentRank;
+          const theme = TIER_THEMES[visual.id];
           const hasRange = item.minRating != null || item.maxRating != null;
           return (
             <li
               key={visual.id}
               aria-current={current ? 'step' : undefined}
               className={cn(
-                'flex min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-center sm:flex-row sm:gap-2 sm:px-2 sm:py-3 sm:text-left',
-                current ? cn('is-current', RANK_STYLES[visual.id]) : 'bg-card',
+                'group relative flex min-w-0 items-center gap-2.5 rounded-xl border p-2.5 sm:px-3 sm:py-2.5 transition-all',
+                current
+                  ? theme?.active || 'border-primary bg-primary/5 ring-2 ring-primary/20 shadow-xs'
+                  : 'border-border/60 bg-muted/20 hover:border-border hover:bg-muted/40 hover:shadow-2xs',
               )}
             >
-              <RankEmblem
-                rank={item.name}
-                decorative
-                className="size-7! shrink-0 sm:h-11! sm:w-9!"
-              />
-              <div className="min-w-0">
-                <b className="block text-[10px] font-extrabold wrap-anywhere sm:text-sm">
-                  {item.name}
-                </b>
+              <div className="relative shrink-0 flex items-center justify-center">
+                <RankEmblem
+                  rank={item.name}
+                  decorative
+                  className={cn(
+                    'h-10! w-8! sm:h-11! sm:w-9! shrink-0 transition-transform group-hover:scale-105',
+                    current && 'drop-shadow-xs',
+                  )}
+                />
+              </div>
+              <div className="min-w-0 flex-1 space-y-0.5">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <b
+                    className={cn(
+                      'font-heading text-xs sm:text-sm font-extrabold tracking-tight truncate',
+                      current ? theme?.title : 'text-foreground',
+                    )}
+                  >
+                    {item.name}
+                  </b>
+                  {current && (
+                    <span
+                      className={cn(
+                        'inline-flex items-center gap-1 rounded-full px-1.5 py-0.2 font-mono text-[9px] font-bold border leading-tight',
+                        theme?.badge,
+                      )}
+                    >
+                      <span className="size-1 rounded-full bg-current animate-pulse" />
+                      {t('Hiện tại')}
+                    </span>
+                  )}
+                </div>
                 {hasRange && (
-                  <span className="rank-rating-range hidden text-[10px] wrap-anywhere text-muted-foreground sm:block">
+                  <span className="block font-mono text-[10px] text-muted-foreground truncate">
                     {ratingRange(item)}
                   </span>
                 )}
-                {item.gainMultiplier > 1 && (
-                  <span className="rank-gain-badge hidden text-[10px] font-medium sm:block">
+                {item.gainMultiplier > 1 ? (
+                  <span
+                    className={cn(
+                      'inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.2 font-mono text-[9px] font-bold border leading-tight',
+                      theme?.multiplier,
+                    )}
+                  >
                     ×{item.gainMultiplier} {t('điểm tăng')}
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center rounded-md bg-muted/60 border border-border/40 px-1.5 py-0.2 font-mono text-[9px] font-medium text-muted-foreground/70 leading-tight">
+                    ×1 {t('chuẩn')}
                   </span>
                 )}
               </div>
