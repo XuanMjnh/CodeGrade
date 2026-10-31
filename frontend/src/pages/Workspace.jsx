@@ -18,6 +18,34 @@ import { cn } from '../lib/utils';
 import { History, Trophy, MessageSquare } from 'lucide-react';
 const cpp =
   '#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    \n    return 0;\n}\n';
+function renderStatementText(text) {
+  if (!text) return null;
+  const lines = text.split('\n');
+  return lines.map((line, idx) => {
+    const trimmed = line.trim();
+    const isHeading =
+      /^(?:###\s*)?(dữ liệu vào|dữ liệu ra|dữ liệu ra mong đợi|input|output|ví dụ|ràng buộc|giới hạn)(\s*:)?$/i.test(
+        trimmed,
+      );
+    if (isHeading) {
+      return (
+        <span
+          key={idx}
+          className="block font-heading font-black text-action pt-2.5 pb-0.5 tracking-tight text-[13px] sm:text-sm"
+        >
+          {line}
+        </span>
+      );
+    }
+    return (
+      <React.Fragment key={idx}>
+        {line}
+        {idx < lines.length - 1 ? '\n' : null}
+      </React.Fragment>
+    );
+  });
+}
+
 export default function Workspace({
   id,
   user,
@@ -269,7 +297,7 @@ export default function Workspace({
         </p>
       )}
 
-      <div className="workspace grid min-w-0 items-start gap-4 min-[851px]:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)]">
+      <div className="workspace grid min-w-0 items-start gap-4 min-[851px]:grid-cols-2">
         {/* Left Column: Problem Statement */}
         <section className="statement flex flex-col rounded-2xl border border-border/80 bg-card text-card-foreground shadow-2xs overflow-hidden min-[851px]:h-[720px]">
           <div className="shrink-0 flex items-center justify-between border-b border-border/60 bg-muted/30 px-4 py-2.5">
@@ -297,13 +325,13 @@ export default function Workspace({
 
           <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-5 space-y-4">
             <div className="space-y-1">
-              <h2 className="font-heading text-lg font-bold text-foreground" data-user-content>
+              <h2 className="font-heading text-lg sm:text-xl font-black tracking-tight text-action" data-user-content>
                 {q.general.questionName}
               </h2>
             </div>
 
             <pre className="statement-text whitespace-pre-wrap break-words bg-transparent p-0 font-sans text-sm leading-relaxed text-foreground/90">
-              {q.general.questionText}
+              {renderStatementText(q.general.questionText)}
             </pre>
 
             <div className="space-y-3 pt-2">
@@ -342,13 +370,13 @@ export default function Workspace({
 
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <small className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                      <small className="text-[11px] font-black text-action uppercase tracking-wider font-heading">
                         INPUT
                       </small>
                       {t.stdin && (
                         <button
                           type="button"
-                          className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+                          className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-action transition-colors cursor-pointer"
                           onClick={() => copyExample(t.stdin, trUI('Input'))}
                         >
                           <Icon
@@ -367,13 +395,13 @@ export default function Workspace({
 
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <small className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                      <small className="text-[11px] font-black text-action uppercase tracking-wider font-heading">
                         EXPECTED OUTPUT
                       </small>
                       {t.expected && (
                         <button
                           type="button"
-                          className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+                          className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-action transition-colors cursor-pointer"
                           onClick={() => copyExample(t.expected, trUI('Output'))}
                         >
                           <Icon

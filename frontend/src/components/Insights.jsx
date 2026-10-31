@@ -112,6 +112,15 @@ export function InsightPanel({ title, action, children, className = '' }) {
     </section>
   );
 }
+const levelTones = {
+  1: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
+  2: 'border-teal-500/30 bg-teal-500/10 text-teal-700 dark:text-teal-400',
+  3: 'border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-400',
+  4: 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400',
+  5: 'border-purple-500/30 bg-purple-500/10 text-purple-700 dark:text-purple-400',
+  6: 'border-rose-500/30 bg-rose-500/10 text-rose-700 dark:text-rose-400',
+};
+
 export function ProgressRows({ items, empty = 'Chưa có dữ liệu.' }) {
   return !items.length ? (
     <p className="muted text-xs leading-relaxed text-muted-foreground py-2">{t(empty)}</p>
@@ -144,8 +153,9 @@ export function ProgressRows({ items, empty = 'Chưa có dữ liệu.' }) {
             <span className="truncate text-xs font-semibold text-foreground capitalize" data-user-content>
               {c.name}
             </span>
-            <small className="shrink-0 font-mono text-[10px] font-bold text-muted-foreground tabular-nums">
-              {c.value} / {c.total}
+            <small className="shrink-0 font-mono text-[10px] font-bold tabular-nums">
+              <span className={c.value > 0 ? 'text-action font-bold' : 'text-muted-foreground'}>{c.value}</span>
+              <span className="text-muted-foreground/60 font-normal"> / {c.total}</span>
             </small>
           </div>
           <ProgressMeter
@@ -153,7 +163,8 @@ export function ProgressRows({ items, empty = 'Chưa có dữ liệu.' }) {
             data-verdict={c.name}
             value={c.value}
             max={Math.max(1, c.total)}
-            className="h-1"
+            className="h-1.5 [&_[data-slot=progress-indicator]]:bg-action [&>div]:bg-action"
+            indicatorClassName="bg-action"
           />
         </div>
       ))}
@@ -180,18 +191,21 @@ export function ProblemPicks({ items }) {
               >
                 {p.title}
               </span>
-              <small
-                className="block truncate text-[10px] text-muted-foreground leading-tight"
+              <div
+                className="flex items-center gap-1.5 text-[10px] leading-tight truncate mt-0.5"
                 data-user-content
               >
-                {p.publicId} · {p.category}
-              </small>
+                <span className="font-mono font-bold text-action">{p.publicId}</span>
+                <span className="text-muted-foreground/40 font-normal">•</span>
+                <span className="text-muted-foreground">{p.category}</span>
+              </div>
             </div>
             <span
-              className={
-                'badge inline-flex shrink-0 items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-semibold border level-' +
-                p.difficulty
-              }
+              className={cn(
+                'badge inline-flex shrink-0 items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold border shadow-2xs',
+                levelTones[p.difficulty] || 'border-border bg-muted text-muted-foreground',
+                'level-' + p.difficulty,
+              )}
             >
               {t('Mức')} {p.difficulty}
             </span>
