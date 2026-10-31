@@ -228,15 +228,15 @@ export default function Practice({ user, revision }) {
           )}
         </div>
       )}
-      <div className="library-toolbar mb-3">
-        <div className="filters my-2 flex flex-wrap items-center gap-2.5 rounded-xl border bg-card p-3 sm:p-3.5 [&_input]:min-w-40 [&_input]:flex-1">
+      <div className="library-toolbar mb-3.5">
+        <div className="filters flex flex-wrap items-center gap-2.5 rounded-2xl border border-border/80 bg-card p-3 shadow-2xs transition-all">
           <UiButton
-            className={
-              'secondary border border-input bg-card text-foreground shadow-xs hover:bg-accent hover:text-accent-foreground bookmark-filter ' +
-              (star
-                ? 'is-active border-primary/40 bg-accent text-accent-foreground ring-1 ring-primary/15'
-                : '')
-            }
+            className={cn(
+              'h-9 px-3.5 text-xs font-semibold rounded-xl border transition-all gap-1.5 shadow-2xs cursor-pointer bookmark-filter shrink-0',
+              star
+                ? 'is-active bg-amber-500/10 text-amber-600 border-amber-300 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800 font-bold ring-2 ring-amber-400/20'
+                : 'bg-card text-muted-foreground hover:text-foreground hover:bg-muted/60 border-border/80',
+            )}
             aria-pressed={star}
             onClick={() => {
               S(!star);
@@ -244,59 +244,137 @@ export default function Practice({ user, revision }) {
             }}
             variant="outline"
           >
-            <Icon name="fa-regular fa-star" aria-hidden="true" /> {trUI('Đánh dấu')}
+            <Icon
+              name={star ? 'fa-solid fa-star' : 'fa-regular fa-star'}
+              className={cn(
+                'size-3.5',
+                star ? 'text-amber-500 fill-amber-500' : 'text-muted-foreground/70',
+              )}
+              aria-hidden="true"
+            />
+            <span>{trUI('Đánh dấu')}</span>
+            {star && <span className="size-1.5 rounded-full bg-amber-500 animate-pulse ml-0.5" />}
           </UiButton>
-          <UiInput
-            aria-label={trUI('Tìm bài')}
-            placeholder={trUI('Tìm theo tên bài…')}
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              P(1);
-            }}
-          />
-          <UiNativeSelect
-            aria-label="Category"
-            value={category}
-            onChange={(e) => {
-              setCategory(e.target.value);
-              P(1);
-            }}
-          >
-            <option value="">{trUI('Tất cả category')}</option>
-            {categories?.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </UiNativeSelect>
-          <UiNativeSelect
-            aria-label={trUI('Độ khó')}
-            value={difficulty}
-            onChange={(e) => {
-              setDifficulty(+e.target.value);
-              P(1);
-            }}
-          >
-            <option value="0">{trUI('Tất cả độ khó')}</option>
-            {[1, 2, 3, 4, 5, 6].map((d) => (
-              <option key={d} value={d}>
-                {trUI('Mức')} {d}
-              </option>
-            ))}
-          </UiNativeSelect>
-          <UiNativeSelect
-            aria-label={trUI('Trạng thái AC')}
-            value={state}
-            onChange={(e) => {
-              setState(e.target.value);
-              P(1);
-            }}
-          >
-            <option value="all">{trUI('Mọi trạng thái')}</option>
-            <option value="ac">{trUI('Đã AC')}</option>
-            <option value="todo">{trUI('Chưa AC')}</option>
-          </UiNativeSelect>
+
+          <div className="relative min-w-[200px] flex-1">
+            <Icon
+              name="fa-solid fa-magnifying-glass"
+              className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground/50"
+              aria-hidden="true"
+            />
+            <UiInput
+              aria-label={trUI('Tìm bài')}
+              placeholder={trUI('Tìm theo tên bài…')}
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                P(1);
+              }}
+              className="h-9 pl-9 pr-8 text-xs bg-card border-border/80 rounded-xl shadow-2xs focus-visible:ring-2 focus-visible:ring-primary/20 placeholder:text-muted-foreground/60 transition-all"
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearch('');
+                  P(1);
+                }}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/60 hover:text-foreground inline-flex items-center justify-center rounded-full hover:bg-muted transition-colors cursor-pointer"
+                aria-label={trUI('Xóa tìm kiếm')}
+              >
+                <Icon name="fa-solid fa-xmark" className="size-2.5" />
+              </button>
+            )}
+          </div>
+
+          <div className="shrink-0 min-w-[145px]">
+            <UiNativeSelect
+              aria-label="Category"
+              value={category}
+              onChange={(e) => {
+                setCategory(e.target.value);
+                P(1);
+              }}
+              className={cn(
+                'h-9 text-xs font-semibold rounded-xl border shadow-2xs transition-all cursor-pointer',
+                category
+                  ? 'bg-primary/5 text-primary border-primary/30 font-bold'
+                  : 'bg-card text-foreground border-border/80 hover:border-border',
+              )}
+            >
+              <option value="">{trUI('Tất cả category')}</option>
+              {categories?.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </UiNativeSelect>
+          </div>
+
+          <div className="shrink-0 min-w-[130px]">
+            <UiNativeSelect
+              aria-label={trUI('Độ khó')}
+              value={difficulty}
+              onChange={(e) => {
+                setDifficulty(+e.target.value);
+                P(1);
+              }}
+              className={cn(
+                'h-9 text-xs font-semibold rounded-xl border shadow-2xs transition-all cursor-pointer',
+                difficulty > 0
+                  ? 'bg-action/5 text-action border-action/30 font-bold'
+                  : 'bg-card text-foreground border-border/80 hover:border-border',
+              )}
+            >
+              <option value="0">{trUI('Tất cả độ khó')}</option>
+              {[1, 2, 3, 4, 5, 6].map((d) => (
+                <option key={d} value={d}>
+                  {trUI('Mức')} {d}
+                </option>
+              ))}
+            </UiNativeSelect>
+          </div>
+
+          <div className="shrink-0 min-w-[135px]">
+            <UiNativeSelect
+              aria-label={trUI('Trạng thái AC')}
+              value={state}
+              onChange={(e) => {
+                setState(e.target.value);
+                P(1);
+              }}
+              className={cn(
+                'h-9 text-xs font-semibold rounded-xl border shadow-2xs transition-all cursor-pointer',
+                state !== 'all'
+                  ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800 font-bold'
+                  : 'bg-card text-foreground border-border/80 hover:border-border',
+              )}
+            >
+              <option value="all">{trUI('Mọi trạng thái')}</option>
+              <option value="ac">{trUI('Đã AC')}</option>
+              <option value="todo">{trUI('Chưa AC')}</option>
+            </UiNativeSelect>
+          </div>
+
+          {(search || category || difficulty > 0 || state !== 'all' || star) && (
+            <UiButton
+              variant="ghost"
+              size="sm"
+              className="h-9 px-2.5 text-xs font-semibold text-muted-foreground hover:text-action hover:bg-action/10 rounded-xl transition-all gap-1.5 cursor-pointer shrink-0"
+              onClick={() => {
+                setSearch('');
+                setCategory('');
+                setDifficulty(0);
+                setState('all');
+                S(false);
+                P(1);
+              }}
+              title={trUI('Đặt lại bộ lọc')}
+            >
+              <Icon name="fa-solid fa-rotate-left" className="size-3" aria-hidden="true" />
+              <span className="hidden sm:inline">{trUI('Đặt lại')}</span>
+            </UiButton>
+          )}
         </div>
       </div>
       <ErrorBox error={error || categoryError || allError || bookmarkError} />
@@ -304,7 +382,7 @@ export default function Practice({ user, revision }) {
         <Loading />
       ) : (
         <div
-          className="paper text-card-foreground shadow-subtle table-wrap min-w-0 overflow-x-auto rounded-xl border border-border/80 bg-card [&_thead]:bg-linear-to-b [&_thead]:from-muted/70 [&_thead]:to-muted/40 [&_thead_th]:border-b [&_thead_th]:border-border/80"
+          className="paper text-card-foreground shadow-subtle table-wrap min-w-0 overflow-x-auto rounded-2xl border border-border/80 bg-card shadow-2xs [&_thead]:bg-linear-to-b [&_thead]:from-muted/70 [&_thead]:to-muted/40 [&_thead_th]:border-b [&_thead_th]:border-border/80"
           data-pagination="manual"
           role="region"
           aria-label={trUI('Bảng dữ liệu')}
@@ -488,29 +566,45 @@ export default function Practice({ user, revision }) {
             </div>
           )}
           <div
-            className="table-footer flex flex-wrap items-center gap-3 border-t px-4 py-3 text-xs text-muted-foreground [&>span:last-child]:ml-auto [&_button]:h-11 [&_button]:border [&_button]:border-input [&_button]:bg-card [&_button]:text-foreground [&_button:disabled]:bg-muted [&_button:disabled]:text-muted-foreground"
+            className="table-footer flex flex-wrap items-center justify-between gap-3 border-t border-border/60 bg-muted/20 px-4 py-3 text-xs text-muted-foreground rounded-b-2xl"
             aria-label={trUI('Phân trang bài tập')}
           >
-            <UiButton
-              className="ghost bg-transparent text-muted-foreground shadow-none hover:bg-muted hover:text-foreground"
-              disabled={currentPage <= 1}
-              onClick={() => P(currentPage - 1)}
-              variant="ghost"
-            >
-              Previous
-            </UiButton>
-            <span>
-              {currentPage} / {totalPages}
-            </span>
-            <UiButton
-              className="ghost bg-transparent text-muted-foreground shadow-none hover:bg-muted hover:text-foreground"
-              disabled={currentPage * 20 >= rows.length}
-              onClick={() => P(currentPage + 1)}
-              variant="ghost"
-            >
-              Next
-            </UiButton>
-            {rows.length} {trUI('bài tập')} <span>C++ 11 · C++ 17 · C++ 20 · Python 3.11</span>
+            <div className="flex items-center gap-2">
+              <UiButton
+                className="h-8 px-3 text-xs font-semibold rounded-lg border border-border/80 bg-card text-foreground hover:bg-muted hover:text-action shadow-2xs transition-all disabled:opacity-40 disabled:hover:bg-card disabled:hover:text-foreground cursor-pointer flex items-center gap-1.5"
+                disabled={currentPage <= 1}
+                onClick={() => P(currentPage - 1)}
+                variant="outline"
+              >
+                <Icon name="fa-solid fa-chevron-left" className="size-2.5" aria-hidden="true" />
+                <span>{trUI('Trang trước')}</span>
+              </UiButton>
+
+              <span className="inline-flex items-center px-2.5 py-1 font-mono text-xs font-bold text-foreground bg-card border border-border/80 rounded-lg shadow-2xs">
+                {currentPage} / {totalPages || 1}
+              </span>
+
+              <UiButton
+                className="h-8 px-3 text-xs font-semibold rounded-lg border border-border/80 bg-card text-foreground hover:bg-muted hover:text-action shadow-2xs transition-all disabled:opacity-40 disabled:hover:bg-card disabled:hover:text-foreground cursor-pointer flex items-center gap-1.5"
+                disabled={currentPage * 20 >= rows.length}
+                onClick={() => P(currentPage + 1)}
+                variant="outline"
+              >
+                <span>{trUI('Trang sau')}</span>
+                <Icon name="fa-solid fa-chevron-right" className="size-2.5" aria-hidden="true" />
+              </UiButton>
+
+              <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-card border border-border/60 text-xs text-muted-foreground shadow-2xs ml-1">
+                <span className="font-mono font-bold text-action">{rows.length}</span>
+                <span>{trUI('bài tập')}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono ml-auto">
+              <Icon name="fa-solid fa-code" className="size-3 text-primary shrink-0" aria-hidden="true" />
+              <span className="hidden md:inline">C++ 11 · C++ 17 · C++ 20 · Python 3.11</span>
+              <span className="md:hidden">C++ / Python</span>
+            </div>
           </div>
         </div>
       )}

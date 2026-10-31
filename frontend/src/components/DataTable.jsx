@@ -26,29 +26,31 @@ export function DataTable({ children, paginate = true, pageSize = 20, ...props }
       </Table>
       {active && (
         <nav
-          className="pagination flex items-center justify-end gap-3 border-t px-4 py-3 text-xs text-muted-foreground"
+          className="pagination flex items-center justify-end gap-2 border-t border-border/60 bg-muted/20 px-4 py-2.5 text-xs text-muted-foreground rounded-b-xl"
           aria-label={t('Phân trang')}
         >
-          <span>
+          <Button
+            variant="outline"
+            size="sm"
+            aria-label={t('Trang trước')}
+            disabled={current === 1}
+            onClick={() => setPage(current - 1)}
+            className="h-8 px-2.5 text-xs font-semibold rounded-lg border border-border/80 bg-card text-foreground hover:bg-muted hover:text-action shadow-2xs transition-all disabled:opacity-40"
+          >
+            <ChevronLeft className="size-3.5" />
+          </Button>
+          <span className="inline-flex items-center px-2.5 py-1 font-mono text-xs font-bold text-foreground bg-card border border-border/80 rounded-lg shadow-2xs">
             {current} / {pages}
           </span>
           <Button
             variant="outline"
-            size="icon-sm"
-            aria-label={t('Trang trước')}
-            disabled={current === 1}
-            onClick={() => setPage(current - 1)}
-          >
-            <ChevronLeft className="size-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon-sm"
+            size="sm"
             aria-label={t('Trang sau')}
             disabled={current === pages}
             onClick={() => setPage(current + 1)}
+            className="h-8 px-2.5 text-xs font-semibold rounded-lg border border-border/80 bg-card text-foreground hover:bg-muted hover:text-action shadow-2xs transition-all disabled:opacity-40"
           >
-            <ChevronRight className="size-4" />
+            <ChevronRight className="size-3.5" />
           </Button>
         </nav>
       )}

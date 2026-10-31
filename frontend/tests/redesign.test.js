@@ -4,7 +4,7 @@ import { build } from 'esbuild';
 import { JSDOM } from 'jsdom';
 import { defaults } from '../src/lib/coderunner.js';
 
-// Component fixtures exercise UI state. Actual server journeys live in survival-ui.cjs.
+// Component fixtures exercise UI state. Actual server journeys live in tests/browser/.
 const bundle = await build({
   stdin: {
     contents: `import React,{act} from 'react';import {createRoot} from 'react-dom/client';import Studio from './src/pages/QuestionEditor.jsx';import Lobby from './src/pages/SurvivalLobby.jsx';import {Room} from './src/pages/Survival.jsx';import {Admin} from './src/pages/Records.jsx';const root=createRoot(document.getElementById('root'));window.harness={act,render:(kind,p)=>root.render(React.createElement({Studio,Lobby,Room,Admin}[kind],p)),unmount:()=>root.unmount()};`,
@@ -98,7 +98,9 @@ async function mount(kind, options = {}) {
       pretendToBeVisual: true,
     }),
     w = dom.window,
-    calls = [];
+    calls = [],
+    observers = [],
+    scrolls = [];
   const state = { question: fixture(), queue: { state: 'IDLE' }, room: room('LOBBY'), ...options };
   w.MessageChannel = class {
     constructor() {
@@ -109,7 +111,26 @@ async function mount(kind, options = {}) {
   w.IS_REACT_ACT_ENVIRONMENT = true;
   w.structuredClone = structuredClone;
   w.confirm = () => true;
-  w.HTMLElement.prototype.scrollIntoView = () => {};
+  w.IntersectionObserver = class {
+    constructor(callback) {
+      this.callback = callback;
+      this.targets = new Set();
+      observers.push(this);
+    }
+    observe(target) {
+      this.targets.add(target);
+    }
+    disconnect() {
+      this.targets.clear();
+    }
+    intersect(target, isIntersecting = true) {
+      assert.ok(this.targets.has(target), 'Section must be observed before intersection');
+      this.callback([{ target, isIntersecting }], this);
+    }
+  };
+  w.HTMLElement.prototype.scrollIntoView = function () {
+    scrolls.push(this.id);
+  };
   w.fetch = async () => ({
     json: async () => ({
       questionTypes: [{ id: 'python3_program', description: 'Python program' }],
@@ -196,6 +217,8 @@ async function mount(kind, options = {}) {
     w,
     state,
     calls,
+    observers,
+    scrolls,
     act,
     click,
     edit,
@@ -206,21 +229,28 @@ async function mount(kind, options = {}) {
     },
   };
 }
-test('studio keeps every configured field and whitespace across panels and save', async () => {
+test('studio keeps every configured field and whitespace across sections and save', async () => {
   const h = await mount('Studio');
   try {
-    assert.equal(h.w.document.querySelectorAll('[role=tab]').length, 5);
-    assert.equal(h.w.document.querySelectorAll('[role=tabpanel]:not([hidden])').length, 1);
+    const navigation = h.w.document.querySelectorAll('.studio-nav button');
+    assert.equal(navigation.length, 5);
+    const sections = h.w.document.querySelectorAll('.studio-content fieldset > section');
+    assert.equal(sections.length, 5);
+    assert.ok([...sections].every((section) => !section.hidden));
     await h.edit('general.questionName', 'Edited ∑');
-    await h.click('3Đáp án mẫuLời giải tham chiếu & preload');
+    await h.act(async () => navigation[2].click());
+    assert.equal(h.scrolls.at(-1), 'sec-3-answer');
+    assert.equal(navigation[2].getAttribute('aria-pressed'), 'true');
     await h.edit('answer.sampleAnswer', 'print(42)\n');
-    await h.click('4Bộ kiểm thửInput, output & thuộc tính');
+    await h.act(async () => navigation[3].click());
+    assert.equal(h.scrolls.at(-1), 'sec-4-testcases');
     const first = h.w.document.querySelector('.test-block');
     assert.match(first.textContent, /Public Example/);
-    assert.match(first.textContent, /Display: Hide/);
+    assert.equal(first.querySelector('[aria-label="testcases.0.display"]').value, 'HIDE');
+    assert.match(first.querySelector('.test-heading').textContent, /Hide/);
     assert.match(
-      h.w.document.querySelectorAll('.test-block')[1].textContent,
-      /Không phải ví dụ công khai/,
+      h.w.document.querySelectorAll('.test-block')[1].querySelector('.test-heading').textContent,
+      /Không công khai/,
     );
     await h.click('Lưu và tiếp tục sửa');
     const saved = h.calls.find((c) => c.type === 'QUESTION_SAVE').payload;
@@ -256,7 +286,7 @@ test('studio import/export preserves schema, IDs, example/display flags and iden
     };
     h.w.URL.revokeObjectURL = () => {};
     h.w.HTMLAnchorElement.prototype.click = () => {};
-    await h.click('Export JSON');
+    await h.click('Xuất JSON');
     const exported = JSON.parse(await blob.text());
     assert.equal(exported.id, undefined);
     assert.equal(exported.publicId, undefined);
@@ -293,7 +323,7 @@ test('invalid JSON or invalid configuration never replaces or saves the current 
     await h.close();
   }
 });
-test('failed save retains local draft and cancelled navigation; tab keyboard works', async () => {
+test('failed save retains local draft and cancelled navigation; checklist keyboard works', async () => {
   const h = await mount('Studio', { rejectSave: true });
   try {
     await h.edit('general.questionName', 'Keep draft');
@@ -307,14 +337,42 @@ test('failed save retains local draft and cancelled navigation; tab keyboard wor
     const event = new h.w.CustomEvent('codegrade:before-navigate', { cancelable: true });
     h.w.dispatchEvent(event);
     assert.equal(event.defaultPrevented, true);
-    const tab = h.w.document.querySelector('[role=tab]');
-    await h.act(async () =>
-      tab.dispatchEvent(new h.w.KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true })),
-    );
-    assert.equal(h.w.document.querySelector('[role=tab][aria-selected=true]').id, 'studio-tab-1');
+    const item = h.w.document.querySelectorAll('.studio-checklist [role=button]')[4];
+    assert.equal(item.tabIndex, 0);
+    for (const key of ['Enter', ' ']) {
+      const keyboard = new h.w.KeyboardEvent('keydown', { key, bubbles: true, cancelable: true });
+      const previousScrolls = h.scrolls.length;
+      await h.act(async () => item.dispatchEvent(keyboard));
+      assert.equal(keyboard.defaultPrevented, true);
+      assert.equal(h.scrolls.length, previousScrolls + 1);
+      assert.equal(h.scrolls.at(-1), 'sec-2-grading');
+      assert.match(
+        h.w.document.querySelector('.studio-nav button[aria-pressed=true]').textContent,
+        /Cấu hình chấm/,
+      );
+    }
   } finally {
     await h.close();
   }
+});
+test('studio tracks visible sections and disconnects its observer on unmount', async () => {
+  const h = await mount('Studio');
+  const observer = h.observers.at(-1);
+  try {
+    assert.equal(observer.targets.size, 5);
+    const section = h.w.document.getElementById('sec-4-testcases');
+    const activeSection = () =>
+      h.w.document.querySelector('.studio-nav button[aria-pressed=true]').textContent;
+    assert.match(activeSection(), /Thông tin cơ bản/);
+    await h.act(async () => observer.intersect(section, false));
+    assert.match(activeSection(), /Thông tin cơ bản/);
+    await h.act(async () => observer.intersect(section));
+    assert.match(activeSection(), /Bộ kiểm thử/);
+    assert.equal(h.w.document.querySelectorAll('.studio-nav button[aria-pressed=true]').length, 1);
+  } finally {
+    await h.close();
+  }
+  assert.equal(observer.targets.size, 0);
 });
 test('lobby uses official progression and keeps practice creation separate from queues', async () => {
   const h = await mount('Lobby');
