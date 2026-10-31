@@ -75,6 +75,25 @@ function Timer() {
     </section>
   );
 }
+
+const RANK_STYLES = [
+  {
+    badge: 'border border-amber-300 bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-200 dark:border-amber-700',
+    text: 'text-amber-700 dark:text-amber-300',
+    score: 'bg-amber-50 text-amber-800 border-amber-200/80 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800',
+  },
+  {
+    badge: 'border border-emerald-300 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-200 dark:border-emerald-700',
+    text: 'text-emerald-700 dark:text-emerald-300',
+    score: 'bg-emerald-50 text-emerald-800 border-emerald-200/80 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800',
+  },
+  {
+    badge: 'border border-orange-300 bg-orange-100 text-orange-800 dark:bg-orange-950/70 dark:text-orange-200 dark:border-orange-700',
+    text: 'text-orange-700 dark:text-orange-300',
+    score: 'bg-orange-50 text-orange-800 border-orange-200/80 dark:bg-orange-950/50 dark:text-orange-300 dark:border-orange-800',
+  },
+];
+
 export default function Utilities({ side, revision }) {
   const [problems, error] = useResource(side === 'right' ? 'PROBLEMS' : null, {}, revision),
     [categories, categoryError] = useResource(side === 'right' ? 'CATEGORIES' : null, {}, revision),
@@ -173,45 +192,57 @@ export default function Utilities({ side, revision }) {
         </>
       ) : (
         <>
-          <section className="category-stats space-y-3 rounded-xl border bg-card p-3.5 shadow-subtle">
+          <section className="category-stats space-y-3 rounded-xl border bg-card !p-3 shadow-subtle">
             <div className="rail-title mb-2.5 flex items-center justify-between gap-2 border-b border-border/50 pb-2">
-              <h3 className="font-heading text-xs font-bold tracking-tight text-foreground">{t('Bài theo danh mục')}</h3>
-              <span className="rail-total ml-auto inline-flex items-center justify-center rounded-full bg-emerald-50 px-2 py-0.5 font-mono text-[11px] font-bold text-emerald-700 ring-1 ring-emerald-500/20">
+              <div className="flex items-center gap-1.5">
+                <span className="flex size-6 items-center justify-center rounded-md bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400">
+                  <Icon name="fa-solid fa-layer-group" className="size-3.5" />
+                </span>
+                <h3 className="font-heading text-xs font-bold tracking-tight text-foreground">
+                  {t('Bài theo danh mục')}
+                </h3>
+              </div>
+              <span className="rail-total ml-auto inline-flex items-center justify-center rounded-full bg-emerald-50 px-2 py-0.5 font-mono text-[11px] font-bold text-emerald-700 ring-1 ring-emerald-500/20 dark:bg-emerald-950/50 dark:text-emerald-300">
                 {problems?.length || 0}
               </span>
             </div>
-            <UiLabel className="rail-search mb-4 flex items-center gap-2 rounded-md bg-muted pl-2.5 text-muted-foreground [&_input]:border-0 [&_input]:bg-transparent [&_input]:text-xs [&_input]:shadow-none">
-              <Icon name="fa-solid fa-magnifying-glass" aria-hidden="true" />
+            <UiLabel className="rail-search mb-4 flex items-center gap-2 rounded-lg border border-border/70 bg-muted/40 px-2.5 py-1 text-muted-foreground transition-colors focus-within:border-emerald-500/50 focus-within:bg-card focus-within:ring-1 focus-within:ring-emerald-500/20 [&_input]:border-0 [&_input]:bg-transparent [&_input]:p-0 [&_input]:text-xs [&_input]:shadow-none">
+              <Icon name="fa-solid fa-magnifying-glass" className="size-3.5 shrink-0 text-muted-foreground/70" aria-hidden="true" />
               <UiInput
                 type="search"
                 aria-label={t('Tìm danh mục')}
                 placeholder={t('Tìm danh mục…')}
                 value={search}
                 onChange={(e) => S(e.target.value)}
+                className="h-7 text-xs"
               />
             </UiLabel>
             <ErrorBox error={error || categoryError} />
             {!categories || !problems ? (
               <Loading />
             ) : (
-              <div className="category-chips flex flex-wrap gap-2">
+              <div className="category-chips flex flex-wrap gap-1.5">
                 {categories
                   .filter((c) =>
                     c.name.toLocaleLowerCase('vi').includes(search.trim().toLocaleLowerCase('vi')),
                   )
-                  .map((c) => (
-                    <UiButton
-                      className="category-chip flex items-center justify-between gap-3 rounded-lg border border-border/70 bg-card px-3 py-2 text-left text-xs font-medium text-foreground transition-colors hover:bg-muted/70 hover:text-foreground shadow-2xs h-auto min-h-9"
-                      key={c.id}
-                      onClick={() => go('/practice?category=' + encodeURIComponent(c.id))}
-                      variant="ghost"
-                    >
-                      <span data-user-content>{c.name}</span>
-                      <b className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-bold text-muted-foreground">
-                        {problems.filter((p) => p.category_id === c.id).length}
-                      </b>
-                    </UiButton>
-                  ))}
+                  .map((c) => {
+                    const count = problems.filter((p) => p.category_id === c.id).length;
+                    return (
+                      <UiButton
+                        key={c.id}
+                        onClick={() => go('/practice?category=' + encodeURIComponent(c.id))}
+                        variant="ghost"
+                        size="sm"
+                        className="category-chip h-[26px] rounded-full border-0 bg-muted/65 px-2.5 text-[11px] font-medium text-foreground/85 transition-all hover:bg-muted hover:text-foreground shadow-none gap-1.5 focus-visible:ring-1"
+                      >
+                        <span data-user-content className="truncate">{c.name}</span>
+                        <b className="inline-flex items-center justify-center rounded-full bg-action px-1.5 h-4 min-w-4 text-[10px] font-semibold text-white leading-none shrink-0 shadow-none">
+                          {count}
+                        </b>
+                      </UiButton>
+                    );
+                  })}
               </div>
             )}
             {categories &&
@@ -225,7 +256,14 @@ export default function Utilities({ side, revision }) {
           </section>
           <section className="elo-card space-y-3 rounded-xl border bg-card p-3.5 shadow-subtle">
             <div className="rail-title mb-2.5 flex items-center justify-between gap-2 border-b border-border/50 pb-2">
-              <h3 className="font-heading text-xs font-bold tracking-tight text-foreground">{t('Top Elo Contest')}</h3>
+              <div className="flex items-center gap-1.5">
+                <span className="flex size-6 items-center justify-center rounded-md bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400">
+                  <Icon name="fa-solid fa-trophy" className="size-3.5" />
+                </span>
+                <h3 className="font-heading text-xs font-bold tracking-tight text-foreground">
+                  {t('Top Elo Contest')}
+                </h3>
+              </div>
               <a
                 href="#/leaderboard"
                 aria-label={t('Xem toàn bộ bảng xếp hạng')}
@@ -238,31 +276,56 @@ export default function Utilities({ side, revision }) {
             {!rank ? (
               <Loading />
             ) : rank.length ? (
-              <ol className="elo-list divide-y [&>li]:flex [&>li]:items-center [&>li]:gap-2.5 [&>li]:py-3 [&_small]:block [&_small]:text-[11px] [&_small]:text-muted-foreground [&_b]:text-xs [&_strong]:text-xs">
-                {rank.slice(0, 5).map((u, i) => (
-                  <li key={u.id}>
-                    <span
-                      className={
-                        'elo-position flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted font-mono text-xs font-semibold position-' +
-                        (i + 1)
-                      }
+              <ol className="elo-list divide-y divide-border/50 text-xs">
+                {rank.slice(0, 5).map((u, i) => {
+                  const style = RANK_STYLES[i];
+                  return (
+                    <li
+                      key={u.id}
+                      className="group flex items-center gap-2.5 py-2.5 px-1.5 -mx-1.5 rounded-lg transition-colors hover:bg-muted/40"
                     >
-                      {i === 0 ? (
-                        <>
-                          <Icon name="fa-solid fa-trophy" aria-hidden="true" />
-                          <span className="sr-only">1</span>
-                        </>
-                      ) : (
-                        i + 1
-                      )}
-                    </span>
-                    <span className="elo-person min-w-0 flex-1">
-                      <b data-user-content>{u.display_name}</b>
-                      <small data-user-content>@{u.username}</small>
-                    </span>
-                    <strong>{u.elo}</strong>
-                  </li>
-                ))}
+                      <span
+                        className={cn(
+                          'elo-position flex size-8 shrink-0 items-center justify-center rounded-lg font-mono text-xs font-semibold shadow-2xs',
+                          style
+                            ? style.badge
+                            : 'bg-muted/70 text-muted-foreground border border-border/70',
+                          'position-' + (i + 1),
+                        )}
+                      >
+                        {i === 0 ? (
+                          <>
+                            <Icon name="fa-solid fa-trophy" className="size-3.5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+                            <span className="sr-only">1</span>
+                          </>
+                        ) : (
+                          <span className={cn('font-bold', style?.text || 'text-muted-foreground')}>
+                            {i + 1}
+                          </span>
+                        )}
+                      </span>
+                      <span className="elo-person min-w-0 flex-1">
+                        <b
+                          data-user-content
+                          className="block truncate text-xs font-semibold text-foreground group-hover:text-primary transition-colors"
+                        >
+                          {u.display_name}
+                        </b>
+                        <small data-user-content className="block truncate text-[11px] text-muted-foreground">
+                          @{u.username}
+                        </small>
+                      </span>
+                      <strong
+                        className={cn(
+                          'elo-score shrink-0 rounded-md px-2 py-0.5 font-mono text-xs font-bold tabular-nums border shadow-2xs',
+                          style?.score || 'bg-muted/50 text-muted-foreground border-border/50 font-semibold',
+                        )}
+                      >
+                        {u.elo}
+                      </strong>
+                    </li>
+                  );
+                })}
               </ol>
             ) : (
               <p className="rail-empty text-sm leading-relaxed text-muted-foreground">
