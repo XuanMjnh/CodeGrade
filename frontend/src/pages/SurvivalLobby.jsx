@@ -656,54 +656,84 @@ export default function SurvivalLobby({ user, revision }) {
           </details>
         </aside>
       </div>
-      <section className="min-w-0 overflow-hidden rounded-2xl border bg-card">
+      <section className="min-w-0 overflow-hidden rounded-2xl border border-border/80 bg-card shadow-2xs">
         <div
-          className="flex overflow-x-auto border-b bg-muted/30 p-2"
+          className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 bg-muted/20 px-4 py-3 sm:px-5"
           role="tablist"
-          aria-label="Khám phá Survival"
+          aria-label={t('Khám phá Survival')}
         >
-          {tabs.map(([key, icon, label]) => (
-            <Button
-              key={key}
-              id={'survival-tab-' + key}
-              role="tab"
-              aria-selected={tab === key}
-              aria-controls={'survival-panel-' + key}
-              tabIndex={tab === key ? 0 : -1}
-              onClick={() => setTab(key)}
-              onKeyDown={(e) => {
-                const i = tabs.findIndex((t) => t[0] === key);
-                const next =
-                  e.key === 'ArrowRight'
-                    ? (i + 1) % tabs.length
-                    : e.key === 'ArrowLeft'
-                      ? (i + tabs.length - 1) % tabs.length
-                      : e.key === 'Home'
-                        ? 0
-                        : e.key === 'End'
-                          ? tabs.length - 1
-                          : null;
-                if (next !== null) {
-                  e.preventDefault();
-                  setTab(tabs[next][0]);
-                  document.getElementById('survival-tab-' + tabs[next][0])?.focus();
-                }
-              }}
-              variant="ghost"
-              className={cn(
-                'h-11 shrink-0 rounded-lg px-4 text-sm font-bold',
-                tab === key ? 'bg-card text-primary shadow-xs' : 'text-muted-foreground',
-              )}
-            >
-              <Icon name={'fa-solid ' + icon} className="size-3.5!" />
-              {label}
-              {key === 'rooms' && (
-                <span className="rounded bg-accent px-2 py-0.5 font-mono text-sm font-bold text-primary">
-                  {rooms?.length ?? '—'}
-                </span>
-              )}
-            </Button>
-          ))}
+          <div className="inline-flex items-center gap-1.5 rounded-xl bg-muted/50 p-1 border border-border/40">
+            {tabs.map(([key, icon, label]) => {
+              const active = tab === key;
+              return (
+                <button
+                  type="button"
+                  key={key}
+                  id={'survival-tab-' + key}
+                  role="tab"
+                  aria-selected={active}
+                  aria-controls={'survival-panel-' + key}
+                  tabIndex={active ? 0 : -1}
+                  onClick={() => setTab(key)}
+                  onKeyDown={(e) => {
+                    const i = tabs.findIndex((t) => t[0] === key);
+                    const next =
+                      e.key === 'ArrowRight'
+                        ? (i + 1) % tabs.length
+                        : e.key === 'ArrowLeft'
+                          ? (i + tabs.length - 1) % tabs.length
+                          : e.key === 'Home'
+                            ? 0
+                            : e.key === 'End'
+                              ? tabs.length - 1
+                              : null;
+                    if (next !== null) {
+                      e.preventDefault();
+                      setTab(tabs[next][0]);
+                      document.getElementById('survival-tab-' + tabs[next][0])?.focus();
+                    }
+                  }}
+                  className={cn(
+                    'relative inline-flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs sm:text-sm font-heading font-extrabold transition-all cursor-pointer',
+                    active
+                      ? 'bg-card text-foreground shadow-2xs border border-border/60'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-card/50',
+                  )}
+                >
+                  <Icon
+                    name={'fa-solid ' + icon}
+                    className={cn('size-3.5', active ? 'text-primary' : 'text-muted-foreground/70')}
+                  />
+                  <span>{label}</span>
+                  {key === 'rooms' && (
+                    <span
+                      className={cn(
+                        'inline-flex items-center justify-center rounded-full px-2 py-0.5 font-mono text-[11px] font-bold',
+                        active
+                          ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+                          : 'bg-muted text-muted-foreground',
+                      )}
+                    >
+                      {rooms?.length ?? '—'}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground font-medium">
+            {tab === 'rooms' ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-emerald-700 dark:text-emerald-300 text-[11px] font-semibold">
+                <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                {t('Cập nhật trực tiếp')}
+              </span>
+            ) : (
+              <span className="text-[11px] text-muted-foreground">
+                {t('Lưu kết quả các trận gần nhất')}
+              </span>
+            )}
+          </div>
         </div>
         <div
           role="tabpanel"
@@ -713,99 +743,230 @@ export default function SurvivalLobby({ user, revision }) {
           className="min-w-0 p-4 outline-none sm:p-5"
         >
           {tab === 'rooms' && (
-            <div className="arena-room-browser">
-              <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-                <h2 className="text-xl font-extrabold">Phòng đang mở</h2>
-              </div>
+            <div className="arena-room-browser space-y-4">
               {!rooms ? (
                 <Loading />
               ) : rooms.length ? (
-                <div className="room-grid grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                <div className="room-grid grid gap-3 lg:grid-cols-2">
                   {rooms.map((r) => (
-                    <Button
-                      variant="outline"
+                    <article
                       key={r.id}
-                      className="room-card h-auto min-w-0 flex-col items-stretch gap-3 rounded-xl border-border p-4 text-left whitespace-normal hover:border-primary"
-                      disabled={busy || occupied}
-                      onClick={() => action('ROOM_JOIN', { roomId: r.id })}
+                      className={cn(
+                        'room-card group relative flex flex-col justify-between rounded-xl border border-border/80 bg-card p-3.5 sm:px-4 sm:py-3.5 text-left transition-all duration-150 hover:border-border hover:shadow-subtle cursor-pointer',
+                        (busy || occupied) && 'opacity-60 cursor-not-allowed pointer-events-none',
+                      )}
+                      onClick={() => !busy && !occupied && action('ROOM_JOIN', { roomId: r.id })}
+                      tabIndex={0}
+                      role="button"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          if (!busy && !occupied) action('ROOM_JOIN', { roomId: r.id });
+                        }
+                      }}
                     >
-                      <div className="flex items-center justify-between gap-3">
-                        <Badge tone={r.state === 'LOBBY' ? 'success' : ''}>
-                          {survivalStates[r.state] || r.state}
-                        </Badge>
-                        <span className="flex items-center gap-1.5 font-mono text-lg font-extrabold text-primary">
-                          <Icon name="fa-solid fa-users" className="size-3.5!" />
-                          {r.count}/{r.capacity}
+                      <div>
+                        {/* Hàng 1: Tiêu đề bên trái, Trạng thái & Mã phòng bên phải */}
+                        <div className="room-card-header flex items-center justify-between gap-2">
+                          <h3
+                            className="room-card-title font-heading text-sm sm:text-base font-bold text-foreground group-hover:text-primary transition-colors tracking-tight line-clamp-1"
+                            data-user-content
+                            title={r.name}
+                          >
+                            {r.name}
+                          </h3>
+                          <div className="flex shrink-0 items-center gap-1.5">
+                            <span
+                              className={cn(
+                                'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold tracking-tight',
+                                r.state === 'LOBBY' && 'bg-emerald-50 text-emerald-700 border border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60',
+                                ['ROUND_ACTIVE', 'COUNTDOWN'].includes(r.state) && 'bg-amber-50 text-amber-700 border border-amber-200/60 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/60',
+                                ['ROUND_GRADING', 'ROUND_RESULT'].includes(r.state) && 'bg-blue-50 text-blue-700 border border-blue-200/60 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800/60',
+                                ['FINISHED', 'CLOSED'].includes(r.state) && 'bg-muted/70 text-muted-foreground border border-border/60',
+                              )}
+                            >
+                              {r.state === 'LOBBY' && (
+                                <span className="size-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                              )}
+                              {survivalStates[r.state] || r.state}
+                            </span>
+                            <span
+                              className="room-code-tag inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-mono font-extrabold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 shadow-2xs"
+                              title={`${t('Mã phòng')}: ${r.code}`}
+                            >
+                              <Icon name="fa-solid fa-key" className="size-2.5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+                              <span>Mã {r.code}</span>
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Hàng 2: Thông tin Host & metadata xếp gọn gàng trên 1 dòng với dấu chấm ngăn cách */}
+                        <div className="room-card-meta mt-2.5 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-xs text-muted-foreground">
+                          <span className="inline-flex items-center gap-1.5 font-medium text-foreground">
+                            <Icon name="fa-solid fa-user" className="size-3 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+                            <span>{r.hostName}</span>
+                          </span>
+                          <span className="text-muted-foreground/30" aria-hidden="true">•</span>
+                          <span className="inline-flex items-center gap-1.5 font-medium text-foreground">
+                            <Icon name="fa-solid fa-users" className="size-3 text-blue-600 dark:text-blue-400" aria-hidden="true" />
+                            <span>
+                              <b className="font-mono font-extrabold text-blue-600 dark:text-blue-400">{r.count}</b>
+                              <span className="text-muted-foreground font-mono">/{r.capacity} Coder</span>
+                            </span>
+                          </span>
+                          {r.selectedDifficulties?.length ? (
+                            <>
+                              <span className="text-muted-foreground/30" aria-hidden="true">•</span>
+                              <span className="inline-flex items-center gap-1.5 font-medium text-foreground">
+                                <Icon name="fa-solid fa-layer-group" className="size-3 text-orange-500 dark:text-orange-400" aria-hidden="true" />
+                                <span>{t('Mức')} <b className="font-mono font-bold text-orange-600 dark:text-orange-400">{r.selectedDifficulties.join(', ')}</b></span>
+                              </span>
+                            </>
+                          ) : null}
+                          <span className="text-muted-foreground/30" aria-hidden="true">•</span>
+                          <span className="inline-flex items-center gap-1.5 font-medium text-foreground">
+                            <Icon name="fa-solid fa-gamepad" className="size-3 text-purple-600 dark:text-purple-400" aria-hidden="true" />
+                            <span>{t('Giao lưu')}</span>
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Hàng 3: Chân thẻ với Thông tin sẵn sàng bên trái & Tham gia phòng → bên phải */}
+                      <div className="room-card-footer mt-2.5 flex items-center justify-between border-t border-border/50 pt-2 text-xs">
+                        {r.state === 'LOBBY' ? (
+                          <div className="room-card-status inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+                            <Icon name="fa-solid fa-circle-check" className="size-3.5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+                            <span className="clock-label font-sans text-[11px] text-muted-foreground font-normal">
+                              {t('Trạng thái')}:
+                            </span>
+                            <span className="font-bold">
+                              {r.capacity - r.count > 0 ? `${t('Còn')} ${r.capacity - r.count} ${t('chỗ')}` : t('Đã đủ người')}
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="room-card-status inline-flex items-center gap-1.5 text-[11px] font-medium text-amber-700 dark:text-amber-400">
+                            <Icon name="fa-solid fa-flag-checkered" className="size-3.5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+                            <span className="font-semibold">{survivalStates[r.state] || r.state}</span>
+                          </div>
+                        )}
+
+                        <span className="inline-flex items-center gap-1 font-bold text-action transition-all group-hover:text-action-hover">
+                          <span>{t('Tham gia phòng')}</span>
+                          <Icon name="fa-solid fa-arrow-right" className="size-3 text-action group-hover:translate-x-1 transition-transform" />
                         </span>
                       </div>
-                      <div>
-                        <h3 className="truncate text-xl font-extrabold" data-user-content>
-                          {r.name}
-                        </h3>
-                        <p
-                          className="mt-1.5 text-xs font-normal text-muted-foreground"
-                          data-user-content
-                        >
-                          {r.hostName} · Mã {r.code}
-                        </p>
-                      </div>
-                      <span className="flex items-center justify-between border-t pt-3 text-sm font-bold text-action">
-                        Tham gia / xem
-                        <Icon name="fa-solid fa-arrow-right" className="size-3.5!" />
-                      </span>
-                    </Button>
+                    </article>
                   ))}
                 </div>
               ) : (
-                <div className="rounded-xl border border-dashed bg-muted/30 px-5 py-10 text-center">
-                  <Icon
-                    name="fa-solid fa-door-open"
-                    className="mx-auto mb-3 size-7! text-primary"
-                  />
-                  <h3 className="text-xl">Chưa có phòng đang mở</h3>
+                <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border/80 bg-muted/20 px-6 py-12 text-center">
+                  <div className="flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-3.5 shadow-2xs">
+                    <Icon name="fa-solid fa-door-open" className="size-6" />
+                  </div>
+                  <h3 className="font-heading text-base font-extrabold text-foreground">
+                    {t('Chưa có phòng nào đang mở')}
+                  </h3>
+                  <p className="mt-1 max-w-sm text-xs text-muted-foreground">
+                    {t('Hãy tạo phòng mới hoặc chuyển sang chế độ Ghép trận để bắt đầu thi đấu ngay.')}
+                  </p>
                 </div>
               )}
             </div>
           )}
           {tab === 'history' && (
-            <div className="arena-match-history">
-              <h2 className="mb-4 text-xl font-extrabold">Lịch sử chiến đấu</h2>
+            <div className="arena-match-history space-y-4">
               {!history ? (
                 <Loading />
               ) : history.length ? (
-                <div className="grid gap-3 md:grid-cols-2">
+                <div className="history-grid grid gap-3 lg:grid-cols-2">
                   {history.map((h) => (
-                    <a
+                    <article
                       key={h.room_id}
-                      href={'#/room/' + h.room_id}
-                      className="flex min-w-0 items-center gap-4 rounded-xl border p-4 transition-colors hover:border-primary hover:bg-accent/40"
+                      className="history-card group relative flex flex-col justify-between rounded-xl border border-border/80 bg-card p-3.5 sm:px-4 sm:py-3.5 text-left transition-all duration-150 hover:border-border hover:shadow-subtle cursor-pointer"
+                      onClick={() => go('/room/' + h.room_id)}
+                      tabIndex={0}
+                      role="button"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          go('/room/' + h.room_id);
+                        }
+                      }}
                     >
-                      <span
-                        className={cn(
-                          'grid size-14 shrink-0 place-items-center rounded-xl border-b-[3px] font-mono text-2xl font-extrabold',
-                          h.placement === 1
-                            ? 'border-gold bg-warning-soft text-warning'
-                            : 'border-border bg-muted text-muted-foreground',
-                        )}
-                      >
-                        #{h.placement}
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <b className="block text-xl">{survivalModes[h.mode] || h.mode}</b>
-                        <span className="mt-1 block font-mono text-base font-extrabold text-primary">
-                          +{h.exp} EXP
-                          {h.mode === 'RANKED' ? ` · ${h.rating_before} → ${h.rating_after}` : ''}
+                      <div>
+                        {/* Hàng 1: Chế độ bên trái, Thứ hạng bên phải */}
+                        <div className="history-card-header flex items-center justify-between gap-2">
+                          <h3
+                            className="history-card-title font-heading text-sm sm:text-base font-bold text-foreground group-hover:text-primary transition-colors tracking-tight line-clamp-1"
+                          >
+                            {survivalModes[h.mode] || h.mode}
+                          </h3>
+                          <div className="flex shrink-0 items-center gap-1.5">
+                            <span
+                              className={cn(
+                                'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold tracking-tight',
+                                h.placement === 1
+                                  ? 'bg-amber-50 text-amber-700 border border-amber-200/60 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/60'
+                                  : 'bg-muted/70 text-muted-foreground border border-border/60',
+                              )}
+                            >
+                              {h.placement === 1 ? '🏆 Hạng #1' : `Hạng #${h.placement}`}
+                            </span>
+                            <span className="inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[10px] font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/60">
+                              +{h.exp} EXP
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Hàng 2: Metadata */}
+                        <div className="history-card-meta mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-muted-foreground">
+                          <span className="inline-flex items-center gap-1.5 font-medium text-foreground">
+                            <Icon name="fa-solid fa-gamepad" className="size-3 text-purple-600 dark:text-purple-400" aria-hidden="true" />
+                            <span>Code Survival</span>
+                          </span>
+                          {h.mode === 'RANKED' && (
+                            <>
+                              <span className="text-muted-foreground/30" aria-hidden="true">•</span>
+                              <span className="inline-flex items-center gap-1.5 font-mono font-medium text-foreground">
+                                <Icon name="fa-solid fa-trophy" className="size-3 text-amber-500 dark:text-amber-400" aria-hidden="true" />
+                                <span>Rating: <b className="text-amber-700 dark:text-amber-400">{h.rating_before} → {h.rating_after}</b></span>
+                              </span>
+                            </>
+                          )}
+                          <span className="text-muted-foreground/30" aria-hidden="true">•</span>
+                          <span className="inline-flex items-center gap-1.5 font-medium text-foreground">
+                            <Icon name="fa-solid fa-award" className="size-3 text-blue-600 dark:text-blue-400" aria-hidden="true" />
+                            <span>Vị trí <b className="font-mono text-blue-600 dark:text-blue-400">#{h.placement}</b></span>
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Hàng 3: Chân thẻ */}
+                      <div className="history-card-footer mt-2.5 flex items-center justify-between border-t border-border/50 pt-2 text-xs">
+                        <div className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
+                          <Icon name="fa-solid fa-flag-checkered" className="size-3 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+                          <span>{t('Đã kết thúc')}</span>
+                        </div>
+                        <span className="inline-flex items-center gap-1 font-bold text-action transition-all group-hover:text-action-hover">
+                          <span>{t('Xem chi tiết')}</span>
+                          <Icon name="fa-solid fa-arrow-right" className="size-3 text-action group-hover:translate-x-1 transition-transform" />
                         </span>
                       </div>
-                      <Icon
-                        name="fa-solid fa-arrow-right"
-                        className="size-4! text-muted-foreground"
-                      />
-                    </a>
+                    </article>
                   ))}
                 </div>
               ) : (
-                <p className="py-8 text-center text-xs text-muted-foreground">Chưa có trận đấu.</p>
+                <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border/80 bg-muted/20 px-6 py-12 text-center">
+                  <div className="flex size-14 items-center justify-center rounded-2xl bg-muted/50 text-muted-foreground/60 mb-3.5">
+                    <Icon name="fa-solid fa-clock-rotate-left" className="size-6" />
+                  </div>
+                  <h3 className="font-heading text-base font-extrabold text-foreground">
+                    {t('Chưa có lịch sử thi đấu')}
+                  </h3>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {t('Tham gia các trận đấu để lưu lại thành tích của bạn tại đây.')}
+                  </p>
+                </div>
               )}
             </div>
           )}
