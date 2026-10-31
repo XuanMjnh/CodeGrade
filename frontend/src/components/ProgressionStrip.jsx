@@ -26,160 +26,71 @@ function ratingRange(item) {
     );
   return '—';
 }
-const TIER_THEMES = {
-  bronze: {
-    title: 'text-[#ffdbb3]',
-    surface: 'from-[#493022] via-[#291f1b] to-[#181b20] border-[#efa767]/35',
-    crest: 'border-[#efa767]/30 bg-[#efa767]/10 shadow-[0_0_24px_#efa76718]',
-    accent: 'bg-[#efa767]',
-    active: 'border-[#efa767] ring-2 ring-[#efa767]/30 shadow-[0_4px_16px_#a95f3226]',
-    badge: 'border-[#efa767]/35 bg-[#efa767]/15 text-[#ffdbb3]',
-    multiplier: 'border-[#efa767]/25 bg-[#efa767]/10 text-[#ffdbb3]',
-  },
-  silver: {
-    title: 'text-[#e1f0ff]',
-    surface: 'from-[#344858] via-[#222d38] to-[#191e28] border-[#b6d8f2]/35',
-    crest: 'border-[#b6d8f2]/30 bg-[#b6d8f2]/10 shadow-[0_0_24px_#b6d8f218]',
-    accent: 'bg-[#b6d8f2]',
-    active: 'border-[#b6d8f2] ring-2 ring-[#b6d8f2]/30 shadow-[0_4px_16px_#62788a26]',
-    badge: 'border-[#b6d8f2]/35 bg-[#b6d8f2]/15 text-[#e1f0ff]',
-    multiplier: 'border-[#b6d8f2]/25 bg-[#b6d8f2]/10 text-[#e1f0ff]',
-  },
-  gold: {
-    title: 'text-[#ffe89a]',
-    surface: 'from-[#51401c] via-[#2e281a] to-[#1f1e22] border-[#ffd76d]/40',
-    crest: 'border-[#ffd76d]/35 bg-[#ffd76d]/10 shadow-[0_0_24px_#ffd76d20]',
-    accent: 'bg-[#ffd76d]',
-    active: 'border-[#ffd76d] ring-2 ring-[#ffd76d]/30 shadow-[0_4px_16px_#a8761226]',
-    badge: 'border-[#ffd76d]/35 bg-[#ffd76d]/15 text-[#ffe89a]',
-    multiplier: 'border-[#ffd76d]/25 bg-[#ffd76d]/10 text-[#ffe89a]',
-  },
-  platinum: {
-    title: 'text-[#bceee0]',
-    surface: 'from-[#184e42] via-[#17332e] to-[#17242a] border-[#62e2ba]/35',
-    crest: 'border-[#62e2ba]/30 bg-[#62e2ba]/10 shadow-[0_0_24px_#62e2ba18]',
-    accent: 'bg-[#62e2ba]',
-    active: 'border-[#62e2ba] ring-2 ring-[#62e2ba]/30 shadow-[0_4px_16px_#24826c26]',
-    badge: 'border-[#62e2ba]/35 bg-[#62e2ba]/15 text-[#bceee0]',
-    multiplier: 'border-[#62e2ba]/25 bg-[#62e2ba]/10 text-[#bceee0]',
-  },
-  diamond: {
-    title: 'text-[#b9edff]',
-    surface: 'from-[#19485d] via-[#1b3047] to-[#23233b] border-[#68dcff]/40',
-    crest: 'border-[#68dcff]/35 bg-[#68dcff]/10 shadow-[0_0_24px_#68dcff20]',
-    accent: 'bg-[#68dcff]',
-    active: 'border-[#68dcff] ring-2 ring-[#68dcff]/30 shadow-[0_4px_16px_#237d9d26]',
-    badge: 'border-[#68dcff]/35 bg-[#68dcff]/15 text-[#b9edff]',
-    multiplier: 'border-[#68dcff]/25 bg-[#68dcff]/10 text-[#b9edff]',
-  },
-  master: {
-    title: 'text-[#ffce77]',
-    surface: 'from-[#5a3025] via-[#3a2233] to-[#262039] border-[#ffac64]/45',
-    crest: 'border-[#ffac64]/40 bg-[#ffac64]/10 shadow-[0_0_24px_#ffac6426]',
-    accent: 'bg-[#ffac64]',
-    active: 'border-[#ffac64] ring-2 ring-[#ffac64]/30 shadow-[0_4px_16px_#b84e2326]',
-    badge: 'border-[#ffac64]/35 bg-[#ffac64]/15 text-[#ffce77]',
-    multiplier: 'border-[#ffac64]/25 bg-[#ffac64]/10 text-[#ffce77]',
-  },
-};
-
 export function RankTierStrip({ stats }) {
   if (!stats) return null;
   const guide = stats.rankTiers || RANK_TIERS;
   const currentRank = getRankTier(stats.rank).id;
   return (
     <section
-      className="survival-rank-strip min-w-0 rounded-2xl border border-border/80 bg-card p-2 shadow-sm sm:p-2.5"
+      className="survival-rank-strip min-w-0 rounded-2xl border border-border/80 bg-card px-2.5 py-2 sm:px-3 sm:py-2.5 shadow-2xs"
       aria-label={t('Các bậc Rank')}
     >
-      <ol className="grid grid-cols-1 gap-2.5 min-[360px]:grid-cols-2 min-[640px]:grid-cols-3 min-[1080px]:grid-cols-6">
+      <ol className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-6 sm:gap-2">
         {guide.map((item) => {
           const visual = getRankTier(item.name),
             current = visual.id === currentRank;
-          const theme = TIER_THEMES[visual.id];
           const hasRange = item.minRating != null || item.maxRating != null;
           return (
             <li
               key={visual.id}
               aria-current={current ? 'step' : undefined}
               className={cn(
-                'relative isolate flex min-h-28 min-w-0 items-center gap-2.5 overflow-hidden rounded-xl border bg-linear-to-br p-2.5 sm:px-3',
-                theme?.surface || 'from-slate-700 to-slate-900 border-slate-600',
+                'group relative flex flex-col items-center justify-between gap-1.5 rounded-xl px-2 py-2 text-center transition-all duration-200',
                 current
-                  ? theme?.active || 'border-primary bg-primary/5 ring-2 ring-primary/20 shadow-xs'
-                  : 'shadow-xs',
+                  ? 'bg-action/10 dark:bg-action/15 shadow-2xs'
+                  : 'bg-transparent hover:bg-muted/30',
               )}
             >
-              <div
-                aria-hidden="true"
-                className={cn(
-                  'absolute inset-x-0 bottom-0',
-                  current ? 'h-1' : 'h-0.5 opacity-50',
-                  theme?.accent,
-                )}
-              />
-              <div
-                className={cn(
-                  'relative grid h-16 w-12 shrink-0 place-items-center rounded-xl border sm:h-18 sm:w-14',
-                  theme?.crest,
-                )}
-              >
+              {/* Logo Rank (Gọn gàng, không viền khung) */}
+              <div className="flex h-11 w-full items-center justify-center sm:h-12">
                 <RankEmblem
                   rank={item.name}
                   decorative
-                  className={cn(
-                    'h-14! w-11! sm:h-16! sm:w-13! shrink-0 drop-shadow-[0_4px_6px_#0006]',
-                  )}
+                  className="h-10 w-9 sm:h-11 sm:w-10 shrink-0 transition-transform duration-200 group-hover:scale-105 drop-shadow-xs"
                 />
               </div>
-              <div className="relative min-w-0 flex-1 space-y-1">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <b
-                    className={cn(
-                      'font-heading text-base min-[1280px]:text-lg font-black leading-tight tracking-tight',
-                      theme?.title || 'text-slate-100',
-                    )}
-                  >
+
+              {/* Thông tin ở dưới logo */}
+              <div className="flex flex-col items-center gap-0.5 w-full">
+                <div className="flex flex-wrap items-center justify-center gap-1">
+                  <b className="font-heading text-xs sm:text-sm font-extrabold text-foreground tracking-tight leading-tight">
                     {item.name}
                   </b>
                   {current && (
-                    <span
-                      className={cn(
-                        'inline-flex items-center gap-1 rounded-full px-1.5 py-0.2 font-mono text-[9px] font-bold border leading-tight',
-                        theme?.badge,
-                      )}
-                    >
-                      <span className="size-1 rounded-full bg-current shadow-[0_0_6px_currentColor]" />
+                    <span className="inline-flex items-center gap-1 rounded-full bg-action/20 px-1.5 py-0.2 font-mono text-[9px] font-bold text-action leading-tight">
+                      <span className="size-1 rounded-full bg-action" />
                       {t('Hiện tại')}
                     </span>
                   )}
                 </div>
+
                 {hasRange && (
-                  <span className="block font-mono text-[10px] leading-relaxed text-slate-300">
+                  <span className="font-mono text-[10px] sm:text-[11px] font-semibold text-muted-foreground leading-tight">
                     {ratingRange(item)}
                   </span>
                 )}
-                {item.gainMultiplier > 1 ? (
-                  <span
-                    className={cn(
-                      'inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.2 font-mono text-[9px] font-bold border leading-tight',
-                      theme?.multiplier || 'border-white/15 bg-white/10 text-slate-200',
-                    )}
-                  >
-                    ×{item.gainMultiplier} {t('điểm tăng')}
-                  </span>
-                ) : (
-                  <span
-                    className={cn(
-                      'inline-flex items-center rounded-md border px-1.5 py-0.2 font-mono text-[9px] font-medium leading-tight',
-                      current
-                        ? 'border-white/15 bg-white/10 text-slate-200'
-                        : 'border-white/10 bg-white/5 text-slate-300',
-                    )}
-                  >
-                    ×1 {t('chuẩn')}
-                  </span>
-                )}
+
+                <div className="pt-0.5">
+                  {item.gainMultiplier > 1 ? (
+                    <span className="inline-flex items-center gap-0.5 rounded-md bg-amber-500/10 px-1.5 py-0.2 font-mono text-[9px] sm:text-[10px] font-bold text-amber-700 dark:text-amber-400 leading-tight">
+                      ×{item.gainMultiplier} {t('điểm tăng')}
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center rounded-md bg-muted/50 px-1.5 py-0.2 font-mono text-[9px] sm:text-[10px] font-medium text-muted-foreground/80 leading-tight">
+                      ×1 {t('chuẩn')}
+                    </span>
+                  )}
+                </div>
               </div>
             </li>
           );
@@ -314,7 +225,7 @@ export default function ProgressionStrip({ stats, user, showRankGuide = false })
             {t('Các bậc Rank')}
             <Icon name="fa-solid fa-chevron-down" aria-hidden="true" />
           </summary>
-          <ol className="mt-[18px] grid grid-cols-2 gap-3 min-[481px]:grid-cols-3 min-[768px]:grid-cols-6 min-[768px]:gap-4">
+          <ol className="mt-3 grid grid-cols-2 gap-1.5 min-[481px]:grid-cols-3 min-[768px]:grid-cols-6 min-[768px]:gap-2">
             {guide.map((item) => {
               const visual = getRankTier(item.name),
                 current = visual.id === tier.id;
@@ -322,26 +233,43 @@ export default function ProgressionStrip({ stats, user, showRankGuide = false })
                 <li
                   key={visual.id}
                   className={cn(
-                    'flex flex-col items-center justify-start gap-2 rounded-xl border border-transparent px-2.5 py-4 text-center text-xs [&>small]:text-[10px] [&>.rank-rating-range]:font-mono [&>.rank-rating-range]:text-[10px]',
+                    'group flex flex-col items-center justify-between gap-1.5 rounded-xl px-2 py-2 text-center text-xs transition-all duration-200',
                     current
-                      ? cn('is-current', RANK_STYLES[visual.id])
-                      : RANK_STYLES[visual.id]
-                          ?.split(' ')
-                          .find((token) => token.startsWith('text-')),
+                      ? 'bg-action/10 dark:bg-action/15 shadow-2xs'
+                      : 'bg-transparent hover:bg-muted/30',
                   )}
                   aria-current={current ? 'step' : undefined}
                 >
-                  <RankEmblem rank={item.name} decorative />
-                  <b>{item.name}</b>
-                  <span className="rank-rating-range">{ratingRange(item)}</span>
-                  {item.gainMultiplier > 1 ? (
-                    <span className="rank-gain-badge">
-                      ×{item.gainMultiplier} {t('điểm tăng')}
-                    </span>
-                  ) : (
-                    item.gainMultiplier === 1 && <small>{t('Điểm tăng tiêu chuẩn')}</small>
-                  )}
-                  {current && <small>{t('Rank của bạn')}</small>}
+                  <div className="flex h-11 w-full items-center justify-center sm:h-12">
+                    <RankEmblem
+                      rank={item.name}
+                      decorative
+                      className="h-10 w-9 sm:h-11 sm:w-10 shrink-0 transition-transform duration-200 group-hover:scale-105 drop-shadow-xs"
+                    />
+                  </div>
+                  <div className="flex flex-col items-center gap-0.5 w-full">
+                    <div className="flex flex-wrap items-center justify-center gap-1">
+                      <b className="font-heading font-extrabold text-foreground tracking-tight leading-tight">{item.name}</b>
+                      {current && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-action/20 px-1.5 py-0.2 font-mono text-[9px] font-bold text-action leading-tight">
+                          <span className="size-1 rounded-full bg-action" />
+                          {t('Hiện tại')}
+                        </span>
+                      )}
+                    </div>
+                    <span className="font-mono text-[10px] font-semibold text-muted-foreground leading-tight">{ratingRange(item)}</span>
+                    <div className="pt-0.5">
+                      {item.gainMultiplier > 1 ? (
+                        <span className="inline-flex items-center gap-0.5 rounded-md bg-amber-500/10 px-1.5 py-0.2 font-mono text-[9px] font-bold text-amber-700 dark:text-amber-400 leading-tight">
+                          ×{item.gainMultiplier} {t('điểm tăng')}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center rounded-md bg-muted/50 px-1.5 py-0.2 font-mono text-[9px] font-medium text-muted-foreground/80 leading-tight">
+                          ×1 {t('chuẩn')}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </li>
               );
             })}
