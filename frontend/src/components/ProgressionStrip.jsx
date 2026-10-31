@@ -5,6 +5,7 @@ import { Badge } from './ui';
 import { t } from '../lib/locale';
 import RankEmblem, { RANK_TIERS, RANK_STYLES, getRankTier } from './RankEmblem';
 import { cn } from '../lib/utils';
+import RankAmbientBackground from './RankAmbientBackground';
 function ratingRange(item) {
   if (item.minRating == null && typeof item.maxRating === 'number')
     return (
@@ -28,46 +29,46 @@ function ratingRange(item) {
 }
 const TIER_THEMES = {
   bronze: {
-    title: 'text-[#a95f32] dark:text-[#f5d6ad]',
+    title: 'text-[#ffdbb3]',
     active:
-      'border-[#a95f32]/60 bg-gradient-to-br from-[#fcf0e4] to-card dark:from-[#a95f32]/25 dark:to-card ring-2 ring-[#a95f32]/25 shadow-xs',
-    badge: 'bg-[#a95f32]/15 text-[#a95f32] border-[#a95f32]/30 dark:text-[#f5d6ad]',
-    multiplier: 'bg-[#a95f32]/15 text-[#a95f32] border-[#a95f32]/30 dark:text-[#f5d6ad]',
+      'border-[#efa767]/70 bg-[#39271e]/50 ring-1 ring-[#efa767]/45 shadow-[inset_0_0_20px_#efa76715]',
+    badge: 'border-[#efa767]/35 bg-[#efa767]/15 text-[#ffdbb3]',
+    multiplier: 'border-[#efa767]/25 bg-[#efa767]/10 text-[#ffdbb3]',
   },
   silver: {
-    title: 'text-[#62788a] dark:text-[#e8f0f6]',
+    title: 'text-[#e1f0ff]',
     active:
-      'border-[#62788a]/60 bg-gradient-to-br from-[#f0f4f7] to-card dark:from-[#62788a]/25 dark:to-card ring-2 ring-[#62788a]/25 shadow-xs',
-    badge: 'bg-[#62788a]/15 text-[#62788a] border-[#62788a]/30 dark:text-[#e8f0f6]',
-    multiplier: 'bg-[#62788a]/15 text-[#62788a] border-[#62788a]/30 dark:text-[#e8f0f6]',
+      'border-[#b6d8f2]/70 bg-[#263240]/50 ring-1 ring-[#b6d8f2]/45 shadow-[inset_0_0_20px_#b6d8f215]',
+    badge: 'border-[#b6d8f2]/35 bg-[#b6d8f2]/15 text-[#e1f0ff]',
+    multiplier: 'border-[#b6d8f2]/25 bg-[#b6d8f2]/10 text-[#e1f0ff]',
   },
   gold: {
-    title: 'text-amber-700 dark:text-amber-300',
+    title: 'text-[#ffe89a]',
     active:
-      'border-amber-400 bg-gradient-to-br from-[#fff7da] to-card dark:from-amber-500/25 dark:to-card ring-2 ring-amber-400/30 shadow-xs',
-    badge: 'bg-amber-500/15 text-amber-700 border-amber-400/40 dark:text-amber-300',
-    multiplier: 'bg-amber-500/15 text-amber-700 border-amber-400/40 dark:text-amber-300',
+      'border-[#ffd76d]/70 bg-[#3a301b]/50 ring-1 ring-[#ffd76d]/45 shadow-[inset_0_0_20px_#ffd76d15]',
+    badge: 'border-[#ffd76d]/35 bg-[#ffd76d]/15 text-[#ffe89a]',
+    multiplier: 'border-[#ffd76d]/25 bg-[#ffd76d]/10 text-[#ffe89a]',
   },
   platinum: {
-    title: 'text-[#24826c] dark:text-[#bceee0]',
+    title: 'text-[#bceee0]',
     active:
-      'border-emerald-500/60 bg-gradient-to-br from-[#e9f7f1] to-card dark:from-emerald-500/25 dark:to-card ring-2 ring-emerald-500/25 shadow-xs',
-    badge: 'bg-emerald-500/15 text-emerald-700 border-emerald-400/40 dark:text-emerald-300',
-    multiplier: 'bg-emerald-500/15 text-emerald-700 border-emerald-400/40 dark:text-emerald-300',
+      'border-[#62e2ba]/70 bg-[#173d36]/50 ring-1 ring-[#62e2ba]/45 shadow-[inset_0_0_20px_#62e2ba15]',
+    badge: 'border-[#62e2ba]/35 bg-[#62e2ba]/15 text-[#bceee0]',
+    multiplier: 'border-[#62e2ba]/25 bg-[#62e2ba]/10 text-[#bceee0]',
   },
   diamond: {
-    title: 'text-[#237d9d] dark:text-[#b9edff]',
+    title: 'text-[#b9edff]',
     active:
-      'border-sky-500/60 bg-gradient-to-br from-[#eaf8fc] to-card dark:from-sky-500/25 dark:to-card ring-2 ring-sky-500/25 shadow-xs',
-    badge: 'bg-sky-500/15 text-sky-700 border-sky-400/40 dark:text-sky-300',
-    multiplier: 'bg-sky-500/15 text-sky-700 border-sky-400/40 dark:text-sky-300',
+      'border-[#68dcff]/70 bg-[#183347]/50 ring-1 ring-[#68dcff]/45 shadow-[inset_0_0_20px_#68dcff15]',
+    badge: 'border-[#68dcff]/35 bg-[#68dcff]/15 text-[#b9edff]',
+    multiplier: 'border-[#68dcff]/25 bg-[#68dcff]/10 text-[#b9edff]',
   },
   master: {
-    title: 'text-[#c65316] dark:text-[#ffce77]',
+    title: 'text-[#ffce77]',
     active:
-      'border-orange-500/60 bg-gradient-to-br from-[#fff0e4] to-card dark:from-orange-500/25 dark:to-card ring-2 ring-orange-500/25 shadow-xs',
-    badge: 'bg-orange-500/15 text-orange-700 border-orange-400/40 dark:text-orange-300',
-    multiplier: 'bg-orange-500/15 text-orange-700 border-orange-400/40 dark:text-orange-300',
+      'border-[#ffac64]/70 bg-[#3b2632]/50 ring-1 ring-[#ffac64]/45 shadow-[inset_0_0_20px_#ffac6415]',
+    badge: 'border-[#ffac64]/35 bg-[#ffac64]/15 text-[#ffce77]',
+    multiplier: 'border-[#ffac64]/25 bg-[#ffac64]/10 text-[#ffce77]',
   },
 };
 
@@ -77,10 +78,11 @@ export function RankTierStrip({ stats }) {
   const currentRank = getRankTier(stats.rank).id;
   return (
     <section
-      className="survival-rank-strip min-w-0 rounded-2xl border border-border/80 bg-card p-2 sm:p-2.5 shadow-2xs"
+      className="survival-rank-strip relative isolate min-w-0 overflow-hidden rounded-2xl border border-primary/40 bg-[#101e25] p-2 shadow-sm sm:p-2.5"
       aria-label={t('Các bậc Rank')}
     >
-      <ol className="grid grid-cols-2 min-[640px]:grid-cols-3 min-[1080px]:grid-cols-6 gap-2">
+      <RankAmbientBackground />
+      <ol className="relative grid grid-cols-2 gap-2 min-[640px]:grid-cols-3 min-[1080px]:grid-cols-6">
         {guide.map((item) => {
           const visual = getRankTier(item.name),
             current = visual.id === currentRank;
@@ -91,10 +93,10 @@ export function RankTierStrip({ stats }) {
               key={visual.id}
               aria-current={current ? 'step' : undefined}
               className={cn(
-                'group relative flex min-w-0 items-center gap-2.5 rounded-xl border p-2.5 sm:px-3 sm:py-2.5 transition-all',
+                'group relative flex min-w-0 items-center gap-2.5 rounded-xl border p-2.5 transition-colors sm:px-3 sm:py-2.5',
                 current
                   ? theme?.active || 'border-primary bg-primary/5 ring-2 ring-primary/20 shadow-xs'
-                  : 'border-border/60 bg-muted/20 hover:border-border hover:bg-muted/40 hover:shadow-2xs',
+                  : 'border-white/10 bg-white/5 hover:border-white/25 hover:bg-white/10',
               )}
             >
               <div className="relative shrink-0 flex items-center justify-center">
@@ -112,7 +114,7 @@ export function RankTierStrip({ stats }) {
                   <b
                     className={cn(
                       'font-heading text-xs sm:text-sm font-extrabold tracking-tight truncate',
-                      current ? theme?.title : 'text-foreground',
+                      current ? theme?.title : 'text-slate-100',
                     )}
                   >
                     {item.name}
@@ -124,13 +126,13 @@ export function RankTierStrip({ stats }) {
                         theme?.badge,
                       )}
                     >
-                      <span className="size-1 rounded-full bg-current animate-pulse" />
+                      <span className="size-1 rounded-full bg-current shadow-[0_0_6px_currentColor]" />
                       {t('Hiện tại')}
                     </span>
                   )}
                 </div>
                 {hasRange && (
-                  <span className="block font-mono text-[10px] text-muted-foreground truncate">
+                  <span className={cn('block truncate font-mono text-[10px]', 'text-slate-300')}>
                     {ratingRange(item)}
                   </span>
                 )}
@@ -138,13 +140,20 @@ export function RankTierStrip({ stats }) {
                   <span
                     className={cn(
                       'inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.2 font-mono text-[9px] font-bold border leading-tight',
-                      theme?.multiplier,
+                      current ? theme?.multiplier : 'border-white/15 bg-white/10 text-slate-200',
                     )}
                   >
                     ×{item.gainMultiplier} {t('điểm tăng')}
                   </span>
                 ) : (
-                  <span className="inline-flex items-center rounded-md bg-muted/60 border border-border/40 px-1.5 py-0.2 font-mono text-[9px] font-medium text-muted-foreground/70 leading-tight">
+                  <span
+                    className={cn(
+                      'inline-flex items-center rounded-md border px-1.5 py-0.2 font-mono text-[9px] font-medium leading-tight',
+                      current
+                        ? 'border-white/15 bg-white/10 text-slate-200'
+                        : 'border-white/10 bg-white/5 text-slate-300',
+                    )}
+                  >
                     ×1 {t('chuẩn')}
                   </span>
                 )}

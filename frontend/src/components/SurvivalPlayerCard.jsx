@@ -1,49 +1,14 @@
 import React from 'react';
-import RankEmblem, { getRankTier } from './RankEmblem';
+import CurrentRankCard from './CurrentRankCard';
 import ProgressMeter from './ProgressMeter';
 import Icon from './Icon';
 import { Badge, Loading } from './ui';
 import { t } from '../lib/locale';
 import { cn } from '../lib/utils';
 
-const RANK_THEMES = {
-  bronze: {
-    title: 'text-[#a95f32] dark:text-[#f5d6ad]',
-    card: 'border-[#a95f32]/40 bg-gradient-to-br from-[#fcf0e4] to-card dark:from-[#a95f32]/20 dark:to-card',
-    badge: 'bg-[#a95f32]/10 text-[#a95f32] border-[#a95f32]/25',
-  },
-  silver: {
-    title: 'text-[#62788a] dark:text-[#e8f0f6]',
-    card: 'border-[#62788a]/40 bg-gradient-to-br from-[#f0f4f7] to-card dark:from-[#62788a]/20 dark:to-card',
-    badge: 'bg-[#62788a]/10 text-[#62788a] border-[#62788a]/25',
-  },
-  gold: {
-    title: 'text-amber-700 dark:text-amber-300',
-    card: 'border-amber-400/50 bg-gradient-to-br from-[#fff7da] to-card dark:from-amber-500/20 dark:to-card',
-    badge: 'bg-amber-500/15 text-amber-700 border-amber-400/30 dark:text-amber-300',
-  },
-  platinum: {
-    title: 'text-[#24826c] dark:text-[#bceee0]',
-    card: 'border-emerald-500/40 bg-gradient-to-br from-[#e9f7f1] to-card dark:from-emerald-500/20 dark:to-card',
-    badge: 'bg-emerald-500/15 text-emerald-700 border-emerald-400/30 dark:text-emerald-300',
-  },
-  diamond: {
-    title: 'text-[#237d9d] dark:text-[#b9edff]',
-    card: 'border-sky-500/40 bg-gradient-to-br from-[#eaf8fc] to-card dark:from-sky-500/20 dark:to-card',
-    badge: 'bg-sky-500/15 text-sky-700 border-sky-400/30 dark:text-sky-300',
-  },
-  master: {
-    title: 'text-[#c65316] dark:text-[#ffce77]',
-    card: 'border-orange-500/40 bg-gradient-to-br from-[#fff0e4] to-card dark:from-orange-500/20 dark:to-card',
-    badge: 'bg-orange-500/15 text-orange-700 border-orange-400/30 dark:text-orange-300',
-  },
-};
-
 export default function SurvivalPlayerCard({ stats, user }) {
   if (!stats) return <Loading />;
   const levelStart = 100 * (stats.level - 1) ** 2;
-  const tier = getRankTier(stats.rank);
-  const theme = RANK_THEMES[tier.id] || RANK_THEMES.bronze;
 
   return (
     <section
@@ -97,29 +62,7 @@ export default function SurvivalPlayerCard({ stats, user }) {
         />
       </div>
 
-      {/* Rank Rating Card */}
-      <div
-        className={cn(
-          'flex items-center gap-3 rounded-xl border p-3.5 shadow-2xs transition-all',
-          theme.card,
-        )}
-      >
-        <RankEmblem rank={stats.rank} decorative className="h-12! w-10! shrink-0 drop-shadow-xs" />
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center justify-between gap-1">
-            <b className={cn('block font-heading text-base font-black tracking-tight truncate', theme.title)}>
-              {stats.rank}
-            </b>
-            <span className={cn('rounded-full px-2 py-0.5 font-mono text-[9px] font-bold border leading-tight shrink-0', theme.badge)}>
-              Hạng
-            </span>
-          </div>
-          <div className="flex items-baseline gap-1 mt-0.5">
-            <b className="font-mono text-lg font-black text-foreground">{stats.rating}</b>
-            <span className="text-[11px] font-medium text-muted-foreground">rating</span>
-          </div>
-        </div>
-      </div>
+      <CurrentRankCard stats={stats} />
 
       {/* Badges */}
       {stats.badges?.length > 0 && (

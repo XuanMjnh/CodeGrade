@@ -319,10 +319,16 @@ test('failed save retains local draft and cancelled navigation; tab keyboard wor
 test('lobby uses official progression and keeps practice creation separate from queues', async () => {
   const h = await mount('Lobby');
   try {
-    assert.equal(h.w.document.querySelectorAll('.mode-card').length, 3);
-    assert.match(h.w.document.querySelector('.progression-strip').textContent, /420 EXP/);
+    const modes = [...h.w.document.querySelectorAll('#survival-modes button[aria-pressed]')];
+    assert.equal(modes.length, 3);
+    assert.match(
+      h.w.document.querySelector('section[aria-label="Thông tin Coder"]').textContent,
+      /420 EXP/,
+    );
     assert.ok(h.w.document.querySelector('.avatar-frame-silver'));
-    await h.act(async () => h.w.document.querySelector('.mode-ranked').click());
+    await h.act(async () =>
+      modes.find((button) => button.textContent.includes('Đấu Rank')).click(),
+    );
     assert.equal(h.w.document.querySelector('.arena-practice'), null);
     await h.click('Tìm trận Ranked');
     assert.deepEqual(

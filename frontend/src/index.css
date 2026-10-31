@@ -143,3 +143,48 @@
     @apply cursor-pointer;
   }
 }
+
+@keyframes modeGradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes modeShimmer {
+  0% {
+    transform: translateX(-150%) skewX(-15deg);
+  }
+  50%, 100% {
+    transform: translateX(250%) skewX(-15deg);
+  }
+}
+
+@keyframes modeGlowPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 0.75;
+  }
+}
+
+.animate-mode-gradient {
+  background-size: 200% 200%;
+  animation: modeGradientShift 4s ease infinite;
+}
+
+.animate-mode-shimmer {
+  animation: modeShimmer 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.animate-mode-glow {
+  animation: modeGlowPulse 3s ease-in-out infinite;
+}

@@ -43,22 +43,43 @@ const MODES = [
 function ModeCard({ item, index, selected, disabled, onSelect }) {
   const modeStyles = {
     PRACTICE: {
-      selected:
-        'border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/25 ring-1.5 ring-emerald-500/30',
-      iconBox: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
-      badge: 'bg-emerald-600 text-white',
+      gradient:
+        'bg-gradient-to-r from-emerald-500/20 via-teal-500/30 to-emerald-600/25 dark:from-emerald-950/70 dark:via-teal-900/50 dark:to-emerald-950/70',
+      selectedGradient:
+        'bg-gradient-to-r from-emerald-500/30 via-teal-500/45 to-emerald-600/35 dark:from-emerald-900/80 dark:via-teal-900/70 dark:to-emerald-900/80 ring-2 ring-emerald-600 border-emerald-600 shadow-md',
+      borderDefault: 'border-emerald-600/40 hover:border-emerald-600/70',
+      glowOrb: 'bg-emerald-500/35 dark:bg-emerald-400/25',
+      shimmer: 'via-emerald-300/35 dark:via-emerald-400/25',
+      iconBox: 'bg-emerald-600 text-white shadow-xs',
+      badge: 'bg-emerald-600 text-white ring-2 ring-emerald-400/40',
+      unselectedRadio: 'border-emerald-600/50 bg-white/80 dark:bg-card/80',
+      delay: '0s',
     },
     NORMAL: {
-      selected:
-        'border-orange-500 bg-orange-50/50 dark:bg-orange-950/25 ring-1.5 ring-orange-500/30',
-      iconBox: 'bg-orange-500/15 text-orange-600 dark:text-orange-400',
-      badge: 'bg-orange-500 text-white',
+      gradient:
+        'bg-gradient-to-r from-orange-500/20 via-amber-500/30 to-orange-600/25 dark:from-orange-950/70 dark:via-amber-900/50 dark:to-orange-950/70',
+      selectedGradient:
+        'bg-gradient-to-r from-orange-500/30 via-amber-500/45 to-orange-600/35 dark:from-orange-900/80 dark:via-amber-900/70 dark:to-orange-900/80 ring-2 ring-orange-500 border-orange-500 shadow-md',
+      borderDefault: 'border-orange-500/40 hover:border-orange-500/70',
+      glowOrb: 'bg-orange-500/35 dark:bg-orange-400/25',
+      shimmer: 'via-orange-300/35 dark:via-orange-400/25',
+      iconBox: 'bg-orange-500 text-white shadow-xs',
+      badge: 'bg-orange-500 text-white ring-2 ring-orange-400/40',
+      unselectedRadio: 'border-orange-500/50 bg-white/80 dark:bg-card/80',
+      delay: '1s',
     },
     RANKED: {
-      selected:
-        'border-amber-500 bg-amber-50/50 dark:bg-amber-950/25 ring-1.5 ring-amber-500/30',
-      iconBox: 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
-      badge: 'bg-amber-500 text-white',
+      gradient:
+        'bg-gradient-to-r from-amber-500/25 via-yellow-500/35 to-amber-600/30 dark:from-amber-950/70 dark:via-yellow-900/50 dark:to-amber-950/70',
+      selectedGradient:
+        'bg-gradient-to-r from-amber-500/35 via-yellow-500/50 to-amber-600/40 dark:from-amber-900/80 dark:via-yellow-900/70 dark:to-amber-900/80 ring-2 ring-amber-500 border-amber-500 shadow-md',
+      borderDefault: 'border-amber-500/40 hover:border-amber-500/70',
+      glowOrb: 'bg-amber-400/40 dark:bg-amber-400/30',
+      shimmer: 'via-yellow-200/45 dark:via-amber-300/30',
+      iconBox: 'bg-amber-500 text-white shadow-xs',
+      badge: 'bg-amber-500 text-white ring-2 ring-amber-400/40',
+      unselectedRadio: 'border-amber-500/50 bg-white/80 dark:bg-card/80',
+      delay: '2s',
     },
   };
   const style = modeStyles[item.id] || modeStyles.PRACTICE;
@@ -71,34 +92,55 @@ function ModeCard({ item, index, selected, disabled, onSelect }) {
       disabled={disabled}
       onClick={onSelect}
       className={cn(
-        'group relative h-auto w-full justify-start gap-3 rounded-xl border p-3 sm:p-3.5 text-left whitespace-normal shadow-2xs transition-all',
+        'group relative overflow-hidden h-auto w-full items-center justify-start gap-3 rounded-xl border p-3 sm:p-3.5 text-left whitespace-normal shadow-2xs transition-all duration-300 animate-mode-gradient',
         selected
-          ? style.selected + ' shadow-xs'
-          : 'border-border/70 bg-card hover:bg-muted/40 hover:border-border text-foreground',
+          ? style.selectedGradient
+          : cn(style.gradient, style.borderDefault, 'hover:shadow-xs'),
       )}
+      style={{ animationDelay: style.delay }}
     >
+      {/* Nền động (Luôn chạy động ngay cả khi chưa click) */}
+      <div
+        className={cn(
+          'pointer-events-none absolute -right-3 -top-3 size-24 rounded-full blur-xl animate-mode-glow',
+          style.glowOrb,
+        )}
+        style={{ animationDelay: style.delay }}
+        aria-hidden="true"
+      />
+      <div
+        className={cn(
+          'pointer-events-none absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent to-transparent animate-mode-shimmer',
+          style.shimmer,
+        )}
+        style={{ animationDelay: style.delay }}
+        aria-hidden="true"
+      />
+
+      {/* Mode Icon */}
       <span
         className={cn(
-          'flex size-10 shrink-0 items-center justify-center rounded-xl transition-transform group-hover:scale-105',
+          'relative z-10 flex size-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-105',
           style.iconBox,
         )}
       >
         <Icon name={'fa-solid ' + item.icon} className="size-5" />
       </span>
-      <span className="min-w-0 flex-1 space-y-0.5">
+
+      {/* Mode Title (Bỏ dòng mô tả nhỏ theo yêu cầu người dùng) */}
+      <span className="relative z-10 min-w-0 flex-1">
         <strong className="block font-heading text-sm sm:text-base font-extrabold text-foreground truncate">
           {item.name}
         </strong>
-        <span className="block text-[11px] font-medium text-muted-foreground truncate">
-          {item.facts.join(' · ')}
-        </span>
       </span>
+
+      {/* Radio check badge */}
       <span
         className={cn(
-          'flex size-5 shrink-0 items-center justify-center rounded-full transition-all',
+          'relative z-10 flex size-5 shrink-0 items-center justify-center rounded-full transition-all duration-200',
           selected
-            ? style.badge + ' shadow-2xs'
-            : 'border-2 border-muted-foreground/30 text-transparent',
+            ? style.badge + ' shadow-2xs scale-105'
+            : cn('border-2 text-transparent group-hover:scale-105', style.unselectedRadio),
         )}
       >
         <Icon name="fa-solid fa-check" className="size-3" />

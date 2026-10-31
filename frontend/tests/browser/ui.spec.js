@@ -91,9 +91,11 @@ test('the shared header and side rails surround the Survival game hub', async ({
   ).toBe('rgb(198, 83, 22)');
   await route(page, 'survival', 'CODE SURVIVAL.');
   await expect(page.locator('.utility-rail')).toHaveCount(0);
-  await expect(page.locator('.mode-card')).toHaveCount(3);
-  await expect(page.locator('.mode-practice')).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('.progression-strip')).toHaveCount(1);
+  await expect(page.locator('#survival-modes button[aria-pressed]')).toHaveCount(3);
+  await expect(
+    page.locator('#survival-modes button').filter({ hasText: 'Giao lưu' }),
+  ).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('region', { name: 'Thông tin Coder' })).toHaveCount(1);
   await expect(page.locator('.survival-rank-strip ol > li')).toHaveCount(6);
   await expect(page.locator('.survival-rank-strip')).toBeVisible();
   await expect(page.locator('.survival-rank-strip details')).toHaveCount(0);
