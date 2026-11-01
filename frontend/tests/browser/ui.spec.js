@@ -27,14 +27,17 @@ async function login(page, coder = false) {
     );
   await page.locator('#auth-password').fill(password);
   await page.locator('button[type=submit]').click();
-  await expect(page.locator('#main-content h1')).toHaveText('Thư viện bài tập');
+  await expect(page.locator('#problem-library')).toBeVisible();
+  await expect(page.getByRole('textbox', { name: 'Tìm bài', exact: true })).toBeVisible();
   await expect(page.locator('#main-content .loading')).toHaveCount(0);
 }
-async function route(page, name, heading) {
+async function route(page, name, landmark, role = 'heading') {
   await page.evaluate((value) => {
     location.hash = '/' + value;
   }, name);
-  await expect(page.locator('#main-content h1').first()).toHaveText(heading);
+  await expect(
+    page.getByRole('main').getByRole(role, { name: landmark, exact: true }),
+  ).toBeVisible();
   await expect(page.locator('#main-content .loading')).toHaveCount(0);
 }
 async function noOverflow(page) {
@@ -45,17 +48,17 @@ test('all administrative and learning pages render without runtime errors', asyn
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await login(page);
-  for (const [path, heading] of [
+  for (const [path, landmark, role] of [
     ['survival', 'CODE SURVIVAL.'],
-    ['contests', 'Đấu trường thuật toán'],
+    ['contests', 'Lịch thi đấu'],
     ['leaderboard', 'Những người dẫn đầu'],
-    ['submissions', 'Lịch sử bài nộp'],
-    ['profile', 'Thông tin cá nhân'],
+    ['submissions', 'Chi tiết bài nộp'],
+    ['profile', 'Thống kê cá nhân', 'region'],
     ['announcements', 'Thông báo'],
     ['categories', 'Quản lý danh mục'],
     ['admin', 'Quản trị hệ thống'],
   ]) {
-    await route(page, path, heading);
+    await route(page, path, landmark, role);
     await noOverflow(page);
     await expect(page.getByRole('main').getByRole('alert')).toHaveCount(0);
     await page.setViewportSize({ width: 390, height: 844 });
@@ -84,16 +87,12 @@ test('the shared header and side rails surround the Survival game hub', async ({
   expect(
     await page.locator('body').evaluate((element) => getComputedStyle(element).backgroundColor),
   ).toBe('rgb(245, 246, 247)');
-  expect(
-    await page
-      .locator('.brand-icon')
-      .evaluate((element) => getComputedStyle(element).backgroundColor),
-  ).toBe('rgb(198, 83, 22)');
+  await expect(page.locator('.brand-icon')).toHaveCSS('background-image', /linear-gradient/);
   await route(page, 'survival', 'CODE SURVIVAL.');
   await expect(page.locator('.utility-rail')).toHaveCount(0);
   await expect(page.locator('#survival-modes button[aria-pressed]')).toHaveCount(3);
   await expect(
-    page.locator('#survival-modes button').filter({ hasText: 'Giao lưu' }),
+    page.locator('#survival-modes button').filter({ hasText: 'Đấu Rank' }),
   ).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('region', { name: 'Thông tin Coder' })).toHaveCount(1);
   await expect(page.locator('.survival-rank-strip ol > li')).toHaveCount(6);
@@ -102,20 +101,38 @@ test('the shared header and side rails surround the Survival game hub', async ({
   await noOverflow(page);
 });
 
-test('Question Studio keeps configured fields when switching its five steps', async ({ page }) => {
+test('Question Studio keeps configured fields when navigating its five sections', async ({
+  page,
+}) => {
   await login(page);
   await route(page, 'edit', 'Tạo câu hỏi mới');
-  await expect(page.getByRole('tab')).toHaveCount(5);
-  await page.getByRole('textbox', { name: 'Tên câu hỏi', exact: true }).fill('Browser draft');
-  await page.getByRole('tab').nth(2).click();
-  await expect(page.locator('#studio-panel-2')).toBeVisible();
-  await expect(page.locator('#studio-panel-2 .cm-editor')).toBeVisible();
-  await page.getByRole('tab').nth(0).click();
-  await expect(page.getByRole('textbox', { name: 'Tên câu hỏi', exact: true })).toHaveValue(
-    'Browser draft',
-  );
-  await page.getByRole('tab').nth(0).press('ArrowRight');
-  await expect(page.getByRole('tab').nth(1)).toHaveAttribute('aria-selected', 'true');
+  const navigation = page.getByRole('navigation', { name: 'Mục lục bài tập' });
+  const info = navigation.getByRole('button', { name: /Thông tin cơ bản/ });
+  const grading = navigation.getByRole('button', { name: /Cấu hình chấm/ });
+  const answer = navigation.getByRole('button', { name: /Đáp án mẫu/ });
+  const questionName = page.getByRole('textbox', {
+    name: 'Tên câu hỏi (Question name)',
+    exact: true,
+  });
+  const sampleEditor = page.locator('#sec-3-answer .cm-content').first();
+  const sample = '// Browser reference\nint main() { return 0; }';
+  await expect(navigation.getByRole('button')).toHaveCount(5);
+  await questionName.fill('Browser draft');
+  await answer.click();
+  await expect(page.locator('#sec-3-answer')).toBeInViewport();
+  await expect(answer).toHaveAttribute('aria-pressed', 'true');
+  await sampleEditor.fill(sample);
+  await info.click();
+  await expect(page.locator('#sec-1-info')).toBeInViewport();
+  await expect(questionName).toHaveValue('Browser draft');
+  await info.focus();
+  await page.keyboard.press('Tab');
+  await expect(grading).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#sec-2-grading')).toBeInViewport();
+  await expect(grading).toHaveAttribute('aria-pressed', 'true');
+  await answer.click();
+  await expect(sampleEditor).toHaveText(sample, { useInnerText: true });
   await page.setViewportSize({ width: 390, height: 844 });
   await noOverflow(page);
 });
@@ -205,6 +222,10 @@ test('a live two-player room restores its local round draft after reload', async
     await login(other, 'coder02');
     await route(page, 'survival', 'CODE SURVIVAL.');
     await page
+      .locator('#survival-modes')
+      .getByRole('button', { name: /Giao lưu/ })
+      .click();
+    await page
       .getByRole('textbox', { name: 'Tên phòng', exact: true })
       .fill('UI round verification');
     await page.getByRole('button', { name: 'Tạo phòng', exact: true }).click();
@@ -218,7 +239,19 @@ test('a live two-player room restores its local round draft after reload', async
     await expect(page.locator('.cm-content')).toBeVisible({ timeout: 25000 });
     const draft = '// preserved live round draft';
     await page.locator('.cm-content').fill(draft);
-    await page.waitForTimeout(300);
+    await expect
+      .poll(() =>
+        page.evaluate(
+          (text) =>
+            Object.keys(localStorage).some(
+              (key) =>
+                key.startsWith('cg-code-room:') &&
+                JSON.parse(localStorage.getItem(key))?.source === text,
+            ),
+          draft,
+        ),
+      )
+      .toBe(true);
     await page.reload();
     await expect(page.locator('.cm-content')).toContainText(draft);
     await page.setViewportSize({ width: 390, height: 844 });

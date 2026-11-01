@@ -1957,17 +1957,48 @@ class SystemIntegrationTest {
     for (String mode : List.of("NORMAL", "RANKED")) {
       ObjectNode r = matched(mode);
       String rid = r.path("id").asText();
+      // everyoneAc submits in room roster order, which need not match the coders list.
+      // Put coder0 last so this test always covers a winner other than coder0.
+      ArrayNode players = (ArrayNode) r.path("players");
+      for (int i = 0; i < players.size(); i++)
+        if (players.get(i).path("id").asText().equals(coders.getFirst().id())) {
+          players.add(players.remove(i));
+          break;
+        }
+      String expectedWinner = players.get(0).path("id").asText();
+      writeRoom(r);
       for (int round = 0; round < 5 && !r.path("state").asText().equals("FINISHED"); round++) {
         everyoneAc(r);
         r = rooms.load(rid);
         if (!r.path("state").asText().equals("FINISHED")) r = nextRound(r);
       }
       assertEquals("FINISHED", r.path("state").asText());
+      assertEquals(expectedWinner, r.path("winnerId").asText());
       assertEquals(5, r.path("results").size());
+      assertEquals(
+          List.of(1, 2, 3, 4, 4),
+          java.util.stream.StreamSupport.stream(r.path("results").spliterator(), false)
+              .map(result -> result.path("placement").asInt())
+              .sorted()
+              .toList());
       assertEquals(
           280,
           db.sql.queryForObject(
               "SELECT SUM(exp) FROM match_results WHERE room_id=?", Integer.class, rid));
+      Map<String, JsonNode> settledProgression = new HashMap<>();
+      Map<Integer, Integer> expectedExp = Map.of(1, 100, 2, 80, 3, 60, 4, 20);
+      Map<Integer, Integer> expectedRankedRating = Map.of(1, 1048, 2, 1024, 3, 1000, 4, 988);
+      for (var result : r.path("results")) {
+        String uid = result.path("userId").asText();
+        int placement = result.path("placement").asInt();
+        int expectedRating = mode.equals("RANKED") ? expectedRankedRating.get(placement) : 1000;
+        assertEquals(expectedExp.get(placement).intValue(), result.path("exp").asInt());
+        assertEquals(1000, result.path("ratingBefore").asInt());
+        assertEquals(expectedRating, result.path("ratingAfter").asInt());
+        assertEquals(expectedRating, progression.get(uid).path("rating").asInt());
+        assertEquals(1200, identity.user(uid).elo());
+        settledProgression.put(uid, progression.get(uid).deepCopy());
+      }
       db.atomic(
           () -> {
             progression.settle(rooms.load(rid));
@@ -1979,9 +2010,11 @@ class SystemIntegrationTest {
               "SELECT COUNT(*) FROM reward_events WHERE event_key=?",
               Integer.class,
               "match:" + rid));
-      assertEquals(1200, identity.user(coders.getFirst().id()).elo());
-      int rating = progression.get(coders.getFirst().id()).path("rating").asInt();
-      assertEquals(mode.equals("RANKED") ? 1048 : 1000, rating);
+      assertEquals(
+          5,
+          db.sql.queryForObject(
+              "SELECT COUNT(*) FROM match_results WHERE room_id=?", Integer.class, rid));
+      settledProgression.forEach((uid, stats) -> assertEquals(stats, progression.get(uid)));
     }
   }
 
