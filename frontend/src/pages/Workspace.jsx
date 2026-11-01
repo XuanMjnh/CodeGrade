@@ -18,9 +18,25 @@ import { cn } from '../lib/utils';
 import { History, Trophy, MessageSquare } from 'lucide-react';
 const cpp =
   '#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    \n    return 0;\n}\n';
-function renderStatementText(text) {
+function renderStatementText(text, examples = []) {
   if (!text) return null;
-  const lines = text.split('\n');
+  let statement = text.replace(/\r\n/g, '\n');
+  // Older generated questions embed the same public example at the end of the statement.
+  // Remove only an exact duplicate; authored examples and explanations stay intact.
+  for (const example of examples) {
+    const suffix = (
+      '\nVí dụ\nInput:\n' +
+      (example.stdin || '') +
+      'Output:\n' +
+      (example.expected || '')
+    )
+      .replace(/\r\n/g, '\n')
+      .trimEnd();
+    if (statement.trimEnd().endsWith(suffix)) {
+      statement = statement.trimEnd().slice(0, -suffix.length).trimEnd();
+    }
+  }
+  const lines = statement.split('\n');
   return lines.map((line, idx) => {
     const trimmed = line.trim();
     const isHeading =
@@ -331,7 +347,7 @@ export default function Workspace({
             </div>
 
             <pre className="statement-text whitespace-pre-wrap break-words bg-transparent p-0 font-sans text-sm leading-relaxed text-foreground/90">
-              {renderStatementText(q.general.questionText)}
+              {renderStatementText(q.general.questionText, q.examples)}
             </pre>
 
             <div className="space-y-3 pt-2">

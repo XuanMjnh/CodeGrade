@@ -140,6 +140,68 @@ async function mount(extra = {}) {
     },
   };
 }
+for (const [mode, context] of [
+  ['survival', {}],
+  ['contest', { room: null, contestId: 'c1' }],
+  ['practice', { room: null }],
+]) {
+  test(`${mode} shows the legacy public example once in its dedicated card`, async () => {
+    const statement =
+      'Đếm các bộ chỉ số i<j<t thỏa a[i]+a[j]+a[t]=0.\n\nDữ liệu vào\nĐọc n, k và dãy số.\n\nDữ liệu ra\nIn kết quả.';
+    const example = { stdin: '5 3\n2 1 4 1 3\n', expected: '0\n' };
+    const h = await mount({
+      ...context,
+      problem: {
+        ...q,
+        general: {
+          ...q.general,
+          questionText:
+            `${statement}\n\nVí dụ\nInput:\n${example.stdin}Output:\n${example.expected}`.replace(
+              /\n/g,
+              '\r\n',
+            ),
+        },
+        examples: [example],
+      },
+    });
+    try {
+      assert.equal(
+        h.w.document.querySelector('.statement-text').textContent.replace(/\s+/g, ''),
+        statement.replace(/\s+/g, ''),
+      );
+      const cards = h.w.document.querySelectorAll('.example');
+      assert.equal(cards.length, 1);
+      assert.deepEqual(
+        [...cards[0].querySelectorAll('pre')].map((p) => p.textContent),
+        [example.stdin, example.expected],
+      );
+    } finally {
+      await h.close();
+    }
+  });
+}
+
+test('statement retains examples without a matching public card and any following explanation', async () => {
+  const statement = 'Read two numbers\n\nVí dụ\nInput:\n2 3\nOutput:\n5\n';
+  for (const [text, examples] of [
+    [statement, []],
+    [statement, [{ stdin: '1 2\n', expected: '3\n' }]],
+    [statement + '\nGiải thích: 2 + 3 = 5.', [{ stdin: '2 3\n', expected: '5\n' }]],
+  ]) {
+    const h = await mount({
+      problem: { ...q, general: { ...q.general, questionText: text }, examples },
+    });
+    try {
+      assert.ok(h.w.document.querySelector('.statement-text').textContent.includes('2 3\n'));
+      assert.ok(
+        h.w.document.querySelector('.statement-text').textContent.endsWith(text.split('\n').at(-1)),
+      );
+    } finally {
+      await h.close();
+    }
+  }
+});
+
 test('room submit retains code and saves a separate round draft', async () => {
   const h = await mount();
   try {

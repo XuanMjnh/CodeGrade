@@ -65,8 +65,6 @@ def main():
             expected=run(s['source'],stdin)
             assert len(stdin.encode())<=65536 and len(expected.encode())<=65536
             q['testcases'].append(dict(id=f'{s["key"]}-{i}',testcode='',stdin=stdin,expected=expected,extra=['Ví dụ công khai','Cơ bản','Biên','Đặc biệt','Phức tạp'][i],useasexample=i==0,display='SHOW' if i==0 else 'HIDE',hiderestiffail=False,mark=1,ordering=(i+1)*10,testtype=0))
-        example=q['testcases'][0]
-        q['general']['questionText']+='\nVí dụ\nInput:\n'+example['stdin']+'Output:\n'+example['expected']
         out.append(q);index.append({k:s[k] for k in ('key','title','level','method','complexity')})
         dest=ROOT/'solutions'/s['cat']/(s['key']+'.py');dest.parent.mkdir(parents=True,exist_ok=True);dest.write_text(s['source'],encoding='utf-8')
     expected={'Arithmetic':34,'Arrays':34,'Strings':33,'NumberTheory':33,'Sequences':33,'Graphs':33}
