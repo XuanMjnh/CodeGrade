@@ -322,4 +322,3 @@ Giới hạn hiện tại:
 - [Frontend: route, bố cục, editor và kiểm thử](frontend/README.md).
 - [Lời giải tham chiếu](solutions/README.md).
 - [Compose](compose.yaml), [các stage Docker](Dockerfile), [cấu hình mẫu](.env.example).
-- [Yêu cầu học phần và README](INSTRUCTION.md), [phụ lục kỹ thuật v6](report/CodeSurvival-v6.md).
